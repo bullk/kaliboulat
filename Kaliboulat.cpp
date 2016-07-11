@@ -7,7 +7,7 @@
 //#include <SDL2/SDL_ttf.h>
 
 #include "globals.h"
-#include "GUI.h"
+//#include "GUI.h"
 
 
 using namespace stk;
@@ -84,9 +84,9 @@ int main( int argc, char* args[] )
 	}
 
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
-	myGUI_Clip = new GUI_AudioClip(audioMaster.getClipSet()->at(0), 0);
+	//myGUI_Clip = new GUI_AudioClip(audioMaster.getClipSet()->at(0), 0);
 
-	GUI_main();
+	//GUI_main();
 
 	// Shut down the output stream.
 	try {
@@ -97,7 +97,7 @@ int main( int argc, char* args[] )
 	}
 
 	cleanup:
-		delete myGUI_Clip;
+		//delete myGUI_Clip;
 		return 0; /* ISO C requires main to return int. */
 }
 

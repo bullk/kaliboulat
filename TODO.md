@@ -17,8 +17,8 @@
 
 ### GUI
 
-* objet CLICKABLE
-* Placer la gestion d'interface graphique sur l'"extérieur" du main : *elle doit démarrer en premier et s'arrêter en dernier*
+* Intégrer ImGui
+* Le programme doit pouvoir s'éxecuter sans GUI
 
 
 ---------------
