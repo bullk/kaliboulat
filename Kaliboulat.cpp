@@ -7,6 +7,7 @@
 //#include <SDL2/SDL_ttf.h>
 
 #include "globals.h"
+#include "imgui/imgui.h"
 //#include "GUI.h"
 
 
@@ -16,7 +17,7 @@ using namespace std;
 
 //Audio Rendering
 int tick();
-
+void GUI();
 
 //----------------------------------------------------------------------
 // AUDIO FUNCTIONS
@@ -48,10 +49,60 @@ void audioInit (void)
 	Stk::setSampleRate (44100.0);
 	Stk::showWarnings (true);
 	
-
 } 
 
+//----------------------------------------------------------------------
+// GUI
+//----------------------------------------------------------------------
 
+void GUI (void)
+{
+	// Application init
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize.x = 1920.0f;
+	io.DisplaySize.y = 1280.0f;
+	io.IniFilename = "imgui.ini";
+	//#io.RenderDrawListsFn = my_render_function;  // Setup a render function, or set to NULL and call GetDrawData() after Render() to access the render data.
+	// TODO: Fill others settings of the io structure
+
+	// Load texture atlas
+	// There is a default font so you don't need to care about choosing a font yet
+	unsigned char* pixels;
+	int width, height;
+	io.Fonts->GetTexDataAsRGBA32(pixels, &width, &height);
+	// TODO: At this points you've got a texture pointed to by 'pixels' and you need to upload that your your graphic system
+	// TODO: Store your texture pointer/identifier (whatever your engine uses) in 'io.Fonts->TexID'
+
+	// Application main loop
+	while (true)
+	{
+		// 1) get low-level inputs (e.g. on Win32, GetKeyboardState(), or poll your events, etc.)
+		// TODO: fill all fields of IO structure and call NewFrame
+		ImGuiIO& io = ImGui::GetIO();
+		io.DeltaTime = 1.0f/60.0f;
+		//#io.MousePos = mouse_pos;
+		//#io.MouseDown[0] = mouse_button_0;
+		//#io.MouseDown[1] = mouse_button_1;
+		//#io.KeysDown[i] = ...
+
+		// 2) call NewFrame(), after this point you can use ImGui::* functions anytime
+		ImGui::NewFrame();
+
+		// 3) most of your application code here
+		ImGui::Begin("My window");
+		ImGui::Text("Hello, world.");
+		ImGui::End();
+		//#MyGameUpdate(); // may use ImGui functions
+		//#MyGameRender(); // may use ImGui functions
+
+		// 4) render & swap video buffers
+		ImGui::Render();
+		//#SwapBuffers();
+	}
+}
+
+
+//----------------------------------------------------------------------
 
 int main( int argc, char* args[] )
 {
@@ -84,9 +135,7 @@ int main( int argc, char* args[] )
 	}
 
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
-	//myGUI_Clip = new GUI_AudioClip(audioMaster.getClipSet()->at(0), 0);
 
-	//GUI_main();
 
 	// Shut down the output stream.
 	try {
@@ -97,7 +146,6 @@ int main( int argc, char* args[] )
 	}
 
 	cleanup:
-		//delete myGUI_Clip;
 		return 0; /* ISO C requires main to return int. */
 }
 
