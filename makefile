@@ -1,8 +1,8 @@
-Kaliboulat: Kaliboulat.cpp AudioGroup.h AudioGroup.cpp Clip.h Clip.cpp imgui/imgui.h imgui/imgui.cpp
-	g++ -Wall -D__LITTLE_ENDIAN__ -D__LINUX_ALSA__ -D__LINUX_ALSASEQ__ -I/usr/include/stk -Os -o Kaliboulat Kaliboulat.cpp imgui/imgui.cpp AudioGroup.cpp Clip.cpp -lstk
-	
-testinitsdl: testinitsdl.cpp
-	g++ -Os -o testinitsdl testinitsdl.cpp -lSDL2
-
-teststreaming: teststreaming.c
-	g++ -Os -o teststreaming teststreaming.c -lSDL2
+CC = g++
+CFLAGS = -Wall -D__LITTLE_ENDIAN__ -D__LINUX_ALSA__ -D__LINUX_ALSASEQ__ -Os
+LDFLAGS = `sdl2-config --cflags` -I/usr/include/stk 
+LDLIBS = `sdl2-config --libs` -lGL -lstk
+CFILES = Kaliboulat.cpp Clip.cpp AudioGroup.cpp GUI.cpp imgui.cpp imgui_draw.cpp imgui_demo.cpp imgui_impl_sdl.cpp
+ 
+Kaliboulat: Kaliboulat.cpp Clip.h Clip.cpp AudioGroup.h AudioGroup.cpp GUI.h GUI.cpp
+	$(CC) $(CFLAGS) $(LDFLAGS) -o Kaliboulat $(CFILES) $(LDLIBS) 
