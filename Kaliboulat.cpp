@@ -63,8 +63,6 @@ void audioInit (void)
 SDL_GLContext glcontext;
 SDL_Window *window = NULL;
 ImVec4 clear_color;
-bool show_test_window;
-bool show_another_window;
 
 int GUI_Init ()
 {
@@ -91,9 +89,7 @@ int GUI_Init ()
     // Setup ImGui binding
     ImGui_ImplSdl_Init(window);
 
-    bool show_test_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImColor(114, 144, 154);
+    clear_color = ImColor(114, 144, 154);
 
     return 0;
 }
@@ -159,29 +155,25 @@ int main( int argc, char* args[] )
         // 1. Show a simple window
         // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
         {
-            static float f = 0.0f;
-            ImGui::Text("Hello, world!");
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clear_color);
-            if (ImGui::Button("Test Window")) show_test_window ^= 1;
-            if (ImGui::Button("Another Window")) show_another_window ^= 1;
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        }
-
-        // 2. Show another simple window, this time using an explicit Begin/End pair
-        if (show_another_window)
-        {
-            ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("Another Window", &show_another_window);
+            ImGui::Begin("Audio Clips");
             ImGui::Text("Hello");
+			// Use functions to generate output
+			// FIXME: This is rather awkward because current plot API only pass in indices. We probably want an API passing floats and user provide sample rate/count.
+			struct Funcs
+			{
+				static float Sin(void*, int i) { return sinf(i * 0.1f); }
+				static float Saw(void*, int i) { return (i & 1) ? 1.0f : 0.0f; }
+			};
+			static int func_type = 0, display_count = 70;
+			ImGui::Separator();
+			ImGui::PushItemWidth(100); ImGui::Combo("func", &func_type, "Sin\0Saw\0"); ImGui::PopItemWidth();
+			ImGui::SameLine();
+			ImGui::SliderInt("Sample count", &display_count, 1, 500);
+			float (*func)(void*, int) = (func_type == 0) ? Funcs::Sin : Funcs::Saw;
+			ImGui::PlotLines("Lines", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
+			ImGui::PlotHistogram("Histogram", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
+			ImGui::Separator();
             ImGui::End();
-        }
-
-        // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-        if (show_test_window)
-        {
-            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
-            ImGui::ShowTestWindow(&show_test_window);
         }
 
         // Rendering
