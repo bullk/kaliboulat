@@ -38,7 +38,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	{
 		*samples = 0;
 		for ( unsigned int j = 0; j < audiogroup->getClipSet()->size(); j++)
-			*samples += audiogroup->getClipSet()->at(j)->tick();
+			if ( audiogroup->getClipSet()->at(j)->getState() == CS_PLAYING )
+				*samples += audiogroup->getClipSet()->at(j)->tick();
 		samples++;
 	}
 	
@@ -51,7 +52,7 @@ void audioInit (void)
 	sampleLs[0] = "bar.wav";
 	sampleLs[1] = "hellosine.wav";
 
-	Stk::setSampleRate (44100.0);
+	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
 	
 } 
@@ -156,27 +157,37 @@ int main( int argc, char* args[] )
         // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
         {
             ImGui::Begin("Audio Clips");
-            ImGui::Text("Hello");
-			// Use functions to generate output
-			// FIXME: This is rather awkward because current plot API only pass in indices. We probably want an API passing floats and user provide sample rate/count.
-			//struct Funcs
-			//{
-				//static float Sin(void*, int i) { return sinf(i * 0.1f); }
-				//static float Saw(void*, int i) { return (i & 1) ? 1.0f : 0.0f; }
-			//};
-			//static int func_type = 0, display_count = 70;
-			//ImGui::Separator();
-			//ImGui::PushItemWidth(100); ImGui::Combo("func", &func_type, "Sin\0Saw\0"); ImGui::PopItemWidth();
-			//ImGui::SameLine();
-			//ImGui::SliderInt("Sample count", &display_count, 1, 500);
-			//float (*func)(void*, int) = (func_type == 0) ? Funcs::Sin : Funcs::Saw;
-			//ImGui::PlotLines("Lines", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
-			//ImGui::PlotHistogram("Histogram", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
-			//ImGui::Separator();
-			static float progress = 0.5f;
+			float progress = 0.0f;
+			int elapsed = 0;
 			char buf[32];
-			sprintf(buf, "%d/%d", (int)(progress_saturated*1753), 1753);
-			ImGui::ProgressBar(progress, ImVec2(0.f,0.f), buf);
+			for ( unsigned int i = 0; i < audioMaster.getClipSet()->size(); i++ )
+			{
+				if ( audioMaster.getClipSet()->at(i)->getState() == CS_PLAYING )
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+					if (ImGui::Button("STOP")) { audioMaster.getClipSet()->at(i)->setState(CS_STOPPED); }
+					ImGui::PopStyleColor(3);				}
+				else
+				{
+					//progress = 0.0f;
+					//elapsed = 0;
+					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+					if (ImGui::Button("PLAY")) { audioMaster.getClipSet()->at(i)->setState(CS_PLAYING); }
+					ImGui::PopStyleColor(3);
+				}
+		        ImGui::SameLine();
+				progress = audioMaster.getClipSet()->at(i)->getTime() / audioMaster.getClipSet()->at(i)->getLength();
+				//elapsed = audioMaster.getClipSet()->at(i)->getTime() / GLOBAL_SAMPLE_RATE;
+				//sprintf(buf, "%d:%d", elapsed / 60, elapsed % 60);
+ 				//ImGui::ProgressBar(progress, ImVec2(100, 0.f), buf);
+ 				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
+		        ImGui::SameLine();
+	            ImGui::Text(audioMaster.getClipSet()->at(i)->getName().c_str());
+			}
             ImGui::End();
         }
 

@@ -18,6 +18,17 @@ Clip::~Clip()
 {
 }
 
+//------------
+
+ClipState Clip::getState()
+{
+	return m_state;
+}
+
+void Clip::setState(ClipState s)
+{
+	m_state = s;
+}
 
 //-------------
 // Constructor 
@@ -30,7 +41,7 @@ AudioClip::AudioClip(std::string path) : FileLoop(path)
 	openFile(path);
 	setRate(1);
 	m_name = path;
-	m_state = 0;
+	m_state = CS_STOPPED;
 	m_angle = 0;
 }
 
@@ -56,13 +67,13 @@ unsigned long AudioClip::getLength(void)
 	return getSize();
 }
 
-//StkFloat AudioClip::getTime(void)
-//{
-	//return time_;
-//}
-//
-int AudioClip::getAngle(void)
+StkFloat AudioClip::getTime(void)
 {
-	m_angle = (360 * time_) / getSize();
-	return m_angle;
+	return time_;
 }
+
+//int AudioClip::getAngle(void)
+//{
+	//m_angle = (360 * time_) / getSize();
+	//return m_angle;
+//}

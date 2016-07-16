@@ -12,6 +12,8 @@
 string sampleDir = "user/Audio";
 string sampleLs[2];
 
+const int GLOBAL_SAMPLE_RATE = 44100;
+
 RtAudio dac;
 AudioGroup audioMaster;
 
