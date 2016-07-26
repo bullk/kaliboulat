@@ -141,22 +141,29 @@ int main( int argc, char* args[] )
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
 
     // Main loop
-    bool done = false;
-    while (!done)
+    bool go_on = true;
+    while (go_on)
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             ImGui_ImplSdl_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
-                done = true;
+                go_on = false;
         }
         ImGui_ImplSdl_NewFrame(window);
 
         // 1. Show a simple window
         // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
         {
-            ImGui::Begin("Audio Clips");
+			ImGuiWindowFlags flags = 0;
+			//flags |= ImGuiWindowFlags_NoTitleBar;
+			flags |= ImGuiWindowFlags_NoResize;
+			flags |= ImGuiWindowFlags_NoMove;
+			flags |= ImGuiWindowFlags_NoCollapse;
+			//flags |= ImGuiWindowFlags_MenuBar;
+			ImGui::SetNextWindowSize(ImVec2(1920,1080));
+            ImGui::Begin("Kaliboulat", &go_on, flags);
 			float progress = 0.0f;
 			int elapsed = 0;
 			char buf[32];
