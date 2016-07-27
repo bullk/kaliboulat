@@ -43,6 +43,7 @@ AudioClip::AudioClip(std::string path) : FileLoop(path)
 	m_name = path;
 	m_state = CS_STOPPED;
 	m_angle = 0;
+	m_volume = 0.5f;
 }
 
 
@@ -71,6 +72,17 @@ StkFloat AudioClip::getTime(void)
 {
 	return time_;
 }
+
+float * AudioClip::getVolume(void)
+{
+	return &m_volume;
+}
+
+//void AudioClip::setVolume(StkFloat v)
+//{
+	//m_volume = v;
+//}
+//
 
 //int AudioClip::getAngle(void)
 //{

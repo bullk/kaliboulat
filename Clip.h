@@ -47,10 +47,12 @@ public:
 	string getName(void);
 	long unsigned int getLength(void);
 	StkFloat getTime(void);
+	float * getVolume(void);
+	//void setVolume(StkFloat);
 	//int getAngle(void);
 
 protected:    
-	
+	float m_volume;
 };
 
 
