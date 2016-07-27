@@ -21,6 +21,9 @@ using namespace std;
 
 //Audio Rendering
 int tick();
+void audioInit();
+
+//GUI
 int GUI_Init();
 void GUI_Close();
 
@@ -56,7 +59,7 @@ void audioInit (void)
 	Stk::showWarnings (true);
 	
 } 
-
+	
 //----------------------------------------------------------------------
 // GUI
 //----------------------------------------------------------------------
@@ -166,6 +169,18 @@ int main( int argc, char* args[] )
 			//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 			ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 			ImGui::Begin("Kaliboulat", &go_on, flags);
+			
+			// Clock based on RtAudio
+			double clockd = dac.getStreamTime();
+			int is = (int) clockd;
+			int im = is / 60;
+			int h = im / 60;
+			int m = im % 60;
+			int s = is % 60;
+			int ms = (int) (clockd * 10) - (is * 10);
+			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ms);
+			
+			// Audio Clips
 			float progress = 0.0f;
 			//int elapsed = 0;
 			//char buf[32];
