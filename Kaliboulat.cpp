@@ -162,11 +162,12 @@ int main( int argc, char* args[] )
 			flags |= ImGuiWindowFlags_NoMove;
 			flags |= ImGuiWindowFlags_NoCollapse;
 			//flags |= ImGuiWindowFlags_MenuBar;
-			ImGui::SetNextWindowSize(ImVec2(1920,1080));
+			//ImGui::SetNextWindowSize(ImVec2(1920,1080));
+			ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
             ImGui::Begin("Kaliboulat", &go_on, flags);
 			float progress = 0.0f;
-			int elapsed = 0;
-			char buf[32];
+			//int elapsed = 0;
+			//char buf[32];
 			for ( unsigned int i = 0; i < audioMaster.getClipSet()->size(); i++ )
 			{
 				if ( audioMaster.getClipSet()->at(i)->getState() == CS_PLAYING )
