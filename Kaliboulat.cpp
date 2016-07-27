@@ -139,7 +139,7 @@ int main( int argc, char* args[] )
 	}
 
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
-	//audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
+	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
 
 	// Main loop
 	bool go_on = true;
@@ -174,20 +174,25 @@ int main( int argc, char* args[] )
 				AudioClip * daClip = audioMaster.getClipSet()->at(i);
 				if ( daClip->getState() == CS_PLAYING )
 				{
+					ImGui::PushID(i);
 					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
 					if (ImGui::Button("STOP")) { daClip->setState(CS_STOPPED); }
-					ImGui::PopStyleColor(3);				}
+					ImGui::PopStyleColor(3);
+					ImGui::PopID();
+				}
 				else
 				{
 					//progress = 0.0f;
 					//elapsed = 0;
+					ImGui::PushID(i);
 					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
 					if (ImGui::Button("PLAY")) { daClip->setState(CS_PLAYING); }
 					ImGui::PopStyleColor(3);
+					ImGui::PopID();
 				}
 				ImGui::SameLine();
 				progress = daClip->getTime() / daClip->getLength();
@@ -196,7 +201,9 @@ int main( int argc, char* args[] )
  				//ImGui::ProgressBar(progress, ImVec2(100, 0.f), buf);
  				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
 				ImGui::SameLine(); ImGui::Text(daClip->getName().c_str());
-				ImGui::SameLine(); ImGui::PushItemWidth(100); ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f"); ImGui::PopItemWidth();
+				ImGui::SameLine(); ImGui::PushID(i); ImGui::PushItemWidth(100);
+				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
+				ImGui::PopItemWidth(); ImGui::PopID();
 			}
 			ImGui::End();
 		}
