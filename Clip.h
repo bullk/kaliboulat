@@ -48,11 +48,14 @@ public:
 	long unsigned int getLength(void);
 	StkFloat getTime(void);
 	float * getVolume(void);
+	float * getGUIRateP(void);
+	void updateRate(void);
 	//void setVolume(StkFloat);
 	//int getAngle(void);
-
+	
 protected:    
 	float m_volume;
+	float gui_rate_;
 };
 
 

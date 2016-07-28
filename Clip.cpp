@@ -40,6 +40,7 @@ AudioClip::AudioClip(std::string path) : FileLoop(path)
 	//static unsigned int clipAutoNumber = 0;
 	openFile(path);
 	setRate(1);
+	gui_rate_ = 1.0f;
 	m_name = path;
 	m_state = CS_STOPPED;
 	m_angle = 0;
@@ -76,6 +77,17 @@ StkFloat AudioClip::getTime(void)
 float * AudioClip::getVolume(void)
 {
 	return &m_volume;
+}
+
+float * AudioClip::getGUIRateP(void)
+{
+	
+	return &gui_rate_;
+}
+
+void AudioClip::updateRate(void)
+{
+	setRate( (StkFloat) gui_rate_ );
 }
 
 //void AudioClip::setVolume(StkFloat v)

@@ -161,7 +161,7 @@ int main( int argc, char* args[] )
 		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
 		{
 			ImGuiWindowFlags flags = 0;
-			//flags |= ImGuiWindowFlags_NoTitleBar;
+			flags |= ImGuiWindowFlags_NoTitleBar;
 			flags |= ImGuiWindowFlags_NoResize;
 			flags |= ImGuiWindowFlags_NoMove;
 			flags |= ImGuiWindowFlags_NoCollapse;
@@ -218,6 +218,8 @@ int main( int argc, char* args[] )
 				ImGui::SameLine(); ImGui::Text(daClip->getName().c_str());
 				ImGui::SameLine(); ImGui::PushID(i); ImGui::PushItemWidth(100);
 				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
+				ImGui::SameLine(); ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f");
+				daClip->updateRate();
 				ImGui::PopItemWidth(); ImGui::PopID();
 			}
 			ImGui::End();
@@ -243,6 +245,6 @@ int main( int argc, char* args[] )
 	cleanup:
 		GUI_Close();
 		return 0; /* ISO C requires main to return int. */
-}
 
+}
 
