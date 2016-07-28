@@ -59,6 +59,28 @@ void audioInit (void)
 	Stk::showWarnings (true);
 	
 } 
+
+void startClock (void)
+{
+	try {
+		dac.startStream();
+	}
+	catch ( RtError &error ) {
+		error.printMessage();
+		//goto cleanup;
+	}
+}
+	
+void stopClock (void)
+{
+	try {
+		dac.stopStream();
+	}
+	catch ( RtError &error ) {
+		error.printMessage();
+		//goto cleanup;
+	}
+}
 	
 //----------------------------------------------------------------------
 // GUI
@@ -133,14 +155,6 @@ int main( int argc, char* args[] )
 		//goto cleanup;
 	}
 
-	try {
-		dac.startStream();
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-		//goto cleanup;
-	}
-
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
 
@@ -161,7 +175,7 @@ int main( int argc, char* args[] )
 		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
 		{
 			ImGuiWindowFlags flags = 0;
-			flags |= ImGuiWindowFlags_NoTitleBar;
+			//flags |= ImGuiWindowFlags_NoTitleBar;
 			flags |= ImGuiWindowFlags_NoResize;
 			flags |= ImGuiWindowFlags_NoMove;
 			flags |= ImGuiWindowFlags_NoCollapse;
@@ -170,8 +184,11 @@ int main( int argc, char* args[] )
 			ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 			ImGui::Begin("Kaliboulat", &go_on, flags);
 			
+            ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
+            ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+
+            ImGui::BeginChild("Master Controls", ImVec2(0, 50), true);
 			// Clock based on RtAudio
-			
 			double clockd = dac.getStreamTime();
 			int is = (int) clockd;
 			int im = is / 60;
@@ -182,8 +199,11 @@ int main( int argc, char* args[] )
 			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ms);
             //ImGui::GetWindowDrawList()->AddRectFilled(pos, ImVec2(pos.x+size.x,pos.y+size.y), ImColor(90,90,120,255));
             //ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize()*2.0f, ImVec2(pos.x+offset.x,pos.y+offset.y), ImColor(255,255,255,255), "Line 1 hello\nLine 2 clip me!", NULL, 0.0f, &clip_rect);
+			ImGui::EndChild();
 			
 			// Audio Clips
+            //ImGui::BeginChild("Audio Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+            ImGui::BeginChild("Audio Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), true);
 			float progress = 0.0f;
 			//int elapsed = 0;
 			//char buf[32];
@@ -225,6 +245,16 @@ int main( int argc, char* args[] )
 				daClip->updateRate();
 				ImGui::PopItemWidth(); ImGui::PopID();
 			}
+            ImGui::EndChild();
+
+            ImGui::SameLine();
+
+            ImGui::BeginChild("Details", ImVec2(0,0), true);
+            ImGui::Text("Details");
+            ImGui::EndChild();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleVar();
+
 			ImGui::End();
 		}
 
