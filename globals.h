@@ -16,5 +16,6 @@ const int GLOBAL_SAMPLE_RATE = 44100;
 
 RtAudio dac;
 AudioGroup audioMaster;
+bool mcState = false;
 
 #endif

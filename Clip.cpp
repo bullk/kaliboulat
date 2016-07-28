@@ -41,7 +41,9 @@ AudioClip::AudioClip(std::string path) : FileLoop(path)
 	openFile(path);
 	setRate(1);
 	gui_rate_ = 1.0f;
-	m_name = path;
+	path_ = path;
+	int p = path_.rfind("/") + 1;
+	m_name = path_.substr(p, path_.length()-p);
 	m_state = CS_STOPPED;
 	m_angle = 0;
 	m_volume = 0.5f;

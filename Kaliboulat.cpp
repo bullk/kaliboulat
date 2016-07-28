@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string>
 #include <cmath>
 
 //#include <SDL2/SDL.h>
@@ -64,6 +65,7 @@ void startClock (void)
 {
 	try {
 		dac.startStream();
+		mcState = true;
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
@@ -75,6 +77,7 @@ void stopClock (void)
 {
 	try {
 		dac.stopStream();
+		mcState = false;
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
@@ -195,10 +198,27 @@ int main( int argc, char* args[] )
 			int h = im / 60;
 			int m = im % 60;
 			int s = is % 60;
-			int ms = (int) (clockd * 10) - (is * 10);
-			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ms);
-            //ImGui::GetWindowDrawList()->AddRectFilled(pos, ImVec2(pos.x+size.x,pos.y+size.y), ImColor(90,90,120,255));
-            //ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize()*2.0f, ImVec2(pos.x+offset.x,pos.y+offset.y), ImColor(255,255,255,255), "Line 1 hello\nLine 2 clip me!", NULL, 0.0f, &clip_rect);
+			int ds = (int) (clockd * 10) - (is * 10);
+			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ds);
+			
+            //TODO : Intégrer les images de commandes
+			//ImGui::Button("STOP")
+			if ( mcState )
+			{
+				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+				if (ImGui::Button("STOP")) { stopClock(); }
+				ImGui::PopStyleColor(3);
+			}
+			else
+			{
+				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+				if (ImGui::Button("PLAY")) { startClock(); }
+				ImGui::PopStyleColor(3);
+			}
 			ImGui::EndChild();
 			
 			// Audio Clips
@@ -222,8 +242,6 @@ int main( int argc, char* args[] )
 				}
 				else
 				{
-					//progress = 0.0f;
-					//elapsed = 0;
 					ImGui::PushID(i);
 					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
@@ -232,13 +250,11 @@ int main( int argc, char* args[] )
 					ImGui::PopStyleColor(3);
 					ImGui::PopID();
 				}
-				ImGui::SameLine();
+				ImGui::SameLine(); // Progress bar
 				progress = daClip->getTime() / daClip->getLength();
-				//elapsed = daClip->getTime() / GLOBAL_SAMPLE_RATE;
-				//sprintf(buf, "%d:%d", elapsed / 60, elapsed % 60);
- 				//ImGui::ProgressBar(progress, ImVec2(100, 0.f), buf);
  				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
-				ImGui::SameLine(); ImGui::Text(daClip->getName().c_str());
+ 				const char * clip_name = daClip->getName().c_str(); // Clip Name
+				ImGui::SameLine(); ImGui::Text("%s", clip_name);
 				ImGui::SameLine(); ImGui::PushID(i); ImGui::PushItemWidth(100);
 				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
 				ImGui::SameLine(); ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f");

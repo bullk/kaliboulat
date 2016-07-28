@@ -31,6 +31,7 @@ public:
 protected:    
 	ClipType m_type;
 	ClipState m_state;
+	string path_;
 	string m_name;
 	string m_location;
 	int m_angle;
