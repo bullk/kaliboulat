@@ -1,3 +1,4 @@
 Kaliboulat
 *.o
 #GUI.*
+sdl_opengl_example/

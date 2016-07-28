@@ -171,6 +171,7 @@ int main( int argc, char* args[] )
 			ImGui::Begin("Kaliboulat", &go_on, flags);
 			
 			// Clock based on RtAudio
+			
 			double clockd = dac.getStreamTime();
 			int is = (int) clockd;
 			int im = is / 60;
@@ -179,6 +180,8 @@ int main( int argc, char* args[] )
 			int s = is % 60;
 			int ms = (int) (clockd * 10) - (is * 10);
 			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ms);
+            //ImGui::GetWindowDrawList()->AddRectFilled(pos, ImVec2(pos.x+size.x,pos.y+size.y), ImColor(90,90,120,255));
+            //ImGui::GetWindowDrawList()->AddText(ImGui::GetFont(), ImGui::GetFontSize()*2.0f, ImVec2(pos.x+offset.x,pos.y+offset.y), ImColor(255,255,255,255), "Line 1 hello\nLine 2 clip me!", NULL, 0.0f, &clip_rect);
 			
 			// Audio Clips
 			float progress = 0.0f;
