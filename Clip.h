@@ -30,11 +30,11 @@ public:
    
 protected:    
 	ClipType m_type;
-	ClipState m_state;
+	ClipState state_;
+	//string m_location;
 	string path_;
-	string m_name;
-	string m_location;
-	int m_angle;
+	string name_;
+	int angle_;
 	
 };
 
@@ -46,6 +46,7 @@ public:
 	AudioClip(string path);
 	~AudioClip();
 	string getName(void);
+	string getPath(void);
 	long unsigned int getLength(void);
 	StkFloat getTime(void);
 	float * getVolume(void);
@@ -55,7 +56,7 @@ public:
 	//int getAngle(void);
 	
 protected:    
-	float m_volume;
+	float volume_;
 	float gui_rate_;
 };
 

@@ -22,12 +22,12 @@ Clip::~Clip()
 
 ClipState Clip::getState()
 {
-	return m_state;
+	return state_;
 }
 
 void Clip::setState(ClipState s)
 {
-	m_state = s;
+	state_ = s;
 }
 
 //-------------
@@ -43,10 +43,10 @@ AudioClip::AudioClip(std::string path) : FileLoop(path)
 	gui_rate_ = 1.0f;
 	path_ = path;
 	int p = path_.rfind("/") + 1;
-	m_name = path_.substr(p, path_.length()-p);
-	m_state = CS_STOPPED;
-	m_angle = 0;
-	m_volume = 0.5f;
+	name_ = path_.substr(p, path_.length()-p);
+	state_ = CS_STOPPED;
+	angle_ = 0;
+	volume_ = 0.5f;
 }
 
 
@@ -62,9 +62,13 @@ AudioClip::~AudioClip()
 
 std::string AudioClip::getName(void)
 {
-	return m_name;
+	return name_;
 }
 	
+std::string AudioClip::getPath(void)
+{
+	return path_;
+}
 
 unsigned long AudioClip::getLength(void)
 {
@@ -78,7 +82,7 @@ StkFloat AudioClip::getTime(void)
 
 float * AudioClip::getVolume(void)
 {
-	return &m_volume;
+	return &volume_;
 }
 
 float * AudioClip::getGUIRateP(void)
@@ -94,12 +98,12 @@ void AudioClip::updateRate(void)
 
 //void AudioClip::setVolume(StkFloat v)
 //{
-	//m_volume = v;
+	//volume_ = v;
 //}
 //
 
 //int AudioClip::getAngle(void)
 //{
-	//m_angle = (360 * time_) / getSize();
-	//return m_angle;
+	//angle_ = (360 * time_) / getSize();
+	//return angle_;
 //}

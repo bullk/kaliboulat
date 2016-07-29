@@ -138,6 +138,7 @@ int main( int argc, char* args[] )
 {
 
 	if (GUI_Init() != 0)	return -1;
+	static int details = 0;
 		
 	audioInit();
 
@@ -185,7 +186,7 @@ int main( int argc, char* args[] )
 			//flags |= ImGuiWindowFlags_MenuBar;
 			//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 			ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
-			ImGui::Begin("Kaliboulat", &go_on, flags);
+			ImGui::Begin("Clips", &go_on, flags);
 			
             ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
             ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
@@ -225,8 +226,6 @@ int main( int argc, char* args[] )
             //ImGui::BeginChild("Audio Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
             ImGui::BeginChild("Audio Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), true);
 			float progress = 0.0f;
-			//int elapsed = 0;
-			//char buf[32];
 			for ( unsigned int i = 0; i < audioMaster.getClipSet()->size(); i++ )
 			{
 				AudioClip * daClip = audioMaster.getClipSet()->at(i);
@@ -254,19 +253,24 @@ int main( int argc, char* args[] )
 				progress = daClip->getTime() / daClip->getLength();
  				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
  				const char * clip_name = daClip->getName().c_str(); // Clip Name
-				ImGui::SameLine(); ImGui::Text("%s", clip_name);
-				ImGui::SameLine(); ImGui::PushID(i); ImGui::PushItemWidth(100);
-				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
-				ImGui::SameLine(); ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f");
-				daClip->updateRate();
-				ImGui::PopItemWidth(); ImGui::PopID();
+				ImGui::SameLine(); if (ImGui::Button(clip_name)) { details = i+1; }
 			}
             ImGui::EndChild();
 
             ImGui::SameLine();
 
             ImGui::BeginChild("Details", ImVec2(0,0), true);
-            ImGui::Text("Details");
+            //ImGui::Text("Details");
+            if (details) 
+            {
+				AudioClip * daClip = audioMaster.getClipSet()->at(details-1);
+				ImGui::PushItemWidth(100);
+				ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
+				ImGui::SameLine(); ImGui::Text("%s", daClip->getPath().c_str());
+				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
+				ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f"); daClip->updateRate();
+				ImGui::PopItemWidth();
+			}
             ImGui::EndChild();
             ImGui::PopStyleColor();
             ImGui::PopStyleVar();
