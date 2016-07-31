@@ -36,7 +36,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer )
 {
 	AudioGroup * audiogroup = (AudioGroup *) dataPointer;
-	register StkFloat *samples = (StkFloat *) outputBuffer;
+	register StkFloat * samples = (StkFloat *) outputBuffer;
 
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
@@ -269,6 +269,7 @@ int main( int argc, char* args[] )
 				ImGui::SameLine(); ImGui::Text("%s", daClip->getPath().c_str());
 				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
 				ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f"); daClip->updateRate();
+				ImGui::SliderInt("pitch", daClip->getGUIPitchP(), -24, 24); daClip->updatePitch();
 				ImGui::PopItemWidth();
 			}
             ImGui::EndChild();

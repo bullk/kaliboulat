@@ -4,6 +4,7 @@
 #include <string>
 //#include <stk/FileRead.h>
 #include <stk/FileLoop.h>
+#include <stk/PitShift.h>
 
 /*		Classes Clip, AudioClip, MidiClip
  * 
@@ -20,13 +21,13 @@ class Clip
 {
 	
 public:
-	Clip();
-	~Clip();
-	ClipState getState();
-	void setState(ClipState);
-	virtual string getName(void) = 0;
+	Clip ();
+	~Clip ();
+	ClipState getState ();
+	void setState (ClipState);
+	virtual string getName (void) = 0;
 	virtual unsigned long getLength(void) = 0;
-	//virtual int getAngle(void) = 0;
+	//virtual int getAngle (void) = 0;
    
 protected:    
 	ClipType m_type;
@@ -43,21 +44,26 @@ class AudioClip : public Clip, public FileLoop
 {
 	
 public:
-	AudioClip(string path);
-	~AudioClip();
-	string getName(void);
-	string getPath(void);
-	long unsigned int getLength(void);
-	StkFloat getTime(void);
-	float * getVolume(void);
-	float * getGUIRateP(void);
-	void updateRate(void);
-	//void setVolume(StkFloat);
-	//int getAngle(void);
+	AudioClip (string path);
+	~AudioClip ();
+	string getName (void);
+	string getPath (void);
+	long unsigned int getLength (void);
+	StkFloat getTime (void);
+	float * getVolume (void);
+	float * getGUIRateP (void);
+	int * getGUIPitchP (void);
+	void updateRate (void);
+	void updatePitch (void);
+	StkFloat tick (unsigned int channel = 0);
+	//void setVolume (StkFloat);
+	//int getAngle (void);
 	
 protected:    
 	float volume_;
 	float gui_rate_;
+	int gui_pitch_;
+	PitShift * pitshift_;
 };
 
 
