@@ -15,6 +15,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
+#define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 using namespace stk;
 using namespace std;
@@ -269,8 +270,9 @@ int main( int argc, char* args[] )
 				ImGui::SameLine(); ImGui::Text("%s", daClip->getPath().c_str());
 				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
 				ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f"); daClip->updateRate();
-				ImGui::SliderInt("pitch", daClip->getGUIPitchP(), -24, 24); daClip->updatePitch();
+				ImGui::SliderInt("pitch", daClip->getGUIPitchP(), -12, 12); daClip->updatePitch();
 				ImGui::PopItemWidth();
+				//ImGui::PlotLines("DATA", daClip->getGUIData(), IM_ARRAYSIZE(daClip->getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
 			}
             ImGui::EndChild();
             ImGui::PopStyleColor();

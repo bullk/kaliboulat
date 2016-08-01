@@ -3,6 +3,9 @@
 ---------------
 ## MAINTENANT
 
+* Résoudre le problème d'affichage des samples audio (nécessite de potasser les tableaux en C)
+
+
 ### Moteur
 
 * Horloge Audio
