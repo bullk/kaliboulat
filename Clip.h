@@ -64,7 +64,7 @@ protected:
 	float volume_;
 	float gui_rate_;
 	int gui_pitch_;
-	float * gui_data_;
+	float gui_data_[];
 	PitShift * pitshift_;
 };
 

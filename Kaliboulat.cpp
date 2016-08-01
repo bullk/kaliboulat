@@ -273,6 +273,7 @@ int main( int argc, char* args[] )
 				ImGui::SliderInt("pitch", daClip->getGUIPitchP(), -12, 12); daClip->updatePitch();
 				ImGui::PopItemWidth();
 				//ImGui::PlotLines("DATA", daClip->getGUIData(), IM_ARRAYSIZE(daClip->getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
+				//ImGui::Text("size %d", IM_ARRAYSIZE(daClip->getGUIData()));
 			}
             ImGui::EndChild();
             ImGui::PopStyleColor();

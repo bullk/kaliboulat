@@ -50,8 +50,9 @@ AudioClip::AudioClip(std::string path) : FileLoop(path)
 	pitshift_->setEffectMix(1.0);
 	gui_rate_ = 1.0f;
 	gui_pitch_ = 0;
-	//float * gui_data_[data_.size()];
-	//for ( unsigned int i=0; i<=data_.size(); i++ )	{ *gui_data_[i] = (float) data_[i]; }
+	//gui_data_[data_.size()];
+	//for ( unsigned int i=0; i<=data_.size(); i++ )	{ gui_data_[i] = (float) data_[i]; }
+	//for ( unsigned int i=0; i<=sizeof(gui_data_); i++ )	{ gui_data_[i] = (float) data_[i]; }
 	updateRate(); updatePitch();
 }
 
@@ -79,7 +80,7 @@ std::string AudioClip::getPath ()
 
 float * AudioClip::getGUIData ()
 {
-	return gui_data_;
+	return &gui_data_[0];
 }
 
 unsigned long AudioClip::getLength(void)
