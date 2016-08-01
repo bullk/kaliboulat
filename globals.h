@@ -6,8 +6,15 @@
 #include <RtError.h>
 
 #include "AudioGroup.h"
+#include "MidiGroup.h"
 
-//Audio 
+
+// MIDI
+
+string midiClipDir = "/user/MIDI";
+string midiClipLs[1] = { "test-Drums-1.mid" };
+
+// Audio 
 
 string sampleDir = "user/Audio";
 string sampleLs[2];
@@ -16,6 +23,7 @@ const int GLOBAL_SAMPLE_RATE = 44100;
 
 RtAudio dac;
 AudioGroup audioMaster;
+MidiGroup midiMaster;
 bool mcState = false;
 
 #endif

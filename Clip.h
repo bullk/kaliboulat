@@ -2,9 +2,9 @@
 #define INC_CLIP_H
 
 #include <string>
-//#include <stk/FileRead.h>
 #include <stk/FileLoop.h>
 #include <stk/PitShift.h>
+#include <stk/MidiFileIn.h>
 
 /*		Classes Clip, AudioClip, MidiClip
  * 
@@ -25,14 +25,14 @@ public:
 	~Clip ();
 	ClipState getState ();
 	void setState (ClipState);
-	virtual string getName (void) = 0;
+	virtual string getPath ();
+	virtual string getName ();
 	virtual unsigned long getLength(void) = 0;
 	//virtual int getAngle (void) = 0;
    
 protected:    
 	ClipType m_type;
 	ClipState state_;
-	//string m_location;
 	string path_;
 	string name_;
 	int angle_;
@@ -46,8 +46,6 @@ class AudioClip : public Clip, public FileLoop
 public:
 	AudioClip (string path);
 	~AudioClip ();
-	string getName ();
-	string getPath ();
 	long unsigned int getLength (void);
 	StkFloat getTime (void);
 	float * getVolume (void);
@@ -69,9 +67,15 @@ protected:
 };
 
 
-class MidiClip : public Clip
+class MidiClip : public Clip, public MidiFileIn
 {
-
+public:
+	MidiClip (string path);
+	~MidiClip ();
+	long unsigned int getLength (void);
+	
+protected:
+	float data;
 };
 
 #endif

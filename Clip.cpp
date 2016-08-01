@@ -20,6 +20,16 @@ Clip::~Clip()
 
 //------------
 
+std::string Clip::getName ()
+{
+	return name_;
+}
+	
+std::string Clip::getPath ()
+{
+	return path_;
+}
+
 ClipState Clip::getState()
 {
 	return state_;
@@ -67,16 +77,6 @@ AudioClip::~AudioClip()
 }
 
 //------------
-
-std::string AudioClip::getName ()
-{
-	return name_;
-}
-	
-std::string AudioClip::getPath ()
-{
-	return path_;
-}
 
 float * AudioClip::getGUIData ()
 {
@@ -137,3 +137,29 @@ StkFloat AudioClip::tick (unsigned int channel)
 	//angle_ = (360 * time_) / getSize();
 	//return angle_;
 //}
+
+
+
+
+//-------------
+// Constructor 
+//-------------
+
+MidiClip::MidiClip(std::string path) : MidiFileIn(path)
+{
+	path_ = path;
+	int p = path_.rfind("/") + 1;
+	name_ = path_.substr(p, path_.length()-p);
+}
+
+
+//------------
+// Destructor 
+//------------
+
+MidiClip::~MidiClip()
+{
+}
+
+//------------
+

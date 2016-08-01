@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string>
-#include <cmath>
+#include <time.h>
 
 //#include <SDL2/SDL.h>
 //#include <SDL2/SDL_image.h>
@@ -20,14 +20,24 @@
 using namespace stk;
 using namespace std;
 
+// MIDI
+void midiInit();
 
-//Audio Rendering
+// Audio Rendering
 int tick();
 void audioInit();
 
-//GUI
+// GUI
 int GUI_Init();
 void GUI_Close();
+
+//----------------------------------------------------------------------
+// MIDI FUNCTIONS
+//----------------------------------------------------------------------
+
+void midiInit()
+{}
+
 
 //----------------------------------------------------------------------
 // AUDIO FUNCTIONS
@@ -52,18 +62,38 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 
-void audioInit (void)
+void audioInit ()
 {
-	sampleLs[0] = "bar.wav";
-	sampleLs[1] = "hellosine.wav";
-
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
 	
+	sampleLs[0] = "bar.wav";
+	sampleLs[1] = "hellosine.wav";
+
+	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
+	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
+
 } 
 
-void startClock (void)
+void startClock ()
 {
+	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
+	RtAudio::StreamParameters parameters;
+	parameters.deviceId = dac.getDefaultOutputDevice();
+	parameters.nChannels = 1;
+	RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+	//RtAudioFormat format = RTAUDIO_SINT16;
+
+	unsigned int bufferFrames = RT_BUFFER_SIZE;
+
+	try {
+		dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&audioMaster );
+	}
+	catch ( RtError &error ) {
+		error.printMessage();
+		//goto cleanup;
+	}
+
 	try {
 		dac.startStream();
 		mcState = true;
@@ -74,7 +104,7 @@ void startClock (void)
 	}
 }
 	
-void stopClock (void)
+void stopClock ()
 {
 	try {
 		dac.stopStream();
@@ -84,6 +114,15 @@ void stopClock (void)
 		error.printMessage();
 		//goto cleanup;
 	}
+
+	// Shut down the output stream.
+	try {
+		dac.closeStream();
+	}
+	catch ( RtError &error ) {
+		error.printMessage();
+	}
+
 }
 	
 //----------------------------------------------------------------------
@@ -143,26 +182,6 @@ int main( int argc, char* args[] )
 		
 	audioInit();
 
-	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
-	RtAudio::StreamParameters parameters;
-	parameters.deviceId = dac.getDefaultOutputDevice();
-	parameters.nChannels = 1;
-	RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-	//RtAudioFormat format = RTAUDIO_SINT16;
-
-	unsigned int bufferFrames = RT_BUFFER_SIZE;
-
-	try {
-		dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&audioMaster );
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-		//goto cleanup;
-	}
-
-	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
-	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
-
 	// Main loop
 	bool go_on = true;
 	while (go_on)
@@ -187,21 +206,40 @@ int main( int argc, char* args[] )
 			//flags |= ImGuiWindowFlags_MenuBar;
 			//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 			ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
-			ImGui::Begin("Clips", &go_on, flags);
+			ImGui::Begin("Software", &go_on, flags);
 			
             ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
             ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
 
             ImGui::BeginChild("Master Controls", ImVec2(0, 50), true);
+
 			// Clock based on RtAudio
-			double clockd = dac.getStreamTime();
+			double clockd;
+			if (mcState) { clockd = dac.getStreamTime(); }
+			else { clockd = 0.0f; }
+			
 			int is = (int) clockd;
 			int im = is / 60;
 			int h = im / 60;
 			int m = im % 60;
 			int s = is % 60;
-			int ds = (int) (clockd * 10) - (is * 10);
-			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ds);
+			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", h, m, s);
+			//int ds = (int) (clockd * 10) - (is * 10);
+			//ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ds);
+			
+			int tempo = 120;
+			int ticks_per_beat = 192;
+			int beats_per_bar = 4;
+			float tick_d = 60.0f / (tempo * ticks_per_beat);
+			int nbeats, nticks, bar, beat, tick;
+			nticks = (int) (clockd / tick_d);
+			nbeats = nticks / ticks_per_beat;
+			tick = nticks % ticks_per_beat;
+			beat = 1 + nbeats % beats_per_bar;
+			bar = 1 + nbeats / beats_per_bar;
+			ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", bar, beat, tick);
+			
+			//ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%d", value);
 			
             //TODO : Intégrer les images de commandes
 			//ImGui::Button("STOP")
@@ -223,10 +261,10 @@ int main( int argc, char* args[] )
 			}
 			ImGui::EndChild();
 			
-			// Audio Clips
-            //ImGui::BeginChild("Audio Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-            ImGui::BeginChild("Audio Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), true);
+            ImGui::BeginChild("Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), true);
 			float progress = 0.0f;
+
+			// Audio Clips
 			for ( unsigned int i = 0; i < audioMaster.getClipSet()->size(); i++ )
 			{
 				AudioClip * daClip = audioMaster.getClipSet()->at(i);
@@ -256,6 +294,41 @@ int main( int argc, char* args[] )
  				const char * clip_name = daClip->getName().c_str(); // Clip Name
 				ImGui::SameLine(); if (ImGui::Button(clip_name)) { details = i+1; }
 			}
+			
+			// MIDI Clips
+			for ( unsigned int i = 0; i < midiMaster.getClipSet()->size(); i++ )
+			{
+				MidiClip * daClip = midiMaster.getClipSet()->at(i);
+				if ( daClip->getState() == CS_PLAYING )
+				{
+					ImGui::PushID(i);
+					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+					if (ImGui::Button("STOP")) { daClip->setState(CS_STOPPED); }
+					ImGui::PopStyleColor(3);
+					ImGui::PopID();
+				}
+				else
+				{
+					ImGui::PushID(i);
+					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+					if (ImGui::Button("PLAY")) { daClip->setState(CS_PLAYING); }
+					ImGui::PopStyleColor(3);
+					ImGui::PopID();
+				}
+				ImGui::SameLine(); // Progress bar
+				//progress = daClip->getTime() / daClip->getLength();ImGuiCol_PlotHistogram
+				progress = 0.5f;
+				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(6/7.0f, 0.6f, 0.6f));
+ 				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
+ 				ImGui::PopStyleColor();
+ 				const char * clip_name = daClip->getName().c_str(); // Clip Name
+				ImGui::SameLine(); if (ImGui::Button(clip_name)) { details = i+1; }
+			}
+
             ImGui::EndChild();
 
             ImGui::SameLine();
@@ -290,14 +363,6 @@ int main( int argc, char* args[] )
 		SDL_GL_SwapWindow(window);
 	}
 
-
-	// Shut down the output stream.
-	try {
-		dac.closeStream();
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-	}
 
 	cleanup:
 		GUI_Close();
