@@ -348,7 +348,7 @@ int main( int argc, char* args[] )
 				AudioClip * daClip = audioMaster.getClipSet()->at(details-1);
 				ImGui::PushItemWidth(100);
 				ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
-				ImGui::SameLine(); ImGui::Text("%s", daClip->getPath().c_str());
+				ImGui::Text("Location : %s", daClip->getPath().c_str());
 				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
 				ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f"); daClip->updateRate();
 				ImGui::SliderInt("pitch", daClip->getGUIPitchP(), -12, 12); daClip->updatePitch();
@@ -359,10 +359,29 @@ int main( int argc, char* args[] )
 			else if (details < 0)
 			{
 				MidiClip * daClip = midiMaster.getClipSet()->at(-details-1);
+				unsigned int ntracks = daClip->getNumberOfTracks();
 				ImGui::PushItemWidth(100);
 				ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
-				ImGui::SameLine(); ImGui::Text("%s", daClip->getPath().c_str());
-				ImGui::PopItemWidth();
+				ImGui::Text("Location : %s", daClip->getPath().c_str());
+				ImGui::Text("MIDI file format %d", daClip->getFileFormat());
+				ImGui::Text("%d tracks", ntracks);
+				ImGui::Text("division value %d", daClip->getDivision());
+				for (unsigned int i=0; i<ntracks; i++)
+				{
+					//ImGui::PushID(i);
+		            if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
+		            {
+						ImGui::Text("%d ticks / second", daClip->getTickSeconds(i));
+                        ImGui::TreePop();
+		            }
+		            //ImGui::PopID();
+				}
+//void 	rewindTrack (unsigned int track=0)
+ 	//Move the specified track event reader to the beginning of its track.
+//unsigned long 	getNextEvent (std::vector< unsigned char > *event, unsigned int track=0)
+ 	//Fill the user-provided vector with the next event in the specified track and return the event delta-time in ticks.
+//unsigned long 	getNextMidiEvent (std::vector< unsigned char > *midiEvent, unsigned int track=0)
+ 	//Fill the user-provided vector with the next MIDI channel event in the specified track and return the event delta time in ticks. 				ImGui::PopItemWidth();
 			}
             ImGui::EndChild();
             ImGui::PopStyleColor();
