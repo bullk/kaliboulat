@@ -309,7 +309,7 @@ int main( int argc, char* args[] )
 				MidiClip * daClip = midiMaster.getClipSet()->at(i);
 				if ( daClip->getState() == CS_PLAYING )
 				{
-					ImGui::PushID(i);
+					ImGui::PushID(4096 + i);
 					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
@@ -319,7 +319,7 @@ int main( int argc, char* args[] )
 				}
 				else
 				{
-					ImGui::PushID(i);
+					ImGui::PushID(4096 + i);
 					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
@@ -355,6 +355,14 @@ int main( int argc, char* args[] )
 				ImGui::PopItemWidth();
 				//ImGui::PlotLines("DATA", daClip->getGUIData(), IM_ARRAYSIZE(daClip->getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
 				//ImGui::Text("size %d", IM_ARRAYSIZE(daClip->getGUIData()));
+			}
+			else if (details < 0)
+			{
+				MidiClip * daClip = midiMaster.getClipSet()->at(-details-1);
+				ImGui::PushItemWidth(100);
+				ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
+				ImGui::SameLine(); ImGui::Text("%s", daClip->getPath().c_str());
+				ImGui::PopItemWidth();
 			}
             ImGui::EndChild();
             ImGui::PopStyleColor();
