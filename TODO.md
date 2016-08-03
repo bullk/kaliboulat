@@ -4,16 +4,16 @@
 ## MAINTENANT
 
 * Résoudre le problème d'affichage des samples audio (nécessite de potasser les tableaux en C)
-
+* Mettre au point une horloge maison (voir clock.h)
 
 ### Moteur
 
-* Horloge Audio
+* Horloge (objet à créer)
+	* Audio
+	* MIDI
+
 * Ajout / suppression de clips
-    * AudioGroup
-    * Playlist / TrackList
-* Horloge MIDI
-* Clips MIDI
+* Playlist / TrackList
 * Proprietes des clips / Affichage
 * Bases de séquençage pour les clips
 

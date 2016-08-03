@@ -163,3 +163,8 @@ MidiClip::~MidiClip()
 
 //------------
 
+long unsigned int MidiClip::getLength()
+{
+	return 0;
+}
+

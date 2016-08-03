@@ -11,7 +11,7 @@
 
 // MIDI
 
-string midiClipDir = "/user/MIDI";
+string midiClipDir = "user/MIDI";
 string midiClipLs[1] = { "test-Drums-1.mid" };
 
 // Audio 

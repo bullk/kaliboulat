@@ -72,7 +72,7 @@ class MidiClip : public Clip, public MidiFileIn
 public:
 	MidiClip (string path);
 	~MidiClip ();
-	long unsigned int getLength (void);
+	long unsigned int getLength ();
 	
 protected:
 	float data;

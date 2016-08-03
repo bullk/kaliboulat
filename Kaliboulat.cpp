@@ -36,7 +36,9 @@ void GUI_Close();
 //----------------------------------------------------------------------
 
 void midiInit()
-{}
+{
+	midiMaster.addAclip (midiClipDir + "/" + midiClipLs[0]);
+}
 
 
 //----------------------------------------------------------------------
@@ -181,11 +183,35 @@ int main( int argc, char* args[] )
 	static int details = 0;
 		
 	audioInit();
+	midiInit();
 
 	// Main loop
 	bool go_on = true;
 	while (go_on)
 	{
+		// Clock based on RtAudio
+		double clockd;
+		if (mcState) { clockd = dac.getStreamTime(); }
+		else { clockd = 0.0f; }
+		
+		int is = (int) clockd;
+		int im = is / 60;
+		int h = im / 60;
+		int m = im % 60;
+		int s = is % 60;
+
+		// MIDI Clock (bar, beat, tick)
+		int tempo = 120;
+		int ticks_per_beat = 192;
+		int beats_per_bar = 4;
+		float tick_d = 60.0f / (tempo * ticks_per_beat);
+		int nbeats, nticks, bar, beat, tick;
+		nticks = (int) (clockd / tick_d);
+		nbeats = nticks / ticks_per_beat;
+		tick = nticks % ticks_per_beat;
+		beat = 1 + nbeats % beats_per_bar;
+		bar = 1 + nbeats / beats_per_bar;
+
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -213,30 +239,12 @@ int main( int argc, char* args[] )
 
             ImGui::BeginChild("Master Controls", ImVec2(0, 50), true);
 
-			// Clock based on RtAudio
-			double clockd;
-			if (mcState) { clockd = dac.getStreamTime(); }
-			else { clockd = 0.0f; }
-			
-			int is = (int) clockd;
-			int im = is / 60;
-			int h = im / 60;
-			int m = im % 60;
-			int s = is % 60;
+			// Clock
 			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", h, m, s);
 			//int ds = (int) (clockd * 10) - (is * 10);
 			//ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ds);
-			
-			int tempo = 120;
-			int ticks_per_beat = 192;
-			int beats_per_bar = 4;
-			float tick_d = 60.0f / (tempo * ticks_per_beat);
-			int nbeats, nticks, bar, beat, tick;
-			nticks = (int) (clockd / tick_d);
-			nbeats = nticks / ticks_per_beat;
-			tick = nticks % ticks_per_beat;
-			beat = 1 + nbeats % beats_per_bar;
-			bar = 1 + nbeats / beats_per_bar;
+
+			// MIDI Clock
 			ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", bar, beat, tick);
 			
 			//ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%d", value);
@@ -326,7 +334,7 @@ int main( int argc, char* args[] )
  				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
  				ImGui::PopStyleColor();
  				const char * clip_name = daClip->getName().c_str(); // Clip Name
-				ImGui::SameLine(); if (ImGui::Button(clip_name)) { details = i+1; }
+				ImGui::SameLine(); if (ImGui::Button(clip_name)) { details = -1-i; }
 			}
 
             ImGui::EndChild();
@@ -335,7 +343,7 @@ int main( int argc, char* args[] )
 
             ImGui::BeginChild("Details", ImVec2(0,0), true);
             //ImGui::Text("Details");
-            if (details) 
+            if (details > 0) 
             {
 				AudioClip * daClip = audioMaster.getClipSet()->at(details-1);
 				ImGui::PushItemWidth(100);

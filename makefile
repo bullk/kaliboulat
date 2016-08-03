@@ -8,7 +8,7 @@ OBJS = Kaliboulat.o Clip.o AudioGroup.o MidiGroup.o GUI.o imgui.o imgui_draw.o i
 Kaliboulat: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o Kaliboulat $(OBJS) $(LDLIBS) 
 
-.cpp.o:
+.cpp.o: $*.h $*.cpp 
 	$(CC) $(CFLAGS) -c $*.cpp
 
 clean:
