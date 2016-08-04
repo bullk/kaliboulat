@@ -369,46 +369,46 @@ int main( int argc, char* args[] )
 			}
 			else if (details < 0)
 			{
-				//MidiClip * daClip = midiMaster.getClipSet()->at(-details-1);
-				//unsigned int ntracks = daClip->getNumberOfTracks();
-				//ImGui::PushItemWidth(100);
-				//ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
-				//ImGui::Text("Location : %s", daClip->getPath().c_str());
-				//ImGui::Text("MIDI file format %d", daClip->getFileFormat());
-				//ImGui::Text("%d tracks", ntracks);
-				//ImGui::Text("division value %d", daClip->getDivision());
-				//for (unsigned int i=0; i<ntracks; i++)
-				//{
-		            //if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
-		            //{
-						//ImGui::Text("%f µs / tick", 1000000 * daClip->getTickSeconds(i)); ImGui::SameLine();
-						//ImGui::Text("-> %.02f BPM", 60 / (daClip->getTickSeconds(i) * daClip->getDivision()));
-						//ImGui::Columns(3, "MIDI Events");
-						//ImGui::Separator();
-						//ImGui::Text("time (ticks)"); ImGui::NextColumn();
-						//ImGui::Text("Status"); ImGui::NextColumn();
-						//ImGui::Text("DATA"); ImGui::NextColumn();
-						//ImGui::Separator();
-//
-						//daClip->rewindTrack(i);
-						//vector< unsigned char > * event = new vector<unsigned char>();
-						//unsigned long abs_time = 0, delta_time = 0;
-						//delta_time = daClip->getNextEvent(event, i);
-						//while ( event->size() > 0 )
-						//{
-							//abs_time += delta_time;
-							//ImGui::Text("%lu", abs_time); ImGui::NextColumn();
-							//ImGui::Text("%x", event->at(0)); ImGui::NextColumn();
-							//ImGui::Text("%lu", event->size()); ImGui::NextColumn();
-							//delta_time = daClip->getNextEvent(event, i);
-						//}
-						//ImGui::Columns(1);
-						//ImGui::Separator();
-						//delete event;
-//
-                        //ImGui::TreePop();
-		            //}
-				//}
+				MidiClip * daClip = midiMaster.getClipSet()->at(-details-1);
+				unsigned int ntracks = daClip->getNumberOfTracks();
+				ImGui::PushItemWidth(100);
+				ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
+				ImGui::Text("Location : %s", daClip->getPath().c_str());
+				ImGui::Text("MIDI file format %d", daClip->getFileFormat());
+				ImGui::Text("%d tracks", ntracks);
+				ImGui::Text("division value %d", daClip->getDivision());
+				for (unsigned int i=0; i<ntracks; i++)
+				{
+		            if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
+		            {
+						ImGui::Text("%f µs / tick", 1000000 * daClip->getTickSeconds(i)); ImGui::SameLine();
+						ImGui::Text("-> %.02f BPM", 60 / (daClip->getTickSeconds(i) * daClip->getDivision()));
+						ImGui::Columns(3, "MIDI Events");
+						ImGui::Separator();
+						ImGui::Text("time (ticks)"); ImGui::NextColumn();
+						ImGui::Text("Status"); ImGui::NextColumn();
+						ImGui::Text("DATA"); ImGui::NextColumn();
+						ImGui::Separator();
+						//------------------------
+						daClip->rewindTrack(i);
+						vector< unsigned char > * event = new vector<unsigned char>();
+						unsigned long abs_time = 0, delta_time = 0;
+						delta_time = daClip->getNextEvent(event, i);
+						while ( event->size() > 0 )
+						{
+							abs_time += delta_time;
+							ImGui::Text("%lu", abs_time); ImGui::NextColumn();
+							ImGui::Text("%x", event->at(0)); ImGui::NextColumn();
+							ImGui::Text("%lu", event->size()); ImGui::NextColumn();
+							delta_time = daClip->getNextEvent(event, i);
+						}
+						ImGui::Columns(1);
+						ImGui::Separator();
+						delete event;
+						//------------------------
+                        ImGui::TreePop();
+		            }
+				}
 			}
             ImGui::EndChild();
             ImGui::PopStyleColor();

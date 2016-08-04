@@ -2,7 +2,3 @@ Kaliboulat
 *.o
 #GUI.*
 sdl_opengl_example/
-midifile/.git*
-midifile/bin
-midifile/obj
-midifile/lib
