@@ -368,20 +368,36 @@ int main( int argc, char* args[] )
 				ImGui::Text("division value %d", daClip->getDivision());
 				for (unsigned int i=0; i<ntracks; i++)
 				{
-					//ImGui::PushID(i);
 		            if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
 		            {
-						ImGui::Text("%d ticks / second", daClip->getTickSeconds(i));
+						ImGui::Text("%f µs / tick", 1000000 * daClip->getTickSeconds(i)); ImGui::SameLine();
+						ImGui::Text("-> %.02f BPM", 60 / (daClip->getTickSeconds(i) * daClip->getDivision()));
+						ImGui::Columns(3, "MIDI Events");
+						ImGui::Separator();
+						ImGui::Text("time (ticks)"); ImGui::NextColumn();
+						ImGui::Text("Status"); ImGui::NextColumn();
+						ImGui::Text("DATA"); ImGui::NextColumn();
+						ImGui::Separator();
+						//------------------------
+						daClip->rewindTrack(i);
+						vector< unsigned char > * event = new vector<unsigned char>();
+						unsigned long abs_time = 0, delta_time = 0;
+						delta_time = daClip->getNextEvent(event, i);
+						while ( event->size() > 0 )
+						{
+							abs_time += delta_time;
+							ImGui::Text("%lu", abs_time); ImGui::NextColumn();
+							ImGui::Text("%x", event->at(0)); ImGui::NextColumn();
+							ImGui::Text("%lu", event->size()); ImGui::NextColumn();
+							delta_time = daClip->getNextEvent(event, i);
+						}
+						ImGui::Columns(1);
+						ImGui::Separator();
+						delete event;
+						//------------------------
                         ImGui::TreePop();
 		            }
-		            //ImGui::PopID();
 				}
-//void 	rewindTrack (unsigned int track=0)
- 	//Move the specified track event reader to the beginning of its track.
-//unsigned long 	getNextEvent (std::vector< unsigned char > *event, unsigned int track=0)
- 	//Fill the user-provided vector with the next event in the specified track and return the event delta-time in ticks.
-//unsigned long 	getNextMidiEvent (std::vector< unsigned char > *midiEvent, unsigned int track=0)
- 	//Fill the user-provided vector with the next MIDI channel event in the specified track and return the event delta time in ticks. 				ImGui::PopItemWidth();
 			}
             ImGui::EndChild();
             ImGui::PopStyleColor();

@@ -145,7 +145,7 @@ StkFloat AudioClip::tick (unsigned int channel)
 // Constructor 
 //-------------
 
-MidiClip::MidiClip(std::string path) : MidiFileIn(path)
+MidiClip::MidiClip (std::string path) : MidiFileIn (path)
 {
 	path_ = path;
 	int p = path_.rfind("/") + 1;
@@ -157,14 +157,13 @@ MidiClip::MidiClip(std::string path) : MidiFileIn(path)
 // Destructor 
 //------------
 
-MidiClip::~MidiClip()
+MidiClip::~MidiClip ()
 {
 }
 
 //------------
 
-long unsigned int MidiClip::getLength()
+long unsigned int MidiClip::getLength ()
 {
 	return 0;
 }
-
