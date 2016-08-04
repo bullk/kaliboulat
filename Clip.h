@@ -4,7 +4,11 @@
 #include <string>
 #include <stk/FileLoop.h>
 #include <stk/PitShift.h>
-#include <stk/MidiFileIn.h>
+
+#include "midifile/include/MidiFile.h"
+#include "midifile/include/Options.h"
+#include <iostream>
+#include <iomanip>
 
 /*		Classes Clip, AudioClip, MidiClip
  * 
@@ -67,7 +71,7 @@ protected:
 };
 
 
-class MidiClip : public Clip, public MidiFileIn
+class MidiClip : public Clip, public MidiFile
 {
 public:
 	MidiClip (string path);
