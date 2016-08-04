@@ -26,10 +26,15 @@ void midiInit();
 // Audio Rendering
 int tick();
 void audioInit();
+void startClock ();
+void pauseClock ();
+void resumeClock ();
+void stopClock ();
 
 // GUI
 int GUI_Init();
 void GUI_Close();
+
 
 //----------------------------------------------------------------------
 // MIDI FUNCTIONS
@@ -93,20 +98,12 @@ void startClock ()
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
-		//goto cleanup;
 	}
-
-	try {
-		dac.startStream();
-		mcState = true;
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-		//goto cleanup;
-	}
-}
 	
-void stopClock ()
+	resumeClock ();
+}
+
+void pauseClock ()
 {
 	try {
 		dac.stopStream();
@@ -114,17 +111,30 @@ void stopClock ()
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
-		//goto cleanup;
-	}
+	}	
+}
 
-	// Shut down the output stream.
+void resumeClock ()
+{
+	try {
+		dac.startStream();
+		mcState = true;
+	}
+	catch ( RtError &error ) {
+		error.printMessage();
+	}
+}
+	
+void stopClock ()
+{
+	pauseClock ();
+	
 	try {
 		dac.closeStream();
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
 	}
-
 }
 	
 //----------------------------------------------------------------------
@@ -174,6 +184,8 @@ void GUI_Close()
 	SDL_Quit();
 }
 
+
+
 //----------------------------------------------------------------------
 
 int main( int argc, char* args[] )
@@ -221,8 +233,7 @@ int main( int argc, char* args[] )
 		}
 		ImGui_ImplSdl_NewFrame(window);
 
-		// 1. Show a simple window
-		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
+		// Main window
 		{
 			ImGuiWindowFlags flags = 0;
 			//flags |= ImGuiWindowFlags_NoTitleBar;
