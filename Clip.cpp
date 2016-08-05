@@ -83,39 +83,39 @@ float * AudioClip::getGUIData ()
 	return &gui_data_[0];
 }
 
-unsigned long AudioClip::getLength(void)
+unsigned long AudioClip::getLength ()
 {
 	return getSize();
 }
 
-StkFloat AudioClip::getTime(void)
+StkFloat AudioClip::getTime ()
 {
 	return time_;
 }
 
-float * AudioClip::getVolume(void)
+float * AudioClip::getVolume ()
 {
 	return &volume_;
 }
 
-float * AudioClip::getGUIRateP (void)
+float * AudioClip::getGUIRateP ()
 {
 	
 	return &gui_rate_;
 }
 
-int * AudioClip::getGUIPitchP (void)
+int * AudioClip::getGUIPitchP ()
 {
 	
 	return &gui_pitch_;
 }
 
-void AudioClip::updateRate (void)
+void AudioClip::updateRate ()
 {
 	setRate( (StkFloat) gui_rate_ );
 }
 
-void AudioClip::updatePitch (void)
+void AudioClip::updatePitch ()
 {
 	pitshift_->setShift( (StkFloat) pow(2, ((float)gui_pitch_/12)) );
 }
@@ -150,6 +150,7 @@ MidiClip::MidiClip (std::string path) : MidiFileIn (path)
 	path_ = path;
 	int p = path_.rfind("/") + 1;
 	name_ = path_.substr(p, path_.length()-p);
+	data_ = new vector<ScheduledMidiMessage *>;
 }
 
 
@@ -159,6 +160,12 @@ MidiClip::MidiClip (std::string path) : MidiFileIn (path)
 
 MidiClip::~MidiClip ()
 {
+    if (data_ != NULL){
+        for (unsigned int i = 0; i < data_->size(); i++)
+        {
+            delete data_->at(i);
+        }
+    }
 }
 
 //------------
@@ -166,4 +173,30 @@ MidiClip::~MidiClip ()
 long unsigned int MidiClip::getLength ()
 {
 	return 0;
+}
+
+void MidiClip::parse()
+{
+	unsigned int ntracks = getNumberOfTracks();
+	for (unsigned int i=0; i<ntracks; i++)
+	{
+		rewindTrack(i);
+		vector< unsigned char > * event = new vector<unsigned char>();
+		unsigned long delta_time=0, abs_time=0;
+		int beats_per_bar = 4;
+		int nbeats, nticks;
+		delta_time = getNextEvent(event, i);
+		while ( event->size() > 0 )
+		{
+			ScheduledMidiMessage * smm = new ScheduledMidiMessage();
+			data_->push_back(smm);
+			abs_time += delta_time;
+			nbeats = abs_time / getDivision();
+			//tick = abs_time % getDivision();
+			//beat = 1 + nbeats % beats_per_bar;
+			//bar = 1 + nbeats / beats_per_bar;
+			delta_time = getNextEvent(event, i);
+		}
+		delete event;
+	}
 }

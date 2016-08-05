@@ -40,7 +40,13 @@ vector<MidiClip *> * MidiGroup::getClipSet()
 
 void MidiGroup::addAclip(std::string path)
 {
-	ClipSet->push_back(new MidiClip(path));
+	if ( path != "")
+	{
+		MidiClip * midiclip = new MidiClip(path);
+		midiclip->parse();
+		ClipSet->push_back(midiclip);
+		
+	}
 }
 
 unsigned long MidiGroup::getLength()

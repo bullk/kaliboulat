@@ -2,9 +2,11 @@
 #define INC_CLIP_H
 
 #include <string>
+#include <vector>
 #include <stk/FileLoop.h>
 #include <stk/PitShift.h>
 #include <stk/MidiFileIn.h>
+#include "midi.h"
 
 /*		Classes Clip, AudioClip, MidiClip
  * 
@@ -27,7 +29,7 @@ public:
 	void setState (ClipState);
 	virtual string getPath ();
 	virtual string getName ();
-	virtual unsigned long getLength(void) = 0;
+	virtual unsigned long getLength() = 0;
 	//virtual int getAngle (void) = 0;
    
 protected:    
@@ -46,14 +48,14 @@ class AudioClip : public Clip, public FileLoop
 public:
 	AudioClip (string path);
 	~AudioClip ();
-	long unsigned int getLength (void);
-	StkFloat getTime (void);
-	float * getVolume (void);
+	long unsigned int getLength ();
+	StkFloat getTime ();
+	float * getVolume ();
 	float * getGUIData ();
-	float * getGUIRateP (void);
-	int * getGUIPitchP (void);
-	void updateRate (void);
-	void updatePitch (void);
+	float * getGUIRateP ();
+	int * getGUIPitchP ();
+	void updateRate ();
+	void updatePitch ();
 	StkFloat tick (unsigned int channel = 0);
 	//void setVolume (StkFloat);
 	//int getAngle (void);
@@ -72,10 +74,11 @@ class MidiClip : public Clip, public MidiFileIn
 public:
 	MidiClip (string path);
 	~MidiClip ();
+	void parse ();
 	long unsigned int getLength ();
 	
 protected:
-	float data;
+	vector<ScheduledMidiMessage *> * data_;
 };
 
 #endif
