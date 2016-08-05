@@ -214,7 +214,7 @@ int main( int argc, char* args[] )
 
 		// MIDI Clock (bar, beat, tick)
 		int tempo = 120;
-		int ticks_per_beat = 192;
+		int ticks_per_beat = 960;
 		int beats_per_bar = 4;
 		float tick_d = 60.0f / (tempo * ticks_per_beat);
 		int nbeats, nticks, bar, beat, tick;
@@ -383,10 +383,13 @@ int main( int argc, char* args[] )
 		            {
 						ImGui::Text("%f µs / tick", 1000000 * daClip->getTickSeconds(i)); ImGui::SameLine();
 						ImGui::Text("-> %.02f BPM", 60 / (daClip->getTickSeconds(i) * daClip->getDivision()));
-						ImGui::Columns(3, "MIDI Events");
+						ImGui::Columns(6, "MIDI Events");
 						ImGui::Separator();
 						ImGui::Text("time (ticks)"); ImGui::NextColumn();
 						ImGui::Text("Status"); ImGui::NextColumn();
+						ImGui::Text("DATA"); ImGui::NextColumn();
+						ImGui::Text("DATA"); ImGui::NextColumn();
+						ImGui::Text("DATA"); ImGui::NextColumn();
 						ImGui::Text("DATA"); ImGui::NextColumn();
 						ImGui::Separator();
 						//------------------------
@@ -397,9 +400,14 @@ int main( int argc, char* args[] )
 						while ( event->size() > 0 )
 						{
 							abs_time += delta_time;
-							ImGui::Text("%lu", abs_time); ImGui::NextColumn();
+							nbeats = abs_time / daClip->getDivision();
+							tick = abs_time % daClip->getDivision();
+							beat = 1 + nbeats % beats_per_bar;
+							bar = 1 + nbeats / beats_per_bar;
+							ImGui::Text("%02d:%02d:%03d", bar, beat, tick); ImGui::NextColumn();
 							ImGui::Text("%x", event->at(0)); ImGui::NextColumn();
 							ImGui::Text("%lu", event->size()); ImGui::NextColumn();
+							ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); 
 							delta_time = daClip->getNextEvent(event, i);
 						}
 						ImGui::Columns(1);
