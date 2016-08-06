@@ -49,7 +49,18 @@ void MidiGroup::addAclip(std::string path)
 	}
 }
 
-unsigned long MidiGroup::getLength()
+//unsigned long MidiGroup::getLength()
+//{
+	//return 1;
+//}
+
+void MidiGroup::tick ()
 {
-	return 1;
+	for (unsigned int i = 0; i < ClipSet->size(); i++)
+	{
+		if (ClipSet->at(i)->getState() == CS_PLAYING)
+		{
+			ClipSet->at(i)->tick();
+		}
+	}
 }

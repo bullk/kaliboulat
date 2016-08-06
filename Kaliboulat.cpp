@@ -226,12 +226,17 @@ int main( int argc, char* args[] )
 
 		// MIDI Clock (bar, beat, tick)
 		nticks = (long unsigned int) (mcDelta / (1000000*tick_d));
+		if (nticks < previous_ticks)
+			previous_ticks = 0;
+		ticks_delta = nticks - previous_ticks;
+		if (ticks_delta > 0)
+			for (int i=0; i<ticks_delta; i++) 
+				midiMaster.tick();
+
 		nbeats = nticks / ticks_per_beat;
 		tick = nticks % ticks_per_beat;
 		beat = 1 + nbeats % beats_per_bar;
 		bar = 1 + nbeats / beats_per_bar;
-		if (nticks < previous_ticks) previous_ticks = 0;
-		ticks_delta = nticks - previous_ticks;
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
@@ -335,7 +340,6 @@ int main( int argc, char* args[] )
 					if (ImGui::Button("STOP")) daClip->setState(CS_STOPPED);
 					ImGui::PopStyleColor(3);
 					ImGui::PopID();
-					if (ticks_delta > 0) for (int i=0; i<ticks_delta; i++) daClip->tick();
 				}
 				else
 				{

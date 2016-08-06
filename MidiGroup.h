@@ -19,7 +19,8 @@ public:
 
     vector<MidiClip *> * getClipSet();
     void addAclip(std::string path);
-    unsigned long getLength();
+    //unsigned long getLength();
+    void tick();
     
 private:
 
