@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string>
-#include <time.h>
+//#include <time.h>
 
 //#include <SDL2/SDL.h>
 //#include <SDL2/SDL_image.h>
@@ -26,10 +26,11 @@ void midiInit();
 // Audio Rendering
 int tick();
 void audioInit();
-void startClock ();
-void pauseClock ();
-void resumeClock ();
-void stopClock ();
+void audioClose();
+void clockStart ();
+void clockPause ();
+void clockContinue ();
+void clockStop ();
 
 // GUI
 int GUI_Init();
@@ -74,16 +75,6 @@ void audioInit ()
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
 	
-	sampleLs[0] = "bar.wav";
-	sampleLs[1] = "hellosine.wav";
-
-	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
-	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
-
-} 
-
-void startClock ()
-{
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
 	parameters.deviceId = dac.getDefaultOutputDevice();
@@ -93,41 +84,33 @@ void startClock ()
 
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
+	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
+	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
+
 	try {
 		dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&audioMaster );
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
 	}
-	
-	resumeClock ();
-}
 
-void pauseClock ()
+	try {
+		dac.startStream();
+	}
+	catch ( RtError &error ) {
+		error.printMessage();
+	}
+
+} 
+
+void audioClose ()
 {
 	try {
 		dac.stopStream();
-		mcState = false;
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
 	}	
-}
-
-void resumeClock ()
-{
-	try {
-		dac.startStream();
-		mcState = true;
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-	}
-}
-	
-void stopClock ()
-{
-	pauseClock ();
 	
 	try {
 		dac.closeStream();
@@ -135,6 +118,25 @@ void stopClock ()
 	catch ( RtError &error ) {
 		error.printMessage();
 	}
+}
+
+void clockStart ()
+{
+	mcStartTime = chrono::system_clock::now();
+	mcState = true;
+}
+
+void clockPause ()
+{
+}
+
+void clockContinue ()
+{
+}
+	
+void clockStop ()
+{
+	mcState = false;
 }
 	
 //----------------------------------------------------------------------
@@ -193,6 +195,7 @@ int main( int argc, char* args[] )
 
 	if (GUI_Init() != 0)	return -1;
 	static int details = 0;
+	
 	long unsigned int previous_ticks = 0, nticks;
 	unsigned int ticks_delta;
 	int is, im, h, m ,s;
@@ -211,18 +214,18 @@ int main( int argc, char* args[] )
 	while (go_on)
 	{
 		// Clock based on RtAudio
-		double clockd;
-		if (mcState) clockd = dac.getStreamTime();
-		else clockd = 0.0f;
-		
-		is = (int) clockd;
+		if (mcState) {
+			mcNow = chrono::system_clock::now();
+			mcDelta = std::chrono::duration_cast<std::chrono::microseconds> (mcNow - mcStartTime).count();
+		}
+		is = mcDelta / 1000000;
 		im = is / 60;
 		h = im / 60;
 		m = im % 60;
 		s = is % 60;
 
 		// MIDI Clock (bar, beat, tick)
-		nticks = (long unsigned int) (clockd / tick_d);
+		nticks = (long unsigned int) (mcDelta / (1000000*tick_d));
 		nbeats = nticks / ticks_per_beat;
 		tick = nticks % ticks_per_beat;
 		beat = 1 + nbeats % beats_per_bar;
@@ -258,8 +261,7 @@ int main( int argc, char* args[] )
 
 			// Clock
 			ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", h, m, s);
-			//int ds = (int) (clockd * 10) - (is * 10);
-			//ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d.%d", h, m, s, ds);
+			//ImGui::SameLine(); ImGui::TextColored(ImColor(127,127,127), "%d", mcDelta);
 
 			// MIDI Clock
 			ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", bar, beat, tick);
@@ -273,7 +275,7 @@ int main( int argc, char* args[] )
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("STOP")) { stopClock(); }
+				if (ImGui::Button("STOP")) { clockStop(); }
 				ImGui::PopStyleColor(3);
 			}
 			else
@@ -281,7 +283,7 @@ int main( int argc, char* args[] )
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("PLAY")) { startClock(); }
+				if (ImGui::Button("PLAY")) { clockStart(); }
 				ImGui::PopStyleColor(3);
 			}
 			ImGui::EndChild();
@@ -449,6 +451,8 @@ int main( int argc, char* args[] )
 	cleanup:
 		GUI_Close();
 		return 0; /* ISO C requires main to return int. */
+	
+	audioClose();
 
 }
 

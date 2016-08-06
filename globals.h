@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #include <string>
+#include <chrono>
 #include <RtAudio.h>
 #include <RtError.h>
 
@@ -9,21 +10,27 @@
 #include "MidiGroup.h"
 
 
+bool mcState = false;
+std::chrono::time_point<std::chrono::system_clock> mcStartTime;
+std::chrono::time_point<std::chrono::system_clock> mcNow;
+long long unsigned int mcDelta;
+
 // MIDI
 
 string midiClipDir = "user/MIDI";
+MidiGroup midiMaster;
+
 string midiClipLs[1] = { "test-Drums-1.mid" };
 
 // Audio 
 
-string sampleDir = "user/Audio";
-string sampleLs[2];
-
 const int GLOBAL_SAMPLE_RATE = 44100;
+string sampleDir = "user/Audio";
 
 RtAudio dac;
 AudioGroup audioMaster;
-MidiGroup midiMaster;
-bool mcState = false;
+
+string sampleLs[2] = { "bar.wav", "hellosine.wav" };
+
 
 #endif

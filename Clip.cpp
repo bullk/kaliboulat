@@ -192,18 +192,10 @@ void MidiClip::parse()
 	{
 		rewindTrack(i);
 		abs_time=0;
-		//int beats_per_bar = 4;
-		//int nbeats, nticks;
 		delta_time = getNextEvent(event, i);
 		while ( event->size() > 0 )
 		{
-			//ScheduledMidiMessage * smm = new ScheduledMidiMessage (event);
-			//data_->push_back(smm);
 			abs_time += delta_time;
-			//nbeats = abs_time / getDivision();
-			//tick = abs_time % getDivision();
-			//beat = 1 + nbeats % beats_per_bar;
-			//bar = 1 + nbeats / beats_per_bar;
 			delta_time = getNextEvent(event, i);
 		}
 		if (abs_time > length_) length_ = abs_time;

@@ -5,7 +5,7 @@
 
 * MAJ imgui
 * Résoudre le problème d'affichage des samples audio (nécessite de potasser les tableaux en C)
-* Mettre au point une horloge maison (voir clock.h)
+* Mettre au point une horloge maison (voir chrono.h)
 * Etudier l'affichage d'images
 
 ### Moteur
