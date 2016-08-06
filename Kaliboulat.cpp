@@ -193,6 +193,15 @@ int main( int argc, char* args[] )
 
 	if (GUI_Init() != 0)	return -1;
 	static int details = 0;
+	long unsigned int previous_ticks = 0, nticks;
+	unsigned int ticks_delta;
+	int is, im, h, m ,s;
+
+	int tempo = 120;
+	int ticks_per_beat = 960;
+	int beats_per_bar = 4;
+	float tick_d = 60.0f / (tempo * ticks_per_beat);
+	int nbeats, bar, beat, tick;
 		
 	audioInit();
 	midiInit();
@@ -203,26 +212,23 @@ int main( int argc, char* args[] )
 	{
 		// Clock based on RtAudio
 		double clockd;
-		if (mcState) { clockd = dac.getStreamTime(); }
-		else { clockd = 0.0f; }
+		if (mcState) clockd = dac.getStreamTime();
+		else clockd = 0.0f;
 		
-		int is = (int) clockd;
-		int im = is / 60;
-		int h = im / 60;
-		int m = im % 60;
-		int s = is % 60;
+		is = (int) clockd;
+		im = is / 60;
+		h = im / 60;
+		m = im % 60;
+		s = is % 60;
 
 		// MIDI Clock (bar, beat, tick)
-		int tempo = 120;
-		int ticks_per_beat = 960;
-		int beats_per_bar = 4;
-		float tick_d = 60.0f / (tempo * ticks_per_beat);
-		int nbeats, nticks, bar, beat, tick;
-		nticks = (int) (clockd / tick_d);
+		nticks = (long unsigned int) (clockd / tick_d);
 		nbeats = nticks / ticks_per_beat;
 		tick = nticks % ticks_per_beat;
 		beat = 1 + nbeats % beats_per_bar;
 		bar = 1 + nbeats / beats_per_bar;
+		if (nticks < previous_ticks) previous_ticks = 0;
+		ticks_delta = nticks - previous_ticks;
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
@@ -324,9 +330,10 @@ int main( int argc, char* args[] )
 					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-					if (ImGui::Button("STOP")) { daClip->setState(CS_STOPPED); }
+					if (ImGui::Button("STOP")) daClip->setState(CS_STOPPED);
 					ImGui::PopStyleColor(3);
 					ImGui::PopID();
+					if (ticks_delta > 0) for (int i=0; i<ticks_delta; i++) daClip->tick();
 				}
 				else
 				{
@@ -334,13 +341,13 @@ int main( int argc, char* args[] )
 					ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 					ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-					if (ImGui::Button("PLAY")) { daClip->setState(CS_PLAYING); }
+					if (ImGui::Button("PLAY")) daClip->setState(CS_PLAYING);
 					ImGui::PopStyleColor(3);
 					ImGui::PopID();
 				}
 				ImGui::SameLine(); // Progress bar
-				//progress = daClip->getTime() / daClip->getLength();ImGuiCol_PlotHistogram
-				progress = 0.5f;
+				progress = (float) daClip->getTime() / daClip->getLength(); //ImGuiCol_PlotHistogram
+				//progress = 0.5f;
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(6/7.0f, 0.6f, 0.6f));
  				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
  				ImGui::PopStyleColor();
@@ -377,6 +384,8 @@ int main( int argc, char* args[] )
 				ImGui::Text("MIDI file format %d", daClip->getFileFormat());
 				ImGui::Text("%d tracks", ntracks);
 				ImGui::Text("division value %d", daClip->getDivision());
+				ImGui::Text("length : %lu", daClip->getLength());
+				ImGui::Text("time : %lu", daClip->getTime());
 				for (unsigned int i=0; i<ntracks; i++)
 				{
 		            if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
@@ -406,7 +415,7 @@ int main( int argc, char* args[] )
 							bar = 1 + nbeats / beats_per_bar;
 							ImGui::Text("%02d:%02d:%03d", bar, beat, tick); ImGui::NextColumn();
 							ImGui::Text("%x", event->at(0)); ImGui::NextColumn();
-							ImGui::Text("%lu", event->size()); ImGui::NextColumn();
+							ImGui::Text("%u", event->size()); ImGui::NextColumn();
 							ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); 
 							delta_time = daClip->getNextEvent(event, i);
 						}
@@ -431,6 +440,9 @@ int main( int argc, char* args[] )
 		glClear(GL_COLOR_BUFFER_BIT);
 		ImGui::Render();
 		SDL_GL_SwapWindow(window);
+		
+		// MIDI Clock tracker
+		previous_ticks = nticks;
 	}
 
 

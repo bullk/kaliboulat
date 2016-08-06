@@ -37,7 +37,7 @@ protected:
 	ClipState state_;
 	string path_;
 	string name_;
-	int angle_;
+	//int angle_;
 	
 };
 
@@ -76,9 +76,12 @@ public:
 	~MidiClip ();
 	void parse ();
 	long unsigned int getLength ();
+	long unsigned int getTime ();
+	void tick ();
 	
 protected:
-	vector<ScheduledMidiMessage *> * data_;
+	long unsigned int length_, time_;
+	//vector<ScheduledMidiMessage *> * data_;
 };
 
 #endif

@@ -6,8 +6,10 @@
 // Constructor 
 //-------------
 
-MidiMessage::MidiMessage ()
+MidiMessage::MidiMessage (vector<unsigned char> * data)
 {
+	data_ = new(vector<unsigned char>);
+	data_ = data;
 }
 
 
@@ -17,6 +19,7 @@ MidiMessage::MidiMessage ()
 
 MidiMessage::~MidiMessage ()
 {
+	delete data_;
 }
 
 //------------
@@ -30,14 +33,13 @@ MidiMessage::~MidiMessage ()
 // Constructor 
 //-------------
 
-ScheduledMidiMessage::ScheduledMidiMessage ()
+ScheduledMidiMessage::ScheduledMidiMessage (vector<unsigned char> * data) : MidiMessage (data)
 {
-	delta_ticks = 0;
-	abs_ticks = 0;
-	int bar;
-	int beat;
-	int tick;
-
+	delta_ticks_ = 0;
+	abs_ticks_ = 0;
+	bar_ = 0;
+	beat_ = 0;
+	tick_ = 0;
 }
 
 
@@ -51,4 +53,9 @@ ScheduledMidiMessage::~ScheduledMidiMessage ()
 
 //------------
 
+unsigned long ScheduledMidiMessage::getAbsTicks() { return abs_ticks_; }
 
+void ScheduledMidiMessage::setAbsTicks(unsigned long ticks)
+{
+	abs_ticks_ = ticks;
+}

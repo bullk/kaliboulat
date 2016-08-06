@@ -54,7 +54,7 @@ AudioClip::AudioClip(std::string path) : FileLoop(path)
 	int p = path_.rfind("/") + 1;
 	name_ = path_.substr(p, path_.length()-p);
 	state_ = CS_STOPPED;
-	angle_ = 0;
+	//angle_ = 0;
 	volume_ = 0.5f;
 	pitshift_ = new PitShift();
 	pitshift_->setEffectMix(1.0);
@@ -150,7 +150,10 @@ MidiClip::MidiClip (std::string path) : MidiFileIn (path)
 	path_ = path;
 	int p = path_.rfind("/") + 1;
 	name_ = path_.substr(p, path_.length()-p);
-	data_ = new vector<ScheduledMidiMessage *>;
+	length_ = 0;
+	time_ = 0;
+	parse ();
+	//data_ = new vector<ScheduledMidiMessage *>;
 }
 
 
@@ -160,43 +163,50 @@ MidiClip::MidiClip (std::string path) : MidiFileIn (path)
 
 MidiClip::~MidiClip ()
 {
-    if (data_ != NULL){
-        for (unsigned int i = 0; i < data_->size(); i++)
-        {
-            delete data_->at(i);
-        }
-    }
+    //if (data_ != NULL){
+        //for (unsigned int i = 0; i < data_->size(); i++)
+        //{
+            //delete data_->at(i);
+        //}
+    //}
 }
 
 //------------
 
-long unsigned int MidiClip::getLength ()
+long unsigned int MidiClip::getLength () { return length_; }
+
+long unsigned int MidiClip::getTime () { return time_; }
+
+void MidiClip::tick()
 {
-	return 0;
+	time_++;
+	if (time_ == length_) time_ = 0;
 }
 
 void MidiClip::parse()
 {
+	vector< unsigned char > * event = new vector<unsigned char>();
 	unsigned int ntracks = getNumberOfTracks();
+	unsigned long delta_time, abs_time;
 	for (unsigned int i=0; i<ntracks; i++)
 	{
 		rewindTrack(i);
-		vector< unsigned char > * event = new vector<unsigned char>();
-		unsigned long delta_time=0, abs_time=0;
-		int beats_per_bar = 4;
-		int nbeats, nticks;
+		abs_time=0;
+		//int beats_per_bar = 4;
+		//int nbeats, nticks;
 		delta_time = getNextEvent(event, i);
 		while ( event->size() > 0 )
 		{
-			ScheduledMidiMessage * smm = new ScheduledMidiMessage();
-			data_->push_back(smm);
+			//ScheduledMidiMessage * smm = new ScheduledMidiMessage (event);
+			//data_->push_back(smm);
 			abs_time += delta_time;
-			nbeats = abs_time / getDivision();
+			//nbeats = abs_time / getDivision();
 			//tick = abs_time % getDivision();
 			//beat = 1 + nbeats % beats_per_bar;
 			//bar = 1 + nbeats / beats_per_bar;
 			delta_time = getNextEvent(event, i);
 		}
-		delete event;
+		if (abs_time > length_) length_ = abs_time;
 	}
+	delete event;
 }
