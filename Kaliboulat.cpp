@@ -198,14 +198,14 @@ int main( int argc, char* args[] )
 	if (GUI_Init() != 0)	return -1;
 	static int details = 0;
 	
-	long unsigned int previous_ticks=0, nticks=0;
+	long unsigned int previous_ticks=0, nb_ticks=0;
 	unsigned int ticks_delta=0;
 	int is=0, im=0, h=0, m=0, s=0;
 
 	int tempo = 120;
 	int ticks_per_beat = 960;
 	int beats_per_bar = 4;
-	float tick_d = 60.0f / (tempo * ticks_per_beat);
+	float tick_duration = 60.0f / (tempo * ticks_per_beat);
 	int nbeats=0, bar=1, beat=1, tick=0;
 		
 	audioInit();
@@ -227,18 +227,18 @@ int main( int argc, char* args[] )
 			s = is % 60;
 
 			// MIDI (bar, beat, tick)
-			nticks = (long unsigned int) (mcDelta / (1000000*tick_d));
-			if (nticks < previous_ticks)
+			nb_ticks = (long unsigned int) (mcDelta / (1000000 * tick_duration));
+			if (nb_ticks < previous_ticks)
 				previous_ticks = 0;
-			ticks_delta = nticks - previous_ticks;
+			ticks_delta = nb_ticks - previous_ticks;
 			if ((previous_ticks == 0) and (ticks_delta == 0))
 				midiMaster.tick();
 			if (ticks_delta > 0)
 				for (unsigned int i=0; i<ticks_delta; i++) 
 					midiMaster.tick();
 
-			nbeats = nticks / ticks_per_beat;
-			tick = nticks % ticks_per_beat;
+			nbeats = nb_ticks / ticks_per_beat;
+			tick = nb_ticks % ticks_per_beat;
 			beat = 1 + nbeats % beats_per_bar;
 			bar = 1 + nbeats / beats_per_bar;
 		}
@@ -264,7 +264,8 @@ int main( int argc, char* args[] )
 			ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 			ImGui::Begin("Software", &go_on, flags);
 			
-			static bool show_app_about = false;
+			static bool about_open = false;
+
 			if (ImGui::BeginMenuBar())
 			{
 				if (ImGui::BeginMenu("File"))
@@ -286,7 +287,7 @@ int main( int argc, char* args[] )
 				}
 				if (ImGui::BeginMenu("Help"))
 				{
-					ImGui::MenuItem("About ImGui", NULL, &show_app_about);
+					ImGui::MenuItem("About this software", NULL, &about_open);
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
@@ -304,10 +305,24 @@ int main( int argc, char* args[] )
 			// MIDI Clock
 			ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", bar, beat, tick);
 			
-			//ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%d", value);
+            
+			if (about_open) 
+				ImGui::OpenPopup("About");
+			if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text("      Kaliboulat / Fullbox Project\n\n    Alien sequencer by BullK Studio\nCoded by Olivier Cadiou aka Al Kali Boul\n");
+				ImGui::Columns(3, NULL, false); ImGui::NextColumn();
+				if (ImGui::Button("Close", ImVec2(80,0))) 
+				{
+					ImGui::CloseCurrentPopup();
+					about_open = false;
+				}
+				ImGui::NextColumn(); ImGui::NextColumn(); ImGui::Columns(1);
+				ImGui::EndPopup();
+			}
 			
             //TODO : Intégrer les images de commandes
-			//ImGui::Button("STOP")
+
 			if ( mcState )
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
@@ -480,7 +495,7 @@ int main( int argc, char* args[] )
 		SDL_GL_SwapWindow(window);
 		
 		// MIDI Clock tracker
-		previous_ticks = nticks;
+		previous_ticks = nb_ticks;
 	}
 	
 	// Close application
