@@ -30,7 +30,7 @@ string sampleDir = "user/Audio";
 RtAudio dac;
 AudioGroup audioMaster;
 
-string sampleLs[2] = { "bar.wav", "hellosine.wav" };
+string sampleLs[3] = { "bar.wav", "hellosine.wav", "bonjouratoutes.wav" };
 
 
 #endif

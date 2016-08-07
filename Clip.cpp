@@ -177,19 +177,32 @@ long unsigned int MidiClip::getLength () { return length_; }
 
 long unsigned int MidiClip::getTime () { return time_; }
 
-void MidiClip::tick()
+void MidiClip::rewind ()
 {
+	time_ = 0;
+	for (unsigned int i=0; i<getNumberOfTracks(); i++) rewindTrack(i);
+}
+
+void MidiClip::tick ()
+{
+	if (time_ == length_) rewind ();
+	for (unsigned int i=0; i<getNumberOfTracks(); i++)
+	{
+		
+		track_indexes_[i]++;
+		
+	}
 	time_++;
-	if (time_ == length_) time_ = 0;
 }
 
 void MidiClip::parse()
 {
+	track_indexes_.clear();
 	vector< unsigned char > * event = new vector<unsigned char>();
-	unsigned int ntracks = getNumberOfTracks();
 	unsigned long delta_time, abs_time;
-	for (unsigned int i=0; i<ntracks; i++)
+	for (unsigned int i=0; i<getNumberOfTracks(); i++)
 	{
+		track_indexes_.push_back(0);
 		rewindTrack(i);
 		abs_time=0;
 		delta_time = getNextEvent(event, i);
@@ -199,6 +212,7 @@ void MidiClip::parse()
 			delta_time = getNextEvent(event, i);
 		}
 		if (abs_time > length_) length_ = abs_time;
+		rewindTrack(i);
 	}
 	delete event;
 }

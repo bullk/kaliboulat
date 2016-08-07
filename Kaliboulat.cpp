@@ -86,6 +86,7 @@ void audioInit ()
 
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
 	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
+	audioMaster.addAclip (sampleDir + "/" + sampleLs[2]);
 
 	try {
 		dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&audioMaster );
@@ -196,15 +197,15 @@ int main( int argc, char* args[] )
 	if (GUI_Init() != 0)	return -1;
 	static int details = 0;
 	
-	long unsigned int previous_ticks = 0, nticks;
-	unsigned int ticks_delta;
-	int is, im, h, m ,s;
+	long unsigned int previous_ticks=0, nticks;
+	unsigned int ticks_delta=0;
+	int is=0, im=0, h=0, m=0, s=0;
 
 	int tempo = 120;
 	int ticks_per_beat = 960;
 	int beats_per_bar = 4;
 	float tick_d = 60.0f / (tempo * ticks_per_beat);
-	int nbeats, bar, beat, tick;
+	int nbeats=0, bar=1, beat=1, tick=0;
 		
 	audioInit();
 	midiInit();
@@ -213,30 +214,33 @@ int main( int argc, char* args[] )
 	bool go_on = true;
 	while (go_on)
 	{
-		// Clock based on RtAudio
+		// Clock
 		if (mcState) {
+			// h:m:s
 			mcNow = chrono::system_clock::now();
 			mcDelta = std::chrono::duration_cast<std::chrono::microseconds> (mcNow - mcStartTime).count();
-		}
-		is = mcDelta / 1000000;
-		im = is / 60;
-		h = im / 60;
-		m = im % 60;
-		s = is % 60;
+			is = mcDelta / 1000000;
+			im = is / 60;
+			h = im / 60;
+			m = im % 60;
+			s = is % 60;
 
-		// MIDI Clock (bar, beat, tick)
-		nticks = (long unsigned int) (mcDelta / (1000000*tick_d));
-		if (nticks < previous_ticks)
-			previous_ticks = 0;
-		ticks_delta = nticks - previous_ticks;
-		if (ticks_delta > 0)
-			for (unsigned int i=0; i<ticks_delta; i++) 
+			// MIDI (bar, beat, tick)
+			nticks = (long unsigned int) (mcDelta / (1000000*tick_d));
+			if (nticks < previous_ticks)
+				previous_ticks = 0;
+			ticks_delta = nticks - previous_ticks;
+			if ((previous_ticks == 0) and (ticks_delta == 0))
 				midiMaster.tick();
+			if (ticks_delta > 0)
+				for (unsigned int i=0; i<ticks_delta; i++) 
+					midiMaster.tick();
 
-		nbeats = nticks / ticks_per_beat;
-		tick = nticks % ticks_per_beat;
-		beat = 1 + nbeats % beats_per_bar;
-		bar = 1 + nbeats / beats_per_bar;
+			nbeats = nticks / ticks_per_beat;
+			tick = nticks % ticks_per_beat;
+			beat = 1 + nbeats % beats_per_bar;
+			bar = 1 + nbeats / beats_per_bar;
+		}
 
 		SDL_Event event;
 		while (SDL_PollEvent(&event))

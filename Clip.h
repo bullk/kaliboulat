@@ -77,10 +77,12 @@ public:
 	void parse ();
 	long unsigned int getLength ();
 	long unsigned int getTime ();
+	void rewind ();
 	void tick ();
 	
 protected:
 	long unsigned int length_, time_;
+	vector<long unsigned int> track_indexes_;
 	//vector<ScheduledMidiMessage *> * data_;
 };
 
