@@ -230,7 +230,7 @@ int main( int argc, char* args[] )
 			previous_ticks = 0;
 		ticks_delta = nticks - previous_ticks;
 		if (ticks_delta > 0)
-			for (int i=0; i<ticks_delta; i++) 
+			for (unsigned int i=0; i<ticks_delta; i++) 
 				midiMaster.tick();
 
 		nbeats = nticks / ticks_per_beat;
@@ -353,7 +353,6 @@ int main( int argc, char* args[] )
 				}
 				ImGui::SameLine(); // Progress bar
 				progress = (float) daClip->getTime() / daClip->getLength(); //ImGuiCol_PlotHistogram
-				//progress = 0.5f;
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(6/7.0f, 0.6f, 0.6f));
  				ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
  				ImGui::PopStyleColor();
@@ -396,21 +395,18 @@ int main( int argc, char* args[] )
 				{
 		            if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
 		            {
-						ImGui::Text("%f µs / tick", 1000000 * daClip->getTickSeconds(i)); ImGui::SameLine();
-						ImGui::Text("-> %.02f BPM", 60 / (daClip->getTickSeconds(i) * daClip->getDivision()));
-						ImGui::Columns(6, "MIDI Events");
+						ImGui::Text ("%f µs / tick", 1000000 * daClip->getTickSeconds(i)); ImGui::SameLine();
+						ImGui::Text ("-> %.02f BPM", 60 / (daClip->getTickSeconds(i) * daClip->getDivision()));
 						ImGui::Separator();
-						ImGui::Text("time (ticks)"); ImGui::NextColumn();
-						ImGui::Text("Status"); ImGui::NextColumn();
-						ImGui::Text("DATA"); ImGui::NextColumn();
-						ImGui::Text("DATA"); ImGui::NextColumn();
-						ImGui::Text("DATA"); ImGui::NextColumn();
-						ImGui::Text("DATA"); ImGui::NextColumn();
+						ImGui::Text("time (BBT)  "); ImGui::SameLine();
+						ImGui::Text("Status  "); ImGui::SameLine();
+						ImGui::Text("DATA"); 
 						ImGui::Separator();
 						//------------------------
 						daClip->rewindTrack(i);
 						vector< unsigned char > * event = new vector<unsigned char>();
 						unsigned long abs_time = 0, delta_time = 0;
+						
 						delta_time = daClip->getNextEvent(event, i);
 						while ( event->size() > 0 )
 						{
@@ -419,13 +415,16 @@ int main( int argc, char* args[] )
 							tick = abs_time % daClip->getDivision();
 							beat = 1 + nbeats % beats_per_bar;
 							bar = 1 + nbeats / beats_per_bar;
-							ImGui::Text("%02d:%02d:%03d", bar, beat, tick); ImGui::NextColumn();
-							ImGui::Text("%x", event->at(0)); ImGui::NextColumn();
-							ImGui::Text("%u", event->size()); ImGui::NextColumn();
-							ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); 
+							ImGui::Text("%02d:%02d:%03d   ", bar, beat, tick); ImGui::SameLine();
+							ImGui::Text("%x      ", event->at(0)); ImGui::SameLine();
+							for (unsigned int i=1; i<event->size(); i++)
+							{
+								if (i>1) ImGui::SameLine();
+								ImGui::Text("%x", event->at(i));
+							}
+							//ImGui::Text("%u", event->size());
 							delta_time = daClip->getNextEvent(event, i);
 						}
-						ImGui::Columns(1);
 						ImGui::Separator();
 						delete event;
 						//------------------------
@@ -454,9 +453,8 @@ int main( int argc, char* args[] )
 
 	cleanup:
 		GUI_Close();
+		audioClose();
 		return 0; /* ISO C requires main to return int. */
-	
-	audioClose();
 
 }
 
