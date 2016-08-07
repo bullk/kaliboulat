@@ -206,6 +206,7 @@ void MidiClip::parse()
 		rewindTrack(i);
 		abs_time=0;
 		delta_time = getNextEvent(event, i);
+		track_indexes_[i] = delta_time;
 		while ( event->size() > 0 )
 		{
 			abs_time += delta_time;

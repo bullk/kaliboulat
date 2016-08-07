@@ -197,7 +197,7 @@ int main( int argc, char* args[] )
 	if (GUI_Init() != 0)	return -1;
 	static int details = 0;
 	
-	long unsigned int previous_ticks=0, nticks;
+	long unsigned int previous_ticks=0, nticks=0;
 	unsigned int ticks_delta=0;
 	int is=0, im=0, h=0, m=0, s=0;
 
@@ -249,19 +249,41 @@ int main( int argc, char* args[] )
 			if (event.type == SDL_QUIT)
 				go_on = false;
 		}
-		ImGui_ImplSdl_NewFrame(window);
 
+		ImGui_ImplSdl_NewFrame(window);
 		// Main window
 		{
 			ImGuiWindowFlags flags = 0;
-			//flags |= ImGuiWindowFlags_NoTitleBar;
+			flags |= ImGuiWindowFlags_NoTitleBar;
 			flags |= ImGuiWindowFlags_NoResize;
 			flags |= ImGuiWindowFlags_NoMove;
 			flags |= ImGuiWindowFlags_NoCollapse;
-			//flags |= ImGuiWindowFlags_MenuBar;
+			flags |= ImGuiWindowFlags_MenuBar;
 			//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 			ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 			ImGui::Begin("Software", &go_on, flags);
+			
+			static bool show_app_about = false;
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("File"))
+				{
+					if (ImGui::MenuItem("New", "Ctrl+N", false, not(mcState))) {}
+					if (ImGui::MenuItem("Open", "Ctrl+O", false, not(mcState))) {}
+					if (ImGui::MenuItem("Save", "Ctrl+S", false, not(mcState))) {}
+					if (ImGui::MenuItem("Save As..", NULL, false, not(mcState))) {}
+					ImGui::Separator();
+					if (ImGui::MenuItem("Options")) {}
+					if (ImGui::MenuItem("Quit", "Alt+F4")) go_on = false;
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Help"))
+				{
+					ImGui::MenuItem("About ImGui", NULL, &show_app_about);
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
+			}
 			
             ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
             ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
@@ -453,12 +475,11 @@ int main( int argc, char* args[] )
 		// MIDI Clock tracker
 		previous_ticks = nticks;
 	}
-
-
-	cleanup:
-		GUI_Close();
-		audioClose();
-		return 0; /* ISO C requires main to return int. */
+	
+	// Close application
+	GUI_Close();
+	audioClose();
+	return 0; /* ISO C requires main to return int. */
 
 }
 
