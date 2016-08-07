@@ -168,7 +168,8 @@ int GUI_Init ()
 	SDL_GetCurrentDisplayMode(0, &current);
 	//window = SDL_CreateWindow("kaliboulat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
 	window = SDL_CreateWindow("kaliboulat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL|SDL_WINDOW_FULLSCREEN_DESKTOP);
-	SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+	//SDL_GLContext glcontext = SDL_GL_CreateContext(window);
+	glcontext = SDL_GL_CreateContext(window);
 
 	// Setup ImGui binding
 	ImGui_ImplSdl_Init(window);
@@ -275,6 +276,12 @@ int main( int argc, char* args[] )
 					ImGui::Separator();
 					if (ImGui::MenuItem("Options")) {}
 					if (ImGui::MenuItem("Quit", "Alt+F4")) go_on = false;
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Import"))
+				{
+					if (ImGui::MenuItem("Audio File", NULL, false, not(mcState))) {}
+					if (ImGui::MenuItem("MIDI File", NULL, false, not(mcState))) {}
 					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu("Help"))
