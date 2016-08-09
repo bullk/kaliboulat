@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <string>
 
-#include <RtAudio.h>
 #include <RtError.h>
+#include <RtAudio.h>
+#include <RtMidi.h>
 
 #include "globals.h"
 #include "Clock.h"
@@ -17,10 +18,6 @@
 
 using namespace stk;
 using namespace std;
-
-RtAudio dac; // main audio output
-AudioGroup audioMaster; // Audio clips manager
-MidiGroup midiMaster; // MIDI clips manager
 
 // MIDI
 
@@ -44,9 +41,9 @@ void audioClose();
 // MIDI FUNCTIONS
 //----------------------------------------------------------------------
 
-void midiInit()
+void midiInit(MidiGroup * midigroup_p)
 {
-	midiMaster.addAclip (midiClipDir + "/" + midiClipLs[0]);
+	midigroup_p->addAclip (midiClipDir + "/" + midiClipLs[0]);
 }
 
 
@@ -76,33 +73,36 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 
-void audioInit ()
+void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
 {
+	audiogroup_p->addAclip (sampleDir + "/" + sampleLs[0]);
+	audiogroup_p->addAclip (sampleDir + "/" + sampleLs[1]);
+	audiogroup_p->addAclip (sampleDir + "/" + sampleLs[2]);
+
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
 	
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
-	parameters.deviceId = dac.getDefaultOutputDevice();
+	parameters.deviceId = dac->getDefaultOutputDevice();
 	parameters.nChannels = 1;
+	
 	RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
-	//RtAudioFormat format = RTAUDIO_SINT16;
-
+	
+	RtAudio::StreamOptions options;
+	options.streamName = APP_NAME;
+	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	audioMaster.addAclip (sampleDir + "/" + sampleLs[0]);
-	audioMaster.addAclip (sampleDir + "/" + sampleLs[1]);
-	audioMaster.addAclip (sampleDir + "/" + sampleLs[2]);
-
 	try {
-		dac.openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)&audioMaster );
+		dac->openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiogroup_p, &options );
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
 	}
 
 	try {
-		dac.startStream();
+		dac->startStream();
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
@@ -110,17 +110,17 @@ void audioInit ()
 
 } 
 
-void audioClose ()
+void audioClose (RtAudio * dac)
 {
 	try {
-		dac.stopStream();
+		dac->stopStream();
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
 	}	
 	
 	try {
-		dac.closeStream();
+		dac->closeStream();
 	}
 	catch ( RtError &error ) {
 		error.printMessage();
@@ -133,13 +133,27 @@ void audioClose ()
 int main( int argc, char* args[] )
 {
 
+	RtAudio * dac = new RtAudio(RtAudio::UNIX_JACK); // main audio output
+	AudioGroup audioMaster; // Audio clips manager
+	audioInit (dac, &audioMaster);
+
+	RtMidiOut * midiout = new RtMidiOut(RtMidi::UNIX_JACK, APP_NAME);
+	// Check available ports.
+	unsigned int nPorts = midiout->getPortCount();
+	if ( nPorts == 0 ) {
+		std::cout << "No ports available!\n";
+		//goto cleanup;
+	}
+	// Open first available port.
+	midiout->openPort( 0 );
+	MidiGroup midiMaster; // MIDI clips manager
+	midiInit (&midiMaster);
+
 	Clock daClock; // main clock
 	daClock.init();
-	audioInit();
-	midiInit();
 
 #ifdef WITH_GUI
-	if (GUI_Init() != 0)	return -1;
+	if (GUI_Init () != 0)	return -1;
 #endif
 	
 	// Main loop
@@ -160,10 +174,12 @@ int main( int argc, char* args[] )
 	}
 	
 	// Close application
+	
 #ifdef WITH_GUI
-	GUI_Close();
+	GUI_Close ();
 #endif
-	audioClose();
+	audioClose (dac);
+	delete midiout;
 	return 0; /* ISO C requires main to return int. */
 
 }

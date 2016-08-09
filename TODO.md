@@ -3,6 +3,9 @@
 ---------------
 ## MAINTENANT
 
+* SORTIE MIDI !!!
+* ENTREE MIDI !!!
+* Sorite Audio en double mono
 * Propriétés de lecture des clips (single, loop, warped...)
 	* single
 	* looped
