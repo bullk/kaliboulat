@@ -3,16 +3,14 @@
 ---------------
 ## MAINTENANT
 
-* MAJ imgui
-* Résoudre le problème d'affichage des samples audio (nécessite de potasser les tableaux en C)
-* Mettre au point une horloge maison (voir chrono.h)
-* Etudier l'affichage d'images
+* Propriétés de lecture des clips (single, loop, warped...)
+	* single
+	* looped
+	* warped ?
+	* free / next beat / next bar
+
 
 ### Moteur
-
-* Horloge (objet à créer)
-	* Audio
-	* MIDI
 
 * Ajout / suppression de clips
 * Playlist / TrackList
@@ -22,8 +20,9 @@
 
 ### GUI
 
-* Intégrer ImGui
-* Le programme doit pouvoir s'éxecuter sans GUI
+* MAJ imgui
+* Etudier l'affichage d'images
+* Résoudre le problème d'affichage des samples audio (nécessite de potasser les tableaux en C)
 
 
 ---------------

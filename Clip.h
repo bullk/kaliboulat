@@ -13,9 +13,6 @@
  *
  */
 
-using namespace std;
-using namespace stk;
-
 enum ClipType { CT_AUDIO, CT_MIDI, CT_OSC, CT_COM };
 enum ClipState { CS_STOPPED, CS_PLAYING, CS_RECORDING };
 
@@ -27,36 +24,36 @@ public:
 	~Clip ();
 	ClipState getState ();
 	void setState (ClipState);
-	virtual string getPath ();
-	virtual string getName ();
+	virtual std::string getPath ();
+	virtual std::string getName ();
 	virtual unsigned long getLength() = 0;
 	//virtual int getAngle (void) = 0;
    
 protected:    
 	ClipType m_type;
 	ClipState state_;
-	string path_;
-	string name_;
+	std::string path_;
+	std::string name_;
 	//int angle_;
 	
 };
 
 
-class AudioClip : public Clip, public FileLoop
+class AudioClip : public Clip, public stk::FileLoop
 {
 	
 public:
-	AudioClip (string path);
+	AudioClip (std::string path);
 	~AudioClip ();
 	long unsigned int getLength ();
-	StkFloat getTime ();
+	stk::StkFloat getTime ();
 	float * getVolume ();
 	float * getGUIData ();
 	float * getGUIRateP ();
 	int * getGUIPitchP ();
 	void updateRate ();
 	void updatePitch ();
-	StkFloat tick (unsigned int channel = 0);
+	stk::StkFloat tick (unsigned int channel = 0);
 	//void setVolume (StkFloat);
 	//int getAngle (void);
 	
@@ -65,14 +62,14 @@ protected:
 	float gui_rate_;
 	int gui_pitch_;
 	float gui_data_[];
-	PitShift * pitshift_;
+	stk::PitShift * pitshift_;
 };
 
 
-class MidiClip : public Clip, public MidiFileIn
+class MidiClip : public Clip, public stk::MidiFileIn
 {
 public:
-	MidiClip (string path);
+	MidiClip (std::string path);
 	~MidiClip ();
 	void parse ();
 	long unsigned int getLength ();
@@ -82,7 +79,7 @@ public:
 	
 protected:
 	long unsigned int length_, time_;
-	vector<long unsigned int> track_indexes_;
+	std::vector<long unsigned int> track_indexes_;
 	//vector<ScheduledMidiMessage *> * data_;
 };
 

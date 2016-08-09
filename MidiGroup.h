@@ -5,7 +5,7 @@
 #include <vector>
 #include "Clip.h"
 
-using namespace std;
+//using namespace std;
 
 class MidiGroup
 {
@@ -17,14 +17,14 @@ public:
 	// Destructor 
 	~MidiGroup();
 
-    vector<MidiClip *> * getClipSet();
+    std::vector<MidiClip *> * getClipSet();
     void addAclip(std::string path);
     //unsigned long getLength();
     void tick();
     
 private:
 
-	vector<MidiClip *> * ClipSet;
+	std::vector<MidiClip *> * ClipSet;
 
 };
 

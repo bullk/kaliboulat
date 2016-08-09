@@ -6,7 +6,7 @@
 
 MidiGroup::MidiGroup()
 {
-	ClipSet = new vector<MidiClip *>;
+	ClipSet = new std::vector<MidiClip *>;
 }
 
 
@@ -29,7 +29,7 @@ MidiGroup::~MidiGroup()
 //---------------------------------------------------------------------------
 // Access file set externally (note this is not thread safe) ??? advise for AudioGroup
 //---------------------------------------------------------------------------
-vector<MidiClip *> * MidiGroup::getClipSet()
+std::vector<MidiClip *> * MidiGroup::getClipSet()
 {
     return this->ClipSet;
 }

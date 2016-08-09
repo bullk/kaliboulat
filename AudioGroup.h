@@ -5,7 +5,7 @@
 #include <vector>
 #include "Clip.h"
 
-using namespace std;
+//using namespace std;
 
 /* Doit contenir un tableau de pointeurs vers des AudioClip
  *	et plus tard des pistes ?
@@ -23,12 +23,13 @@ public:
 	// Destructor 
 	~AudioGroup();
 
-    vector<AudioClip *> * getClipSet();
-    void addAclip(std::string path);
+    std::vector<AudioClip *> * getClipSet ();
+    void addAclip (std::string path);
+    void stopAll ();
     
 private:
 
-	vector<AudioClip *> * ClipSet;
+	std::vector<AudioClip *> * ClipSet;
 
 };
 

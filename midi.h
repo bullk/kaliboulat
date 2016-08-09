@@ -3,7 +3,7 @@
 
 #include <vector>
 
-using namespace std;
+//using namespace std;
 
 // MIDI message types filtered by status byte, sorted by categories (events, channel mode, system common, realtime)
 // source : https://www.midi.org/specifications/item/table-1-summary-of-midi-message
@@ -17,13 +17,13 @@ enum MidiMessageType { MMT_NOTE_OFF, MMT_NOTE_ON, MMT_AFTERTOUCH, MMT_CONTROL_CH
 class MidiMessage
 {
 public:
-	MidiMessage (vector<unsigned char> *);
+	MidiMessage (std::vector<unsigned char> *);
 	~MidiMessage ();
 	
 	
 protected:
 	int type;
-	vector<unsigned char> * data_;
+	std::vector<unsigned char> * data_;
 	
 };
 
@@ -31,7 +31,7 @@ protected:
 class ScheduledMidiMessage : public MidiMessage
 {
 public:
-	ScheduledMidiMessage (vector<unsigned char> *);
+	ScheduledMidiMessage (std::vector<unsigned char> *);
 	~ScheduledMidiMessage ();
 	unsigned long getAbsTicks ();
 	void setAbsTicks (unsigned long);

@@ -1,6 +1,9 @@
 #include <string>
 #include "Clip.h"
 
+using namespace std;
+using namespace stk;
+
 //-------------
 // Constructor 
 //-------------
