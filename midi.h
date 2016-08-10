@@ -2,8 +2,8 @@
 #define INC_MIDI_H
 
 #include <vector>
+#include "Scheduled.h"
 
-//using namespace std;
 
 // MIDI message types filtered by status byte, sorted by categories (events, channel mode, system common, realtime)
 // source : https://www.midi.org/specifications/item/table-1-summary-of-midi-message
@@ -17,7 +17,7 @@ enum MidiMessageType { MMT_NOTE_OFF, MMT_NOTE_ON, MMT_AFTERTOUCH, MMT_CONTROL_CH
 class MidiMessage
 {
 public:
-	MidiMessage (std::vector<unsigned char> *);
+	MidiMessage (std::vector<unsigned char> * data);
 	~MidiMessage ();
 	
 	
@@ -28,16 +28,13 @@ protected:
 };
 
 
-class ScheduledMidiMessage : public MidiMessage
+class ScheduledMidiMessage : public Scheduled, public MidiMessage
 {
 public:
-	ScheduledMidiMessage (std::vector<unsigned char> *);
+	ScheduledMidiMessage (long unsigned int time, std::vector<unsigned char> * data);
 	~ScheduledMidiMessage ();
-	unsigned long getAbsTicks ();
-	void setAbsTicks (unsigned long);
 
 protected:
-	unsigned long delta_ticks_, abs_ticks_;
 	int bar_, beat_, tick_;
 
 };

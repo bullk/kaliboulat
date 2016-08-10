@@ -4,7 +4,7 @@
 // Constructor 
 //-------------
 
-MidiGroup::MidiGroup()
+MidiGroup::MidiGroup ()
 {
 	ClipSet = new std::vector<MidiClip *>;
 }
@@ -14,11 +14,11 @@ MidiGroup::MidiGroup()
 // Destructor 
 //------------
 
-MidiGroup::~MidiGroup()
+MidiGroup::~MidiGroup ()
 {
     //delete each audio file object (and corresponding buffer, etc.)
     if (ClipSet != NULL){
-        for (unsigned int i = 0; i < ClipSet->size(); i++)
+        for (unsigned int i = 0; i < ClipSet->size (); i++)
         {
             delete ClipSet->at(i);
         }
@@ -38,15 +38,9 @@ std::vector<MidiClip *> * MidiGroup::getClipSet()
 // Add a clip
 //------------
 
-void MidiGroup::addAclip(std::string path)
+void MidiGroup::addClip(MidiClip * daClip)
 {
-	if ( path != "")
-	{
-		MidiClip * midiclip = new MidiClip(path);
-		midiclip->parse();
-		ClipSet->push_back(midiclip);
-		
-	}
+		ClipSet->push_back (daClip);
 }
 
 //unsigned long MidiGroup::getLength()
@@ -54,13 +48,9 @@ void MidiGroup::addAclip(std::string path)
 	//return 1;
 //}
 
-void MidiGroup::tick ()
+void MidiGroup::tick (RtMidiOut * midiout)
 {
-	for (unsigned int i = 0; i < ClipSet->size(); i++)
-	{
-		if (ClipSet->at(i)->getState() == CS_PLAYING)
-		{
-			ClipSet->at(i)->tick();
-		}
-	}
+	for (unsigned int i = 0; i < ClipSet->size (); i++)
+		if (ClipSet->at(i)->getState () == CS_PLAYING)
+			ClipSet->at(i)->tick (midiout);
 }

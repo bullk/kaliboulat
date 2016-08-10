@@ -1,29 +1,23 @@
 #ifndef INC_MIDIGROUP_H
 #define INC_MIDIGROUP_H
 
-#include <string>
-#include <vector>
-#include "Clip.h"
-
-//using namespace std;
+#include "MidiClip.h"
 
 class MidiGroup
 {
 
 public:
-
 	// Constructor 
-	MidiGroup();
+	MidiGroup ();
 	// Destructor 
-	~MidiGroup();
+	~MidiGroup ();
 
-    std::vector<MidiClip *> * getClipSet();
-    void addAclip(std::string path);
-    //unsigned long getLength();
-    void tick();
-    
+	std::vector<MidiClip *> * getClipSet ();
+	void addClip (MidiClip * daClip);
+	//unsigned long getLength ();
+	void tick (RtMidiOut *);
+	
 private:
-
 	std::vector<MidiClip *> * ClipSet;
 
 };

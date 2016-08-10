@@ -5,7 +5,7 @@
 
 * SORTIE MIDI !!!
 	* MidiGroup vers sortie
-* Nettoyage des fonctions audio
+* Modularisation des fonctions audio
 * regrouper l'initialisation des contenus (pour préparer la gestion de projet)
 * ENTREE MIDI !!!
 * MIDI THRU

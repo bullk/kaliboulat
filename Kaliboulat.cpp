@@ -5,12 +5,12 @@
 
 #include <RtError.h>
 #include <RtAudio.h>
-#include <RtMidi.h>
 
 #include "globals.h"
 #include "Clock.h"
 #include "AudioGroup.h"
 #include "MidiGroup.h"
+#include "MidiFile.h"
 
 #ifdef WITH_GUI
 #include "GUI.h"
@@ -43,7 +43,8 @@ void audioClose();
 
 void midiInit(MidiGroup * midigroup_p)
 {
-	midigroup_p->addAclip (midiClipDir + "/" + midiClipLs[0]);
+	MidiFile * midifile = new MidiFile(midiClipDir + "/" + midiClipLs[0]);
+	midifile->parse(midigroup_p);
 }
 
 
@@ -94,21 +95,21 @@ void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try dac->openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiogroup_p, &options );
-	catch ( RtError &error ) error.printMessage();
+	try { dac->openStream ( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiogroup_p, &options ); }
+	catch ( RtError &error ) { error.printMessage (); }
 
-	try dac->startStream();
-	catch ( RtError &error ) error.printMessage();
+	try { dac->startStream (); }
+	catch ( RtError &error ) { error.printMessage (); }
 
 } 
 
 void audioClose (RtAudio * dac)
 {
-	try dac->stopStream();
-	catch ( RtError &error ) error.printMessage();
+	try { dac->stopStream (); }
+	catch ( RtError &error ) { error.printMessage (); }
 	
-	try dac->closeStream();
-	catch ( RtError &error ) error.printMessage();
+	try { dac->closeStream (); }
+	catch ( RtError &error ) { error.printMessage (); }
 }
 
 
@@ -148,11 +149,14 @@ int main( int argc, char* args[] )
 	// MAIN LOOP
 	while (go_on)
 	{
+		// Clock update
 		if (daClock.getState()) midi_ticks = daClock.update();
 		
+		// MIDI flow
 		for (unsigned int i=0; i<midi_ticks; i++) 
-			midiMaster.tick();
+			midiMaster.tick(midiout);
 
+		// GUI
 		#ifdef WITH_GUI
 			GUI_Main (&go_on, &daClock, &audioMaster, &midiMaster);
 		#endif

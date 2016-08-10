@@ -1,10 +1,11 @@
 #include "GUI.h"
+#include "MidiFile.h"
 
 using namespace std;
 
-static SDL_GLContext glcontext;
-static SDL_Window *window = NULL;
-static ImVec4 clear_color;
+SDL_GLContext glcontext;
+SDL_Window *window = NULL;
+ImVec4 clear_color;
 
 int GUI_Init ()
 {
@@ -44,6 +45,60 @@ void GUI_Close()
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+void displayMidiFile ()
+{
+	//unsigned short int beats_per_bar = 4;
+	//MidiFile * daFile;
+	//unsigned int ntracks = daFile->getNumberOfTracks();
+	//ImGui::PushItemWidth(100);
+	//ImGui::TextColored(ImColor(255,255,0), "%s", daFile->getName().c_str());
+	//ImGui::Text("Location : %s", daFile->getPath().c_str());
+	//ImGui::Text("MIDI file format %d", daFile->getFileFormat());
+	//ImGui::Text("%d tracks", ntracks);
+	//ImGui::Text("division value %d", daFile->getDivision());
+	//ImGui::Text("length : %lu", daFile->getLength());
+	//ImGui::Text("time : %lu", daFile->getTime());
+	//for (unsigned int i=0; i<ntracks; i++)
+	//{
+		//if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
+		//{
+			//ImGui::Text ("%f µs / tick", 1000000 * daFile->getTickSeconds(i)); ImGui::SameLine();
+			//ImGui::Text ("-> %.02f BPM", 60 / (daFile->getTickSeconds(i) * daFile->getDivision()));
+			//ImGui::Separator();
+			//ImGui::Text("time (BBT)  "); ImGui::SameLine();
+			//ImGui::Text("Status  "); ImGui::SameLine();
+			//ImGui::Text("DATA"); 
+			//ImGui::Separator();
+//
+			//daFile->rewindTrack(i);
+			//vector< unsigned char > * event = new vector<unsigned char>();
+			//unsigned long abs_time = 0, delta_time = 0;
+			//
+			//delta_time = daFile->getNextEvent(event, i);
+			//while ( event->size() > 0 )
+			//{
+				//abs_time += delta_time;
+				//int nbeats = abs_time / daFile->getDivision();
+				//int tick = abs_time % daFile->getDivision();
+				//int beat = 1 + nbeats % beats_per_bar;
+				//int bar = 1 + nbeats / beats_per_bar;
+				//ImGui::Text("%02d:%02d:%03d   ", bar, beat, tick); ImGui::SameLine();
+				//ImGui::Text("%x      ", event->at(0)); ImGui::SameLine();
+				//for (unsigned int i=1; i<event->size(); i++)
+				//{
+					//if (i>1) ImGui::SameLine();
+					//ImGui::Text("%x", event->at(i));
+				//}
+				//delta_time = daFile->getNextEvent(event, i);
+			//}
+			//ImGui::Separator();
+			//delete event;
+//
+			//ImGui::TreePop();
+		//}
+	//}
 }
 
 
@@ -249,57 +304,6 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 		}
 		else if (details < 0)
 		{
-			unsigned short int beats_per_bar = 4;
-			MidiClip * daClip = midigroup_p->getClipSet()->at(-details-1);
-			unsigned int ntracks = daClip->getNumberOfTracks();
-			ImGui::PushItemWidth(100);
-			ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
-			ImGui::Text("Location : %s", daClip->getPath().c_str());
-			ImGui::Text("MIDI file format %d", daClip->getFileFormat());
-			ImGui::Text("%d tracks", ntracks);
-			ImGui::Text("division value %d", daClip->getDivision());
-			ImGui::Text("length : %lu", daClip->getLength());
-			ImGui::Text("time : %lu", daClip->getTime());
-			for (unsigned int i=0; i<ntracks; i++)
-			{
-				if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
-				{
-					ImGui::Text ("%f µs / tick", 1000000 * daClip->getTickSeconds(i)); ImGui::SameLine();
-					ImGui::Text ("-> %.02f BPM", 60 / (daClip->getTickSeconds(i) * daClip->getDivision()));
-					ImGui::Separator();
-					ImGui::Text("time (BBT)  "); ImGui::SameLine();
-					ImGui::Text("Status  "); ImGui::SameLine();
-					ImGui::Text("DATA"); 
-					ImGui::Separator();
-					//------------------------
-					daClip->rewindTrack(i);
-					vector< unsigned char > * event = new vector<unsigned char>();
-					unsigned long abs_time = 0, delta_time = 0;
-					
-					delta_time = daClip->getNextEvent(event, i);
-					while ( event->size() > 0 )
-					{
-						abs_time += delta_time;
-						int nbeats = abs_time / daClip->getDivision();
-						int tick = abs_time % daClip->getDivision();
-						int beat = 1 + nbeats % beats_per_bar;
-						int bar = 1 + nbeats / beats_per_bar;
-						ImGui::Text("%02d:%02d:%03d   ", bar, beat, tick); ImGui::SameLine();
-						ImGui::Text("%x      ", event->at(0)); ImGui::SameLine();
-						for (unsigned int i=1; i<event->size(); i++)
-						{
-							if (i>1) ImGui::SameLine();
-							ImGui::Text("%x", event->at(i));
-						}
-						//ImGui::Text("%u", event->size());
-						delta_time = daClip->getNextEvent(event, i);
-					}
-					ImGui::Separator();
-					delete event;
-					//------------------------
-					ImGui::TreePop();
-				}
-			}
 		}
 		ImGui::EndChild();
 		ImGui::PopStyleColor();

@@ -5,10 +5,8 @@
 #include <vector>
 #include <stk/FileLoop.h>
 #include <stk/PitShift.h>
-#include <stk/MidiFileIn.h>
-#include "midi.h"
 
-/*		Classes Clip, AudioClip, MidiClip
+/*		Classes Clip, AudioClip
  * 
  *
  */
@@ -21,7 +19,7 @@ class Clip
 	
 public:
 	Clip ();
-	~Clip ();
+	virtual ~Clip ();
 	ClipState getState ();
 	void setState (ClipState);
 	virtual std::string getPath ();
@@ -65,22 +63,5 @@ protected:
 	stk::PitShift * pitshift_;
 };
 
-
-class MidiClip : public Clip, public stk::MidiFileIn
-{
-public:
-	MidiClip (std::string path);
-	~MidiClip ();
-	void parse ();
-	long unsigned int getLength ();
-	long unsigned int getTime ();
-	void rewind ();
-	void tick ();
-	
-protected:
-	long unsigned int length_, time_;
-	std::vector<long unsigned int> track_indexes_;
-	//vector<ScheduledMidiMessage *> * data_;
-};
 
 #endif
