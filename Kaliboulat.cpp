@@ -94,37 +94,21 @@ void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try {
-		dac->openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiogroup_p, &options );
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-	}
+	try dac->openStream( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiogroup_p, &options );
+	catch ( RtError &error ) error.printMessage();
 
-	try {
-		dac->startStream();
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-	}
+	try dac->startStream();
+	catch ( RtError &error ) error.printMessage();
 
 } 
 
 void audioClose (RtAudio * dac)
 {
-	try {
-		dac->stopStream();
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-	}	
+	try dac->stopStream();
+	catch ( RtError &error ) error.printMessage();
 	
-	try {
-		dac->closeStream();
-	}
-	catch ( RtError &error ) {
-		error.printMessage();
-	}
+	try dac->closeStream();
+	catch ( RtError &error ) error.printMessage();
 }
 
 
@@ -152,34 +136,38 @@ int main( int argc, char* args[] )
 	Clock daClock; // main clock
 	daClock.init();
 
-#ifdef WITH_GUI
-	if (GUI_Init () != 0)	return -1;
-#endif
+	#ifdef WITH_GUI
+		if (GUI_Init () != 0)	return -1;
+	#endif
 	
 	// Main loop
 	
 	bool go_on = true;
 	unsigned int midi_ticks = 0;
 	
+	// MAIN LOOP
 	while (go_on)
 	{
 		if (daClock.getState()) midi_ticks = daClock.update();
+		
 		for (unsigned int i=0; i<midi_ticks; i++) 
 			midiMaster.tick();
 
-#ifdef WITH_GUI
-		GUI_Main (&go_on, &daClock, &audioMaster, &midiMaster);
-#endif
+		#ifdef WITH_GUI
+			GUI_Main (&go_on, &daClock, &audioMaster, &midiMaster);
+		#endif
 
 	}
 	
 	// Close application
 	
-#ifdef WITH_GUI
-	GUI_Close ();
-#endif
-	audioClose (dac);
+	#ifdef WITH_GUI
+		GUI_Close ();
+	#endif
 	delete midiout;
+	audioClose (dac);
+	delete dac;
+
 	return 0; /* ISO C requires main to return int. */
 
 }
