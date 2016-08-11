@@ -118,11 +118,13 @@ void audioClose (RtAudio * dac)
 int main( int argc, char* args[] )
 {
 
-	RtAudio * dac = new RtAudio(RtAudio::UNIX_JACK); // main audio output
+	//RtAudio * dac = new RtAudio(RtAudio::UNIX_JACK); // main audio output
+	RtAudio * dac = new RtAudio(); // main audio output
 	AudioGroup audioMaster; // Audio clips manager
 	audioInit (dac, &audioMaster);
 
-	RtMidiOut * midiout = new RtMidiOut(RtMidi::UNIX_JACK, APP_NAME);
+	//RtMidiOut * midiout = new RtMidiOut(RtMidi::UNIX_JACK, APP_NAME);
+	RtMidiOut * midiout = new RtMidiOut(APP_NAME);
 	// Check available ports.
 	unsigned int nPorts = midiout->getPortCount();
 	if ( nPorts == 0 ) {
