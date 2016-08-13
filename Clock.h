@@ -9,7 +9,8 @@ class Clock
 {
 
 public:
-	void init ();
+	Clock ();
+	~Clock ();
 	void start ();
 	void stop ();
 	void rewind ();

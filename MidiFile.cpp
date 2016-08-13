@@ -50,7 +50,13 @@ void MidiFile::parse(MidiGroup * midigroup_p)
 		while ( event -> size () > 0 )
 		{
 			abs_time += delta_time;
-			daClip -> appendEvent(abs_time, event);
+			switch ( event -> at(0) )
+			{
+				case 0xFF:
+					break;
+				default:
+					daClip -> appendEvent(abs_time, event);
+			}
 			delta_time = getNextEvent (event, i);
 		}
 		daClip -> setLength(abs_time);

@@ -9,7 +9,7 @@
 MidiMessage::MidiMessage (std::vector<unsigned char> * data)
 {
 	data_ = new std::vector<unsigned char>;
-	data_ = data;
+	*data_ = *data;
 }
 
 
@@ -24,7 +24,17 @@ MidiMessage::~MidiMessage ()
 
 //------------
 
-
+std::string MidiMessage::hexData ()
+{
+	std::string s = "";
+	char buffer[2];
+	for ( unsigned int i = 0; i < data_ -> size (); i++ )
+	{
+		sprintf (buffer, "%x", data_ -> at (i));
+		s += buffer;
+	}
+	return s;
+}
 
 
 // ScheduledMidiMessage Class

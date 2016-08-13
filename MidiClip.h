@@ -21,7 +21,7 @@ public:
 	void appendEvent (long unsigned int time, std::vector<unsigned char> * event);
 	
 protected:
-	long unsigned int length_, time_;
+	long unsigned int length_, time_, index_;
 	std::vector<ScheduledMidiMessage *> * data_;
 };
 

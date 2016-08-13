@@ -21,7 +21,7 @@ using namespace std;
 
 // MIDI
 
-void midiInit();
+void midiInit ();
 string midiClipDir = "user/MIDI";
 string midiClipLs[1] = { "test-Drums-1.mid" };
 
@@ -31,9 +31,9 @@ string midiClipLs[1] = { "test-Drums-1.mid" };
 string sampleDir = "user/Audio";
 string sampleLs[3] = { "bar.wav", "hellosine.wav", "bonjouratoutes.wav" };
 
-int tick();
-void audioInit();
-void audioClose();
+int tick ();
+void audioInit ();
+void audioClose ();
 
 
 
@@ -43,8 +43,8 @@ void audioClose();
 
 void midiInit(MidiGroup * midigroup_p)
 {
-	MidiFile * midifile = new MidiFile(midiClipDir + "/" + midiClipLs[0]);
-	midifile->parse(midigroup_p);
+	MidiFile * midifile = new MidiFile (midiClipDir + "/" + midiClipLs[0]);
+	midifile -> parse (midigroup_p);
 }
 
 
@@ -61,11 +61,11 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
-		for ( unsigned int j = 0; j < audiogroup_p->getClipSet()->size(); j++ )
+		for ( unsigned int j = 0; j < audiogroup_p -> getClipSet () -> size (); j++ )
 		{
-			AudioClip * daClip = audiogroup_p->getClipSet()->at(j);
-			if ( daClip->getState() == CS_PLAYING )
-				*samples += daClip->tick() * *(daClip->getVolume());
+			AudioClip * daClip = audiogroup_p -> getClipSet () -> at (j);
+			if ( daClip -> getState () == CS_PLAYING )
+				*samples += daClip -> tick () * *(daClip -> getVolume ());
 		}
 		samples++;
 	}
@@ -76,16 +76,16 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 
 void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
 {
-	audiogroup_p->addAclip (sampleDir + "/" + sampleLs[0]);
-	audiogroup_p->addAclip (sampleDir + "/" + sampleLs[1]);
-	audiogroup_p->addAclip (sampleDir + "/" + sampleLs[2]);
+	audiogroup_p -> addAclip (sampleDir + "/" + sampleLs[0]);
+	audiogroup_p -> addAclip (sampleDir + "/" + sampleLs[1]);
+	audiogroup_p -> addAclip (sampleDir + "/" + sampleLs[2]);
 
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
 	
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters parameters;
-	parameters.deviceId = dac->getDefaultOutputDevice();
+	parameters.deviceId = dac -> getDefaultOutputDevice ();
 	parameters.nChannels = 1;
 	
 	RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
@@ -117,30 +117,35 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
+	#ifdef __UNIX_JACK__
+		RtAudio * dac = new RtAudio (RtAudio::UNIX_JACK); // main audio output
+	#else
+		RtAudio * dac = new RtAudio (); // main audio output
+	#endif
+	AudioGroup * audioMaster = new AudioGroup (); // Audio clips manager
+	audioInit (dac, audioMaster);
 
-	//RtAudio * dac = new RtAudio(RtAudio::UNIX_JACK); // main audio output
-	RtAudio * dac = new RtAudio(); // main audio output
-	AudioGroup audioMaster; // Audio clips manager
-	audioInit (dac, &audioMaster);
-
-	//RtMidiOut * midiout = new RtMidiOut(RtMidi::UNIX_JACK, APP_NAME);
-	RtMidiOut * midiout = new RtMidiOut(APP_NAME);
+	#ifdef __UNIX_JACK__
+		RtMidiOut * midiout = new RtMidiOut (RtMidi::UNIX_JACK, APP_NAME);
+	#else
+		//RtMidiOut * midiout = new RtMidiOut(APP_NAME);
+	#endif
 	// Check available ports.
-	unsigned int nPorts = midiout->getPortCount();
+	unsigned int nPorts = midiout -> getPortCount ();
 	if ( nPorts == 0 ) {
 		std::cout << "No ports available!\n";
 		//goto cleanup;
 	}
 	// Open first available port.
-	midiout->openPort( 0 );
-	MidiGroup midiMaster; // MIDI clips manager
-	midiInit (&midiMaster);
+	//midiout -> openPort ();
+	midiout -> openVirtualPort ();
+	MidiGroup * midiMaster = new MidiGroup (); // MIDI clips manager
+	midiInit (midiMaster);
 
-	Clock daClock; // main clock
-	daClock.init();
+	Clock * daClock = new Clock (); // main clock
 
 	#ifdef WITH_GUI
-		if (GUI_Init () != 0)	return -1;
+		if ( GUI_Init () != 0 )	return -1;
 	#endif
 	
 	// Main loop
@@ -152,15 +157,17 @@ int main( int argc, char* args[] )
 	while (go_on)
 	{
 		// Clock update
-		if (daClock.getState()) midi_ticks = daClock.update();
-		
-		// MIDI flow
-		for (unsigned int i=0; i<midi_ticks; i++) 
-			midiMaster.tick(midiout);
+		if ( daClock -> getState () ) 
+		{
+			midi_ticks = daClock -> update ();
+			// MIDI flow
+			for (unsigned int i=0; i<midi_ticks; i++) 
+				midiMaster -> tick (midiout);
+		}
 
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (&go_on, &daClock, &audioMaster, &midiMaster);
+			GUI_Main (&go_on, daClock, audioMaster, midiMaster);
 		#endif
 
 	}
@@ -170,7 +177,11 @@ int main( int argc, char* args[] )
 	#ifdef WITH_GUI
 		GUI_Close ();
 	#endif
+	
+	delete daClock;
+	delete midiMaster;
 	delete midiout;
+	delete audioMaster;
 	audioClose (dac);
 	delete dac;
 

@@ -1,6 +1,6 @@
 #include "Clock.h"
 
-void Clock::init ()
+Clock::Clock ()
 {
 	state = false;
 	tempo = 120;
@@ -9,6 +9,9 @@ void Clock::init ()
 	tick_duration = 60.0f / (tempo * ticks_per_beat);
 	rewind ();
 }
+
+Clock::~Clock ()
+{}
 
 void Clock::start ()
 {
@@ -32,8 +35,8 @@ void Clock::rewind ()
 	hour = 0;
 	minute = 0;
 	second = 0;
-	previous_ticks=0;
-	now_ticks=0;
+	previous_ticks = 0;
+	now_ticks = 0;
 }
 	
 unsigned int Clock::update ()

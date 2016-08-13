@@ -1,6 +1,7 @@
 #ifndef INC_MIDI_H
 #define INC_MIDI_H
 
+#include <string>
 #include <vector>
 #include "Scheduled.h"
 
@@ -19,7 +20,8 @@ class MidiMessage
 public:
 	MidiMessage (std::vector<unsigned char> * data);
 	~MidiMessage ();
-	
+	inline std::vector<unsigned char> * getData () { return data_; }
+	std::string hexData ();
 	
 protected:
 	int type;

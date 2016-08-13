@@ -21,6 +21,7 @@ MidiClip::MidiClip (std::string name)
 	name_ = name;
 	length_ = 0;
 	time_ = 0;
+	index_ = 0;
 	data_ = new std::vector<ScheduledMidiMessage *>;
 }
 
@@ -32,8 +33,8 @@ MidiClip::MidiClip (std::string name)
 MidiClip::~MidiClip ()
 {
     if (data_ != NULL){
-        for (unsigned int i = 0; i < data_->size(); i++)
-            delete data_->at(i);
+        for (unsigned int i = 0; i < data_ -> size(); i++)
+            delete data_ -> at(i);
     }
 }
 
@@ -45,17 +46,30 @@ void MidiClip::setLength (long unsigned int length) { length_ = length; }
 
 long unsigned int MidiClip::getTime () { return time_; }
 
-void MidiClip::rewind () { time_ = 0; }
+void MidiClip::rewind ()
+{
+	time_ = 0;
+	index_ = 0;
+}
 
 void MidiClip::tick (RtMidiOut * midiout)
 {
-	if (time_ == length_) rewind ();
-	else time_++;
+	if ( time_ == length_ ) rewind ();
+	else
+	{
+		while ( data_ -> at (index_) -> getTime () == time_ )
+		{
+			midiout -> sendMessage (data_ -> at (index_) -> getData ());
+			if ( index_ < data_ -> size () ) index_++;
+			else break;
+		}
+	time_++;
+}
 }
 
 void MidiClip::appendEvent (long unsigned int time, std::vector<unsigned char> * event)
 {
 	std::vector<unsigned char> ev;
 	ev = *event;
-	data_->push_back (new ScheduledMidiMessage (time, &ev));
+	data_ -> push_back (new ScheduledMidiMessage (time, &ev));
 }
