@@ -53,6 +53,18 @@ void MidiFile::parse(MidiGroup * midigroup_p)
 			switch ( event -> at(0) )
 			{
 				case 0xFF:
+					switch ( event -> at(1) )
+					{
+						case 0x03:
+							clipname = "";
+							unsigned int strend = event->at(2) + 3;
+							for ( unsigned int i=3; i < strend; i++ )
+								clipname += (char) event -> at(i);
+							daClip -> setName (clipname);
+							break;
+						//default:
+							//break;
+					}
 					break;
 				default:
 					daClip -> appendEvent(abs_time, event);

@@ -117,6 +117,7 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
+	// AUDIO INIT
 	#ifdef __UNIX_JACK__
 		RtAudio * dac = new RtAudio (RtAudio::UNIX_JACK); // main audio output
 	#else
@@ -125,15 +126,15 @@ int main( int argc, char* args[] )
 	AudioGroup * audioMaster = new AudioGroup (); // Audio clips manager
 	audioInit (dac, audioMaster);
 
+	// MIDI INIT
 	#ifdef __UNIX_JACK__
 		RtMidiOut * midiout = new RtMidiOut (RtMidi::UNIX_JACK, APP_NAME);
 	#else
 		RtMidiOut * midiout = new RtMidiOut(APP_NAME);
 	#endif
-	// Check available ports.
-	unsigned int nPorts = midiout -> getPortCount ();
+	unsigned int nPorts = midiout -> getPortCount (); // Check available ports.
 	if ( nPorts == 0 )
-		std::cout << "No ports available!" << std::endl;
+		std::cout << "No ports available !" << std::endl;
 	else
 	{
 		for ( unsigned int i=0; i < nPorts; i++ )
@@ -144,18 +145,20 @@ int main( int argc, char* args[] )
 	MidiGroup * midiMaster = new MidiGroup (); // MIDI clips manager
 	midiInit (midiMaster);
 
-	Clock * daClock = new Clock (); // main clock
-
+	// CLOCK INIT
+	Clock * daClock = new Clock ();
+	
+	// GUI INIT
 	#ifdef WITH_GUI
 		if ( GUI_Init () != 0 )	return -1;
 	#endif
 	
-	// Main loop
+	
+	// MAIN LOOP
 	
 	bool go_on = true;
 	unsigned int midi_ticks = 0;
 	
-	// MAIN LOOP
 	while (go_on)
 	{
 		// Clock update
@@ -174,7 +177,7 @@ int main( int argc, char* args[] )
 
 	}
 	
-	// Close application
+	// CLOSE APP
 	
 	#ifdef WITH_GUI
 		GUI_Close ();

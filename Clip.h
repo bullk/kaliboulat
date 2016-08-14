@@ -20,10 +20,11 @@ class Clip
 public:
 	Clip ();
 	virtual ~Clip ();
-	ClipState getState ();
-	void setState (ClipState);
-	virtual std::string getPath ();
-	virtual std::string getName ();
+	inline ClipState getState () { return state_; }
+	inline void setState (ClipState s) { state_ = s; }
+	inline virtual std::string getPath ()  { return path_; }
+	inline virtual std::string getName () { return name_; }
+	inline void virtual setName (std::string s) { name_ = s; }
 	virtual unsigned long getLength() = 0;
 	//virtual int getAngle (void) = 0;
    

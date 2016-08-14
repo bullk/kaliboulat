@@ -20,27 +20,6 @@ Clip::~Clip()
 {
 }
 
-//------------
-
-std::string Clip::getName ()
-{
-	return name_;
-}
-	
-std::string Clip::getPath ()
-{
-	return path_;
-}
-
-ClipState Clip::getState()
-{
-	return state_;
-}
-
-void Clip::setState(ClipState s)
-{
-	state_ = s;
-}
 
 //-------------
 // Constructor 
@@ -80,35 +59,17 @@ AudioClip::~AudioClip()
 
 //------------
 
-float * AudioClip::getGUIData ()
-{
-	return &gui_data_[0];
-}
+float * AudioClip::getGUIData () { return &gui_data_[0]; }
 
-unsigned long AudioClip::getLength ()
-{
-	return getSize();
-}
+unsigned long AudioClip::getLength () { return getSize(); }
 
-StkFloat AudioClip::getTime ()
-{
-	return time_;
-}
+StkFloat AudioClip::getTime () { return time_; }
 
-float * AudioClip::getVolume ()
-{
-	return &volume_;
-}
+float * AudioClip::getVolume () { return &volume_; }
 
-float * AudioClip::getGUIRateP ()
-{
-	return &gui_rate_;
-}
+float * AudioClip::getGUIRateP () { return &gui_rate_; }
 
-int * AudioClip::getGUIPitchP ()
-{
-	return &gui_pitch_;
-}
+int * AudioClip::getGUIPitchP () { return &gui_pitch_; }
 
 void AudioClip::updateRate ()
 {

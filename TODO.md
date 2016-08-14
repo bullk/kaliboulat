@@ -3,7 +3,6 @@
 ---------------
 ## MAINTENANT
 
-* Modularisation des fonctions audio
 * regrouper l'initialisation des contenus (pour préparer la gestion de projet)
 * ENTREE MIDI !!!
 * MIDI THRU
@@ -13,6 +12,7 @@
 	* looped
 	* warped ?
 	* free / next beat / next bar
+* Modularisation des fonctions audio ?
 
 
 ### Moteur
