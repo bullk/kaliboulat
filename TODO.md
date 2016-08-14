@@ -3,8 +3,6 @@
 ---------------
 ## MAINTENANT
 
-* SORTIE MIDI !!!
-	* MidiGroup vers sortie
 * Modularisation des fonctions audio
 * regrouper l'initialisation des contenus (pour préparer la gestion de projet)
 * ENTREE MIDI !!!

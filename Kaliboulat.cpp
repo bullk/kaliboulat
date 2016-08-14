@@ -128,17 +128,19 @@ int main( int argc, char* args[] )
 	#ifdef __UNIX_JACK__
 		RtMidiOut * midiout = new RtMidiOut (RtMidi::UNIX_JACK, APP_NAME);
 	#else
-		//RtMidiOut * midiout = new RtMidiOut(APP_NAME);
+		RtMidiOut * midiout = new RtMidiOut(APP_NAME);
 	#endif
 	// Check available ports.
 	unsigned int nPorts = midiout -> getPortCount ();
-	if ( nPorts == 0 ) {
-		std::cout << "No ports available!\n";
-		//goto cleanup;
+	if ( nPorts == 0 )
+		std::cout << "No ports available!" << std::endl;
+	else
+	{
+		for ( unsigned int i=0; i < nPorts; i++ )
+			std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
+		//midiout -> openPort (); // Open first available port.
+		midiout -> openVirtualPort ();
 	}
-	// Open first available port.
-	//midiout -> openPort ();
-	midiout -> openVirtualPort ();
 	MidiGroup * midiMaster = new MidiGroup (); // MIDI clips manager
 	midiInit (midiMaster);
 
