@@ -40,14 +40,10 @@ MidiClip::~MidiClip ()
 
 //------------
 
-long unsigned int MidiClip::getLength () { return length_; }
-
-void MidiClip::setLength (long unsigned int length) { length_ = length; }
-
-long unsigned int MidiClip::getTime () { return time_; }
 
 void MidiClip::rewind ()
 {
+	std::cout << "rewind" << std::endl;
 	time_ = 0;
 	index_ = 0;
 }
@@ -59,15 +55,16 @@ void MidiClip::tick (RtMidiOut * midiout)
 	{
 		while ( data_ -> at (index_) -> getTime () == time_ )
 		{
+			std::cout << time_ << ":" << index_ << ":" << data_ -> at (index_) -> getData () << std::endl;
 			midiout -> sendMessage (data_ -> at (index_) -> getData ());
 			if ( index_ < data_ -> size () ) index_++;
 			else break;
 		}
 	time_++;
-}
+	}
 }
 
-void MidiClip::appendEvent (long unsigned int time, std::vector<unsigned char> * event)
+void MidiClip::appendEvent (unsigned long time, std::vector<unsigned char> * event)
 {
 	std::vector<unsigned char> ev;
 	ev = *event;

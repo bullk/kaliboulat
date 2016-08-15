@@ -15,6 +15,16 @@
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
+
+struct Screen
+{
+	//enum Type { MAIN }; // For later use
+	enum Context { NONE, PROJECT, AUDIOCLIP, MIDICLIP }; 
+	Context context;
+	unsigned int id;
+};
+
+
 int GUI_Init();
 void GUI_Close();
 void GUI_Main(bool*, Clock*, AudioGroup*, MidiGroup*, Project*);

@@ -170,7 +170,12 @@ int main( int argc, char* args[] )
 			midi_ticks = daClock -> update ();
 			// MIDI flow
 			for (unsigned int i=0; i<midi_ticks; i++) 
+			{
+				char bbt[13];
+				sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), daClock -> getTick()-midi_ticks+i);
+				std::cout << bbt << std::endl;
 				midiMaster -> tick (midiout);
+			}
 		}
 
 		// GUI

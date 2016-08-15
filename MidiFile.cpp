@@ -45,6 +45,7 @@ void MidiFile::parse(MidiGroup * midigroup_p)
 		sprintf(buffer, "%s-track-%02d", name_.c_str(), i);
 		std::string clipname = buffer;
 		MidiClip * daClip = new MidiClip (clipname);
+		daClip -> setDivision (division_);
 		rewindTrack (i);
 		abs_time=0;
 		delta_time = getNextEvent (event, i);

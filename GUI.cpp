@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 SDL_GLContext glcontext;
 SDL_Window *window = NULL;
 ImVec4 clear_color;
@@ -47,64 +48,54 @@ void GUI_Close()
 	SDL_Quit();
 }
 
-void displayMidiFile ()
+void displayMidiClip (MidiClip * daClip)
 {
-	//unsigned short int beats_per_bar = 4;
-	//MidiFile * daFile;
-	//unsigned int ntracks = daFile->getNumberOfTracks();
-	//ImGui::PushItemWidth(100);
-	//ImGui::TextColored(ImColor(255,255,0), "%s", daFile->getName().c_str());
-	//ImGui::Text("Location : %s", daFile->getPath().c_str());
-	//ImGui::Text("MIDI file format %d", daFile->getFileFormat());
-	//ImGui::Text("%d tracks", ntracks);
-	//ImGui::Text("division value %d", daFile->getDivision());
-	//ImGui::Text("length : %lu", daFile->getLength());
-	//ImGui::Text("time : %lu", daFile->getTime());
-	//for (unsigned int i=0; i<ntracks; i++)
-	//{
-		//if (ImGui::TreeNode((void*)(intptr_t)i, "Track %d", i))
-		//{
-			//ImGui::Text ("%f µs / tick", 1000000 * daFile->getTickSeconds(i)); ImGui::SameLine();
-			//ImGui::Text ("-> %.02f BPM", 60 / (daFile->getTickSeconds(i) * daFile->getDivision()));
-			//ImGui::Separator();
-			//ImGui::Text("time (BBT)  "); ImGui::SameLine();
-			//ImGui::Text("Status  "); ImGui::SameLine();
-			//ImGui::Text("DATA"); 
-			//ImGui::Separator();
-//
-			//daFile->rewindTrack(i);
-			//vector< unsigned char > * event = new vector<unsigned char>();
-			//unsigned long abs_time = 0, delta_time = 0;
-			//
-			//delta_time = daFile->getNextEvent(event, i);
-			//while ( event->size() > 0 )
-			//{
-				//abs_time += delta_time;
-				//int nbeats = abs_time / daFile->getDivision();
-				//int tick = abs_time % daFile->getDivision();
-				//int beat = 1 + nbeats % beats_per_bar;
-				//int bar = 1 + nbeats / beats_per_bar;
-				//ImGui::Text("%02d:%02d:%03d   ", bar, beat, tick); ImGui::SameLine();
-				//ImGui::Text("%x      ", event->at(0)); ImGui::SameLine();
-				//for (unsigned int i=1; i<event->size(); i++)
-				//{
-					//if (i>1) ImGui::SameLine();
-					//ImGui::Text("%x", event->at(i));
-				//}
-				//delta_time = daFile->getNextEvent(event, i);
-			//}
-			//ImGui::Separator();
-			//delete event;
-//
-			//ImGui::TreePop();
-		//}
-	//}
+	unsigned short beats_per_bar = 4;
+	ImGui::PushItemWidth(100);
+	ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
+	ImGui::Text("Location : %s", daClip->getPath().c_str());
+	ImGui::Text("size : %lu events", daClip->getSize());
+	ImGui::Text("division value : %d ticks/beat", daClip->getDivision());
+	ImGui::Text("length : %lu ticks", daClip->getLength());
+	ImGui::Text("time : %lu", daClip->getTime());
+	ImGui::Separator();
+	ImGui::Text("time (BBT)  "); ImGui::SameLine();
+	ImGui::Text("Status  "); ImGui::SameLine();
+	ImGui::Text("DATA"); 
+	ImGui::Separator();
+
+	ScheduledMidiMessage * event = NULL;
+	
+	
+	for (unsigned long i=0; i < daClip -> getSize(); i++)
+	{
+		event = daClip->getEvent(i);
+		int nbeats = event->getTime() / daClip->getDivision();
+		int tick = event->getTime() % daClip->getDivision();
+		int beat = 1 + nbeats % beats_per_bar;
+		int bar = 1 + nbeats / beats_per_bar;
+		
+		bool selected = ( daClip -> getIndex () == i );
+		//ImGui::PushID(16384+i);
+		char bbt[13];
+		sprintf (bbt, "%02d:%02d:%03d   ", bar, beat, tick);
+		ImGui::Selectable(bbt, selected); ImGui::SameLine();
+		ImGui::Text("%x      ", event -> getData() -> at (0)); ImGui::SameLine();
+		for (unsigned int j=1; j < event -> getData() -> size(); j++)
+		{
+			if (j>1) ImGui::SameLine();
+			ImGui::Text("%x", event -> getData() -> at (j));
+		}
+		//ImGui::PopID();
+		
+	}
+	ImGui::Separator();
 }
 
 
 void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p, MidiGroup* midigroup_p, Project* project_p)
 {
-	static int details = 0;
+	static Screen details = { Screen::NONE, 0 };
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -124,7 +115,10 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 		flags |= ImGuiWindowFlags_MenuBar;
 		//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 		ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
-		ImGui::Begin("Software", main_switch_p, flags);
+		ImGui::SetNextWindowPos(ImVec2(0,0));
+		char buf[64];
+		sprintf (buf, "%s - Kaliboulat", project_p->getName().c_str());
+		ImGui::Begin(buf, main_switch_p, flags);
 		
 		static bool about_open = false;
 		bool enabled = not(main_clock_p->getState());
@@ -243,7 +237,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 			progress = daClip->getTime() / daClip->getLength();
 			ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
 			const char * clip_name = daClip->getName().c_str(); // Clip Name
-			ImGui::SameLine(); if (ImGui::Button(clip_name)) { details = i+1; }
+			ImGui::SameLine(); if (ImGui::Button(clip_name)) details = { Screen::AUDIOCLIP, i }; 
 		}
 		
 		// MIDI Clips
@@ -280,7 +274,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 			ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
 			ImGui::PopStyleColor();
 			const char * clip_name = daClip->getName().c_str(); // Clip Name
-			ImGui::SameLine(); if (ImGui::Button(clip_name)) { details = -1-i; }
+			ImGui::SameLine(); if (ImGui::Button(clip_name)) details = { Screen::MIDICLIP, i };
 		}
 
 		ImGui::EndChild();
@@ -289,21 +283,29 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 
 		ImGui::BeginChild("Details", ImVec2(0,0), true);
 		//ImGui::Text("Details");
-		if (details > 0) 
+		switch (details.context)
 		{
-			AudioClip * daClip = audiogroup_p->getClipSet()->at(details-1);
-			ImGui::PushItemWidth(100);
-			ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
-			ImGui::Text("Location : %s", daClip->getPath().c_str());
-			ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
-			ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f"); daClip->updateRate();
-			ImGui::SliderInt("pitch", daClip->getGUIPitchP(), -12, 12); daClip->updatePitch();
-			ImGui::PopItemWidth();
-			//ImGui::PlotLines("DATA", daClip->getGUIData(), IM_ARRAYSIZE(daClip->getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
-			//ImGui::Text("size %d", IM_ARRAYSIZE(daClip->getGUIData()));
-		}
-		else if (details < 0)
-		{
+			case Screen::PROJECT:
+			break;
+			case Screen::AUDIOCLIP:
+			{
+				AudioClip * daClip = audiogroup_p->getClipSet()->at(details.id);
+				ImGui::PushItemWidth(100);
+				ImGui::TextColored(ImColor(255,255,0), "%s", daClip->getName().c_str());
+				ImGui::Text("Location : %s", daClip->getPath().c_str());
+				ImGui::SliderFloat("volume", daClip->getVolume(), 0.0f, 1.0f, "%.3f");
+				ImGui::SliderFloat("rate", daClip->getGUIRateP(), 0.125f, 8.0f, "%.3f"); daClip->updateRate();
+				ImGui::SliderInt("pitch", daClip->getGUIPitchP(), -12, 12); daClip->updatePitch();
+				ImGui::PopItemWidth();
+				//ImGui::PlotLines("DATA", daClip->getGUIData(), IM_ARRAYSIZE(daClip->getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
+				//ImGui::Text("size %d", IM_ARRAYSIZE(daClip->getGUIData()));
+			}
+			break;
+			case Screen::MIDICLIP:
+				displayMidiClip (midigroup_p->getClipSet()->at(details.id));
+			break;
+			default:
+			break;
 		}
 		ImGui::EndChild();
 		ImGui::PopStyleColor();

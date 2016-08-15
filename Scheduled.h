@@ -5,14 +5,14 @@
 class Scheduled
 {
 public:
-	Scheduled (long unsigned int);
+	Scheduled (unsigned long);
 	~Scheduled ();
-	long unsigned int getTime ();
-	void setTime (long unsigned int);
+	unsigned long getTime ();
+	void setTime (unsigned long);
 	
 
 protected:
-	long unsigned int time_;
+	unsigned long time_;
 
 };
 
