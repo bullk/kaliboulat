@@ -11,6 +11,7 @@
 #include "AudioGroup.h"
 #include "MidiGroup.h"
 #include "MidiFile.h"
+#include "Project.hpp"
 
 #ifdef WITH_GUI
 #include "GUI.h"
@@ -22,13 +23,13 @@ using namespace std;
 // MIDI
 
 void midiInit ();
-string midiClipDir = "user/MIDI";
+string midiClipDir = "user/test/MIDI";
 string midiClipLs[1] = { "test-Drums-1.mid" };
 
 
 // Audio
 
-string sampleDir = "user/Audio";
+string sampleDir = "user/test/Audio";
 string sampleLs[3] = { "bar.wav", "hellosine.wav", "bonjouratoutes.wav" };
 
 int tick ();
@@ -153,6 +154,8 @@ int main( int argc, char* args[] )
 		if ( GUI_Init () != 0 )	return -1;
 	#endif
 	
+	// INIT PROJECT
+	Project * project = new Project("test");
 	
 	// MAIN LOOP
 	
@@ -172,7 +175,7 @@ int main( int argc, char* args[] )
 
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (&go_on, daClock, audioMaster, midiMaster);
+			GUI_Main (&go_on, daClock, audioMaster, midiMaster, project);
 		#endif
 
 	}

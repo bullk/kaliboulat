@@ -102,7 +102,7 @@ void displayMidiFile ()
 }
 
 
-void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p, MidiGroup* midigroup_p)
+void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p, MidiGroup* midigroup_p, Project* project_p)
 {
 	static int details = 0;
 	SDL_Event event;

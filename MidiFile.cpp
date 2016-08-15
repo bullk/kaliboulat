@@ -23,6 +23,7 @@ MidiFile::~MidiFile ()
 {
 }
 
+
 //------------
 
 void MidiFile::rewind ()

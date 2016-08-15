@@ -10,13 +10,14 @@
 #include "Clock.h"
 #include "AudioGroup.h"
 #include "MidiGroup.h"
+#include "Project.hpp"
 
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 int GUI_Init();
 void GUI_Close();
-void GUI_Main(bool*, Clock*, AudioGroup*, MidiGroup*);
+void GUI_Main(bool*, Clock*, AudioGroup*, MidiGroup*, Project*);
 
 
 #endif
