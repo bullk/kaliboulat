@@ -25,6 +25,7 @@ public:
 
     std::vector<AudioClip *> * getClipSet ();
     void addClip (std::string path);
+    void deleteClip (unsigned int i);
     void stopAll ();
     
 protected:

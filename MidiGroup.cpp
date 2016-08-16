@@ -43,10 +43,12 @@ void MidiGroup::addClip(MidiClip * daClip)
 		ClipSet->push_back (daClip);
 }
 
-//unsigned long MidiGroup::getLength()
-//{
-	//return 1;
-//}
+void MidiGroup::deleteClip (unsigned int i)
+{
+	MidiClip * clip = ClipSet -> at(i);
+	ClipSet -> erase (ClipSet -> begin() + i);
+	delete clip;
+}
 
 void MidiGroup::tick (RtMidiOut * midiout)
 {

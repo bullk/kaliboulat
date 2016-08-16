@@ -16,7 +16,7 @@
 
 ### Moteur
 
-* Ajout / suppression de clips
+* suppression de clips
 * Playlist / TrackList
 * Proprietes des clips / Affichage
 * Bases de séquençage pour les clips

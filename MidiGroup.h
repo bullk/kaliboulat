@@ -14,7 +14,7 @@ public:
 
 	std::vector<MidiClip *> * getClipSet ();
 	void addClip (MidiClip * daClip);
-	//unsigned long getLength ();
+    void deleteClip (unsigned int i);
 	void tick (RtMidiOut *);
     void stopAll ();
 	
