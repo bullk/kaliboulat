@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "Scheduled.h"
+#include "Scheduled.hpp"
 
 
 // MIDI message types filtered by status byte, sorted by categories (events, channel mode, system common, realtime)

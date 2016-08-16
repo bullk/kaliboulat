@@ -2,7 +2,7 @@
 #define INC_MIDIFILE_H
 
 #include <stk/MidiFileIn.h>
-#include "MidiGroup.h"
+#include "MidiGroup.hpp"
 
 
 class MidiFile : public stk::MidiFileIn

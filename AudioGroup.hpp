@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "Clip.h"
+#include "Clip.hpp"
 
 //using namespace std;
 

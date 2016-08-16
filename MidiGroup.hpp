@@ -1,7 +1,7 @@
 #ifndef INC_MIDIGROUP_H
 #define INC_MIDIGROUP_H
 
-#include "MidiClip.h"
+#include "MidiClip.hpp"
 
 class MidiGroup
 {

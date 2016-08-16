@@ -7,9 +7,9 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
 
-#include "Clock.h"
-#include "AudioGroup.h"
-#include "MidiGroup.h"
+#include "Clock.hpp"
+#include "AudioGroup.hpp"
+#include "MidiGroup.hpp"
 #include "Project.hpp"
 
 

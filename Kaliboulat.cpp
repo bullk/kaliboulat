@@ -7,14 +7,14 @@
 #include <RtAudio.h>
 
 #include "globals.h"
-#include "Clock.h"
-#include "AudioGroup.h"
-#include "MidiGroup.h"
-#include "MidiFile.h"
+#include "Clock.hpp"
+#include "AudioGroup.hpp"
+#include "MidiGroup.hpp"
+#include "MidiFile.hpp"
 #include "Project.hpp"
 
 #ifdef WITH_GUI
-#include "GUI.h"
+#include "GUI.hpp"
 #endif
 
 using namespace stk;

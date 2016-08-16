@@ -1,4 +1,4 @@
-#include "MidiGroup.h"
+#include "MidiGroup.hpp"
 
 //-------------
 // Constructor 

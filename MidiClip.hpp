@@ -2,8 +2,8 @@
 #define INC_MIDICLIP_H
 
 #include <RtMidi.h>
-#include "midi.h"
-#include "Clip.h"
+#include "midi.hpp"
+#include "Clip.hpp"
 
 
 class MidiClip : public Clip

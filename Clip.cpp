@@ -1,4 +1,4 @@
-#include "Clip.h"
+#include "Clip.hpp"
 
 using namespace std;
 using namespace stk;

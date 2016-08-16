@@ -1,5 +1,5 @@
-#include "GUI.h"
-#include "MidiFile.h"
+#include "GUI.hpp"
+#include "MidiFile.hpp"
 
 using namespace std;
 
