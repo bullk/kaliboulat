@@ -6,7 +6,7 @@
 * regrouper l'initialisation des contenus (pour préparer la gestion de projet)
 * ENTREE MIDI !!!
 * MIDI THRU
-* Sorite Audio en double mono
+* Sortie Audio en double mono
 * Propriétés de lecture des clips (single, loop, warped...)
 	* single
 	* looped

@@ -49,7 +49,7 @@ void midiInit (MidiGroup * midigroup_p)
 	midifile -> parse (midigroup_p);
 }
 
-void midiPanic (RtMidiOut * midiout_p)
+void midiPanic (RtMidiOut * midiout)
 {
 	vector<unsigned char> cc121 { 0xB0, 0x79, 0xFF }; // Channel 1, all CC OFF
 	vector<unsigned char> cc123 { 0xB0, 0x7B, 0xFF }; // Channel 1, all notes OFF
@@ -59,10 +59,10 @@ void midiPanic (RtMidiOut * midiout_p)
 	{
 		message = cc123;
 		message[0] += i;
-		midiout_p -> sendMessage(&message);
+		midiout -> sendMessage(&message);
 		message = cc121;
 		message[0] += i;
-		midiout_p -> sendMessage(&message);
+		midiout -> sendMessage(&message);
 	}
 }
 
@@ -203,17 +203,19 @@ int main( int argc, char* args[] )
 	
 	// CLOSE APP
 	
-	midiPanic (midiout);
-	
 	#ifdef WITH_GUI
 		GUI_Close ();
 	#endif
 	
+	midiPanic (midiout);
+	
+	midiout -> closePort ();
+	audioClose (dac);
+
 	delete daClock;
 	delete midiMaster;
 	delete midiout;
 	delete audioMaster;
-	audioClose (dac);
 	delete dac;
 
 	return 0; /* ISO C requires main to return int. */
