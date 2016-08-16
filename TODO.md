@@ -3,27 +3,45 @@
 ---------------
 ## MAINTENANT
 
-* ENTREE MIDI !!!
-* MIDI THRU
-* Sortie Audio en double mono
+* isoler imgui
+* Renommer mes fichiers h en hpp
+
+### Fonctionnalités
+
+* Import de fichiers
+
 * Propriétés de lecture des clips (single, loop, warped...)
 	* single
 	* looped
 	* warped ?
 	* free / next beat / next bar
-* Modularisation des fonctions audio ?
 
+* Gestion des projets
+	* Nouveau
+	* Ouvrir
+	* Enregistrer
+	
+### Architecture / Moteur
 
-### Moteur
-
-* suppression de clips
+* Factoriser le code (via un objet Group Set ?)
+* Gestion des pistes
 * Playlist / TrackList
-* Proprietes des clips / Affichage
 * Bases de séquençage pour les clips
 
+### I/O
+
+* MIDI IN
+* MIDI THRU
+* Sortie Audio en double mono
+* Entrees / Sorties multiples
 
 ### GUI
 
+* Etudier l'intérêt d'un objet GUI
+* Factoriser le code
+	* couleurs
+	* affichage des clips
+* Fenêtres d'options
 * MAJ imgui
 * Etudier l'affichage d'images
 * Résoudre le problème d'affichage des samples audio (nécessite de potasser les tableaux en C)
@@ -48,7 +66,6 @@
 ---------------
 ## GUI
 
-* Conditionner l'intégration de l'interface pour la compilation	afin de permettre une compilation sans GUI et donc un exécutable en ligne de commande
 
 * Navigateur de fichier
 	* chercher dans l'existant (SDL)
