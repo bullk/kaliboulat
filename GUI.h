@@ -24,6 +24,13 @@ struct Screen
 	unsigned int audioclip, midiclip;
 };
 
+class GUI
+{
+	public:
+	
+	protected:
+
+};
 
 int GUI_Init();
 void GUI_Close();

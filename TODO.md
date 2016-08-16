@@ -3,7 +3,6 @@
 ---------------
 ## MAINTENANT
 
-* regrouper l'initialisation des contenus (pour préparer la gestion de projet)
 * ENTREE MIDI !!!
 * MIDI THRU
 * Sortie Audio en double mono

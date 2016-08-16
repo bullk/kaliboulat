@@ -48,7 +48,7 @@ void GUI_Close()
 }
 
 
-void displayMidiClip (MidiClip * daClip)
+void displayMidiClipDetails (MidiClip * daClip)
 {
 	unsigned short beats_per_bar = 4;
 	ImGui::PushItemWidth(100);
@@ -283,10 +283,13 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 		ImGui::SameLine();
 
 		// DETAILS WINDOW
-		ImGui::BeginChild("Details", ImVec2(0,0), true);
-		if (ImGui::Button("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
-		if (ImGui::Button("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
-		if (ImGui::Button("MIDI Clip")) details.context = Screen::MIDICLIP;
+		ImGui::BeginChild ("Details", ImVec2(0,0), true);
+		//if ( ImGui::IsWindowHovered () ) ImGui::Text("%s", "HOVERED");
+		if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
+		if ( audiogroup_p -> getClipSet() -> size() )
+			if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
+		if ( midigroup_p -> getClipSet() -> size() )
+			if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
 		ImGui::Separator();
 		
 		switch (details.context)
@@ -333,7 +336,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 			}
 			break;
 			case Screen::MIDICLIP:
-				displayMidiClip (midigroup_p -> getClipSet() -> at(details.midiclip));
+				displayMidiClipDetails (midigroup_p -> getClipSet() -> at(details.midiclip));
 			break;
 			default:
 			break;

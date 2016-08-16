@@ -28,7 +28,7 @@ AudioGroup::~AudioGroup()
 //---------------------------------------------------------------------------
 std::vector<AudioClip *> * AudioGroup::getClipSet()
 {
-    return this->ClipSet;
+    return ClipSet;
 }
 
 //------------
