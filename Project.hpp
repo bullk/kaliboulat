@@ -27,6 +27,7 @@ public:
 	Project (std::string str);
 	~Project ();
 	void updateRessources ();
+	//void importAll ();
 	inline std::string getName () { return name_; }
 	inline std::string getAudioDir () { return dir_ + "/Audio"; }
 	inline std::string getMIDIDir () { return dir_ + "/MIDI"; }

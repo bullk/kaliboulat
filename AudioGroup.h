@@ -24,7 +24,7 @@ public:
 	~AudioGroup();
 
     std::vector<AudioClip *> * getClipSet ();
-    void addAclip (std::string path);
+    void addClip (std::string path);
     void stopAll ();
     
 private:

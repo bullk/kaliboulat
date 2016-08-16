@@ -35,7 +35,7 @@ std::vector<AudioClip *> * AudioGroup::getClipSet()
 // Add a clip
 //------------
 
-void AudioGroup::addAclip(std::string path)
+void AudioGroup::addClip(std::string path)
 {
 	ClipSet->push_back(new AudioClip(path));
 }

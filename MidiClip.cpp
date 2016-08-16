@@ -52,7 +52,7 @@ void MidiClip::tick (RtMidiOut * midiout)
 {
 	while ( data_ -> at (index_) -> getTime () == time_ )
 	{
-		std::cout << time_ << " : " << index_ << " : " << data_ -> at (index_) -> hexData () << std::endl;
+		//std::cout << time_ << " : " << index_ << " : " << data_ -> at (index_) -> hexData () << std::endl;
 		midiout -> sendMessage (data_ -> at (index_) -> getData ());
 		if ( index_ < data_ -> size () ) index_++;
 		if ( index_ == data_ -> size () ) rewind ();

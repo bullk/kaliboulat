@@ -21,7 +21,7 @@ struct Screen
 	//enum Type { MAIN }; // For later use
 	enum Context { NONE, PROJECT, AUDIOCLIP, MIDICLIP }; 
 	Context context;
-	unsigned int id;
+	unsigned int audioclip, midiclip;
 };
 
 

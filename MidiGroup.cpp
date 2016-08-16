@@ -54,3 +54,10 @@ void MidiGroup::tick (RtMidiOut * midiout)
 		if (ClipSet->at(i)->getState () == CS_PLAYING)
 			ClipSet->at(i)->tick (midiout);
 }
+
+void MidiGroup::stopAll ()
+{
+	for (unsigned int i = 0; i < ClipSet->size(); i++)
+		ClipSet->at(i)->setState(CS_STOPPED);
+}
+		

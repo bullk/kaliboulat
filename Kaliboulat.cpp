@@ -24,16 +24,10 @@ using namespace std;
 
 void midiInit (MidiGroup * midigroup_p);
 void midiPanic (MidiGroup * midigroup_p);
-string midiClipDir = "user/test/MIDI";
-string midiClipLs[1] = { "test-Drums-1.mid" };
 
 
 // Audio
 
-string sampleDir = "user/test/Audio";
-string sampleLs[3] = { "bar.wav", "hellosine.wav", "bonjouratoutes.wav" };
-
-int tick ();
 void audioInit ();
 void audioClose ();
 
@@ -45,8 +39,6 @@ void audioClose ();
 
 void midiInit (MidiGroup * midigroup_p)
 {
-	MidiFile * midifile = new MidiFile (midiClipDir + "/" + midiClipLs[0]);
-	midifile -> parse (midigroup_p);
 }
 
 void midiPanic (RtMidiOut * midiout)
@@ -95,10 +87,6 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 
 void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
 {
-	audiogroup_p -> addAclip (sampleDir + "/" + sampleLs[0]);
-	audiogroup_p -> addAclip (sampleDir + "/" + sampleLs[1]);
-	audiogroup_p -> addAclip (sampleDir + "/" + sampleLs[2]);
-
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
 	
@@ -119,7 +107,6 @@ void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
 
 	try { dac->startStream (); }
 	catch ( RtError &error ) { error.printMessage (); }
-
 } 
 
 void audioClose (RtAudio * dac)
@@ -186,9 +173,9 @@ int main( int argc, char* args[] )
 		if ( daClock -> getState () ) 
 		{
 			midi_ticks = daClock -> update ();
-			char bbt[13];
-			sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), daClock -> getTick());
-			std::cout << bbt << midi_ticks << std::endl;
+			//char bbt[13];
+			//sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), daClock -> getTick());
+			//std::cout << bbt << midi_ticks << std::endl;
 			// MIDI flow
 			for (unsigned int i=0; i<midi_ticks; i++) 
 				midiMaster -> tick (midiout);
