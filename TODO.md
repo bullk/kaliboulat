@@ -3,7 +3,6 @@
 ---------------
 ## MAINTENANT
 
-* isoler imgui
 * Renommer mes fichiers h en hpp
 
 ### Fonctionnalités
@@ -49,6 +48,8 @@
 
 ---------------
 ## Architecture
+
+* isoler l'interface graphique dans un thread
 
 * Trouver un modèle modulaire permettant de d'intégrer 
 	* Horloge + Audio + Midi

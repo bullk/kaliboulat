@@ -5,7 +5,7 @@ CFLAGS += -std=c++0x
 #CFLAGS += -std=c++11
 LDFLAGS = `sdl2-config --cflags` -I/usr/include/stk 
 LDLIBS = `sdl2-config --libs` -lGL -lstk -lrtaudio -lrtmidi
-EXT_OBJS = imgui.o imgui_draw.o imgui_demo.o imgui_impl_sdl.o
+EXT_OBJS = imgui/imgui.o imgui/imgui_draw.o imgui/imgui_demo.o imgui/imgui_impl_sdl.o
 GUI_OBJS = GUI.o
 MAIN_OBJS = Clock.o Clip.o Scheduled.o midi.o MidiClip.o MidiGroup.o MidiFile.o AudioGroup.o Project.o Kaliboulat.o 
 OBJS = $(EXT_OBJS) $(GUI_OBJS) $(MAIN_OBJS) 

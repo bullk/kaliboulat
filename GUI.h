@@ -4,8 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
 
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_sdl.h"
 
 #include "Clock.h"
 #include "AudioGroup.h"
