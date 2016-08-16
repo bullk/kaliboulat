@@ -76,7 +76,6 @@ void displayMidiClip (MidiClip * daClip)
 		int bar = 1 + nbeats / beats_per_bar;
 		
 		bool selected = ( daClip -> getIndex () == i );
-		//ImGui::PushID(16384+i);
 		char bbt[13];
 		sprintf (bbt, "%02d:%02d:%03d   ", bar, beat, tick);
 		ImGui::Selectable(bbt, selected); ImGui::SameLine();
@@ -86,8 +85,6 @@ void displayMidiClip (MidiClip * daClip)
 			if (j>1) ImGui::SameLine();
 			ImGui::Text("%x", event -> getData() -> at (j));
 		}
-		//ImGui::PopID();
-		
 	}
 	ImGui::Separator();
 }

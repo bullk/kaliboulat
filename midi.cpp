@@ -27,10 +27,10 @@ MidiMessage::~MidiMessage ()
 std::string MidiMessage::hexData ()
 {
 	std::string s = "";
-	char buffer[2];
+	char buffer[4];
 	for ( unsigned int i = 0; i < data_ -> size (); i++ )
 	{
-		sprintf (buffer, "%x", data_ -> at (i));
+		sprintf (buffer, "%02X ", data_ -> at (i));
 		s += buffer;
 	}
 	return s;

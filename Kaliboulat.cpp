@@ -22,7 +22,8 @@ using namespace std;
 
 // MIDI
 
-void midiInit ();
+void midiInit (MidiGroup * midigroup_p);
+void midiPanic (MidiGroup * midigroup_p);
 string midiClipDir = "user/test/MIDI";
 string midiClipLs[1] = { "test-Drums-1.mid" };
 
@@ -42,10 +43,27 @@ void audioClose ();
 // MIDI FUNCTIONS
 //----------------------------------------------------------------------
 
-void midiInit(MidiGroup * midigroup_p)
+void midiInit (MidiGroup * midigroup_p)
 {
 	MidiFile * midifile = new MidiFile (midiClipDir + "/" + midiClipLs[0]);
 	midifile -> parse (midigroup_p);
+}
+
+void midiPanic (RtMidiOut * midiout_p)
+{
+	vector<unsigned char> cc121 { 0xB0, 0x79, 0xFF }; // Channel 1, all CC OFF
+	vector<unsigned char> cc123 { 0xB0, 0x7B, 0xFF }; // Channel 1, all notes OFF
+	vector<unsigned char> message;
+	
+	for (unsigned short i=0; i<16; i++)
+	{
+		message = cc123;
+		message[0] += i;
+		midiout_p -> sendMessage(&message);
+		message = cc121;
+		message[0] += i;
+		midiout_p -> sendMessage(&message);
+	}
 }
 
 
@@ -168,14 +186,12 @@ int main( int argc, char* args[] )
 		if ( daClock -> getState () ) 
 		{
 			midi_ticks = daClock -> update ();
+			char bbt[13];
+			sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), daClock -> getTick());
+			std::cout << bbt << midi_ticks << std::endl;
 			// MIDI flow
 			for (unsigned int i=0; i<midi_ticks; i++) 
-			{
-				char bbt[13];
-				sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), daClock -> getTick()-midi_ticks+i);
-				std::cout << bbt << std::endl;
 				midiMaster -> tick (midiout);
-			}
 		}
 
 		// GUI
@@ -186,6 +202,8 @@ int main( int argc, char* args[] )
 	}
 	
 	// CLOSE APP
+	
+	midiPanic (midiout);
 	
 	#ifdef WITH_GUI
 		GUI_Close ();

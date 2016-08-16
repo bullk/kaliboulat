@@ -30,6 +30,7 @@ protected:
 };
 
 
+
 class ScheduledMidiMessage : public Scheduled, public MidiMessage
 {
 public:

@@ -1,5 +1,6 @@
 Kaliboulat
 *.o
+*.log
 #GUI.*
 sdl_opengl_example/
 midifile/
