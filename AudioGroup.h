@@ -27,8 +27,7 @@ public:
     void addClip (std::string path);
     void stopAll ();
     
-private:
-
+protected:
 	std::vector<AudioClip *> * ClipSet;
 
 };

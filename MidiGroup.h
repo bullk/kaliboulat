@@ -20,6 +20,7 @@ public:
 	
 private:
 	std::vector<MidiClip *> * ClipSet;
+	unsigned int selected;
 
 };
 

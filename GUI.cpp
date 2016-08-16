@@ -198,23 +198,34 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 		ImGui::BeginChild("Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), true);
 		float progress = 0.0f;
 
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 		// Audio Clips
 		for ( unsigned int i = 0; i < audiogroup_p -> getClipSet() -> size(); i++ )
 		{
+			bool lock = false;
 			AudioClip * daClip = audiogroup_p -> getClipSet() -> at(i);
+			ImGui::PushID(i);
+			if ( details.audioclip == i ) 
+			{ 
+				ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImColor::HSV(7/7.0f, 0.4f, 0.4f));
+				lock = true;
+			}
+			ImGui::BeginChild(i, ImVec2(0, 30)); 
+			if ( ImGui::IsMouseHoveringWindow () and ImGui::IsMouseClicked (0) )
+			{
+				details.context = Screen::AUDIOCLIP;
+				details.audioclip = i;
+			}
 			if ( daClip -> getState() == CS_PLAYING )
 			{
-				ImGui::PushID(i);
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
 				if (ImGui::Button("STOP")) daClip -> setState(CS_STOPPED);
 				ImGui::PopStyleColor(3);
-				ImGui::PopID();
 			}
 			else
 			{
-				ImGui::PushID(i);
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
@@ -224,17 +235,20 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 					main_clock_p -> start();
 				}
 				ImGui::PopStyleColor(3);
-				ImGui::PopID();
 			}
 			ImGui::SameLine(); // Progress bar
 			progress = daClip -> getTime() / daClip -> getLength();
-			ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
-			const char * clip_name = daClip -> getName().c_str(); // Clip Name
-			ImGui::SameLine(); if (ImGui::Button(clip_name)) 
-			{
-				details.context = Screen::AUDIOCLIP;
-				details.audioclip = i;
-			}
+			ImGui::ProgressBar(progress, ImVec2(100, 0.f),""); ImGui::SameLine(); 
+			ImGui::Text("%s", daClip -> getName().c_str());
+			//const char * clip_name = daClip -> getName().c_str(); // Clip Name
+			//if (ImGui::Button(clip_name)) 
+			//{
+				//details.context = Screen::AUDIOCLIP;
+				//details.audioclip = i;
+			//}
+			ImGui::EndChild();
+			if ( lock ) ImGui::PopStyleColor();
+			ImGui::PopID();
 		}
 		
 		// MIDI Clips
@@ -277,14 +291,13 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 				details.midiclip = i;
 			}
 		}
+		ImGui::PopStyleVar ();
+		ImGui::EndChild ();
 
-		ImGui::EndChild();
-
-		ImGui::SameLine();
+		ImGui::SameLine ();
 
 		// DETAILS WINDOW
 		ImGui::BeginChild ("Details", ImVec2(0,0), true);
-		//if ( ImGui::IsWindowHovered () ) ImGui::Text("%s", "HOVERED");
 		if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
 		if ( audiogroup_p -> getClipSet() -> size() )
 			if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
