@@ -1,10 +1,10 @@
-#include "MidiGroup.hpp"
+#include "MidiTrack.hpp"
 
 //-------------
 // Constructor 
 //-------------
 
-MidiGroup::MidiGroup ()
+MidiTrack::MidiTrack ()
 {
 	ClipSet = new std::vector<MidiClip *>;
 }
@@ -14,7 +14,7 @@ MidiGroup::MidiGroup ()
 // Destructor 
 //------------
 
-MidiGroup::~MidiGroup ()
+MidiTrack::~MidiTrack ()
 {
     //delete each audio file object (and corresponding buffer, etc.)
     if (ClipSet != NULL){
@@ -30,26 +30,26 @@ MidiGroup::~MidiGroup ()
 // Add a clip
 //------------
 
-void MidiGroup::addClip(MidiClip * daClip)
+void MidiTrack::addClip(MidiClip * daClip)
 {
 		ClipSet->push_back (daClip);
 }
 
-void MidiGroup::deleteClip (unsigned int i)
+void MidiTrack::deleteClip (unsigned int i)
 {
 	MidiClip * clip = ClipSet -> at(i);
 	ClipSet -> erase (ClipSet -> begin() + i);
 	delete clip;
 }
 
-void MidiGroup::tick (RtMidiOut * midiout)
+void MidiTrack::tick (RtMidiOut * midiout)
 {
 	for (unsigned int i = 0; i < ClipSet->size (); i++)
 		if (ClipSet->at(i)->getState () == CS_PLAYING)
 			ClipSet->at(i)->tick (midiout);
 }
 
-void MidiGroup::stopAll ()
+void MidiTrack::stopAll ()
 {
 	for (unsigned int i = 0; i < ClipSet->size(); i++)
 		ClipSet->at(i)->setState(CS_STOPPED);

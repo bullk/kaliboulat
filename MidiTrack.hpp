@@ -1,16 +1,16 @@
-#ifndef INC_MIDIGROUP_H
-#define INC_MIDIGROUP_H
+#ifndef INC_MIDITRACK_H
+#define INC_MIDITRACK_H
 
 #include "MidiClip.hpp"
 
-class MidiGroup
+class MidiTrack
 {
 
 public:
 	// Constructor 
-	MidiGroup ();
+	MidiTrack ();
 	// Destructor 
-	~MidiGroup ();
+	~MidiTrack ();
 
 	void addClip (MidiClip * daClip);
     void deleteClip (unsigned int i);

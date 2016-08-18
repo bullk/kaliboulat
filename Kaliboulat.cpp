@@ -10,7 +10,7 @@
 #include "globals.h"
 #include "Clock.hpp"
 #include "AudioTrack.hpp"
-#include "MidiGroup.hpp"
+#include "MidiTrack.hpp"
 #include "MidiFile.hpp"
 #include "Project.hpp"
 
@@ -23,8 +23,8 @@ using namespace std;
 
 // MIDI
 
-void midiInit (MidiGroup * midigroup_p);
-void midiPanic (MidiGroup * midigroup_p);
+void midiInit (MidiTrack * miditrack_p);
+void midiPanic (MidiTrack * miditrack_p);
 
 
 // Audio
@@ -38,7 +38,7 @@ void audioClose (RtAudio * dac);
 // MIDI FUNCTIONS
 //----------------------------------------------------------------------
 
-void midiInit (MidiGroup * midigroup_p)
+void midiInit (MidiTrack * miditrack_p)
 {
 }
 
@@ -149,7 +149,7 @@ int main( int argc, char* args[] )
 		//midiout -> openPort (); // Open first available port.
 	//}
 	midiout -> openVirtualPort ();
-	MidiGroup * midiMaster = new MidiGroup (); // MIDI clips manager
+	MidiTrack * midiMaster = new MidiTrack (); // MIDI clips manager
 	midiInit (midiMaster);
 
 	// CLOCK INIT

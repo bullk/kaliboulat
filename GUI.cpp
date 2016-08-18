@@ -87,7 +87,7 @@ void displayMidiClipDetails (MidiClip * daClip)
 }
 
 
-void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p, MidiGroup* midigroup_p, Project* project_p)
+void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p, MidiTrack* miditrack_p, Project* project_p)
 {
 	static Screen details = { Screen::PROJECT, 0 };
 	SDL_Event event;
@@ -173,7 +173,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 			if (ImGui::Button("STOP"))
 			{
 				audiotrack_p -> stopAll();
-				midigroup_p -> stopAll();
+				miditrack_p -> stopAll();
 				main_clock_p -> stop();
 			}
 			ImGui::PopStyleColor(3);
@@ -271,9 +271,9 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		}
 		
 		// MIDI Clips
-		for ( unsigned int i = 0; i < midigroup_p -> getClipSet() -> size(); i++ )
+		for ( unsigned int i = 0; i < miditrack_p -> getClipSet() -> size(); i++ )
 		{
-			MidiClip * daClip = midigroup_p -> getClipSet() -> at(i);
+			MidiClip * daClip = miditrack_p -> getClipSet() -> at(i);
 			bool lock = false;
 			float progress = 0.0f;
 			ImGui::PushID(4096 + i);
@@ -332,11 +332,11 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 				{
 					if (details.midiclip == 0)
 					{
-						if ( midigroup_p -> getClipSet() -> size() == 1 ) 
+						if ( miditrack_p -> getClipSet() -> size() == 1 ) 
 							details.context = Screen::PROJECT;
 					}
 					else details.midiclip--;
-					midigroup_p -> deleteClip (i);
+					miditrack_p -> deleteClip (i);
 				}
                 ImGui::EndPopup();
             }
@@ -356,7 +356,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
 		if ( audiotrack_p -> getClipSet() -> size() )
 			if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
-		if ( midigroup_p -> getClipSet() -> size() )
+		if ( miditrack_p -> getClipSet() -> size() )
 			if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
 		ImGui::Separator();
 		
@@ -382,7 +382,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 						if ( ImGui::Selectable(list -> at(i).c_str()) )
 						{
 							MidiFile * midifile = new MidiFile ( project_p->getMIDIDir() + "/" + list -> at(i).c_str() );
-							midifile -> parse (midigroup_p);
+							midifile -> parse (miditrack_p);
 							delete midifile;
 						}
 				}
@@ -404,7 +404,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 			}
 				break;
 			case Screen::MIDICLIP:
-				displayMidiClipDetails (midigroup_p -> getClipSet() -> at(details.midiclip));
+				displayMidiClipDetails (miditrack_p -> getClipSet() -> at(details.midiclip));
 				break;
 			default:
 				break;

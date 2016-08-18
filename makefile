@@ -10,7 +10,7 @@ ALSALIBS = -lasound -lpthread
 JACKLIBS = -ljack
 EXT_OBJS = imgui.o imgui_draw.o imgui_demo.o imgui_impl_sdl.o
 GUI_OBJS = GUI.o
-MAIN_OBJS = Clock.o Clip.o Scheduled.o midi.o MidiClip.o MidiGroup.o MidiFile.o AudioTrack.o Project.o Kaliboulat.o
+MAIN_OBJS = Clock.o Clip.o Scheduled.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioTrack.o Project.o Kaliboulat.o
 OBJS = $(EXT_OBJS) $(GUI_OBJS) $(MAIN_OBJS) 
 
 new: Kaliboulat-rtmidi2.0.1

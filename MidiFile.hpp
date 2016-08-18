@@ -2,7 +2,7 @@
 #define INC_MIDIFILE_H
 
 #include <stk/MidiFileIn.h>
-#include "MidiGroup.hpp"
+#include "MidiTrack.hpp"
 
 
 class MidiFile : public stk::MidiFileIn
@@ -11,7 +11,7 @@ public:
 	MidiFile (std::string path);
 	~MidiFile ();
 	void rewind ();
-	void parse (MidiGroup * midigroup_p);
+	void parse (MidiTrack * miditrack_p);
 	//long unsigned int getLength ();
 	//long unsigned int getTime ();
 	//void tick (RtMidiOut *);

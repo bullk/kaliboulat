@@ -9,7 +9,7 @@
 
 #include "Clock.hpp"
 #include "AudioTrack.hpp"
-#include "MidiGroup.hpp"
+#include "MidiTrack.hpp"
 #include "Project.hpp"
 #include "MidiFile.hpp"
 
@@ -35,7 +35,7 @@ class GUI
 
 int GUI_Init();
 void GUI_Close();
-void GUI_Main(bool*, Clock*, AudioTrack*, MidiGroup*, Project*);
+void GUI_Main(bool*, Clock*, AudioTrack*, MidiTrack*, Project*);
 
 
 #endif

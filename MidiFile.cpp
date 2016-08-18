@@ -32,7 +32,7 @@ void MidiFile::rewind ()
 	for (unsigned int i=0; i<getNumberOfTracks(); i++) rewindTrack(i);
 }
 
-void MidiFile::parse(MidiGroup * midigroup_p)
+void MidiFile::parse(MidiTrack * miditrack_p)
 {
 	// Assuming File is MIDI Format 1
 	std::vector<unsigned char> * event = new std::vector<unsigned char> ();
@@ -74,7 +74,7 @@ void MidiFile::parse(MidiGroup * midigroup_p)
 			delta_time = getNextEvent (event, i);
 		}
 		daClip -> setLength(abs_time);
-		midigroup_p -> addClip (daClip);
+		miditrack_p -> addClip (daClip);
 	}
 	delete event;
 }
