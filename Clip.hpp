@@ -16,6 +16,8 @@ enum ClipState { CS_STOPPED, CS_PLAYING, CS_RECORDING };
 
 class Clip
 {
+enum LaunchStyle { FREE, BEAT, BAR };
+enum LoopStyle { ONESHOT, MANY, FOREVER };
 	
 public:
 	Clip ();
@@ -33,6 +35,8 @@ protected:
 	ClipState state_;
 	std::string path_;
 	std::string name_;
+	LaunchStyle launchstyle_;
+	LoopStyle loopstyle_;
 	//int angle_;
 	
 };

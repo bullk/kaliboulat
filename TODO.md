@@ -20,7 +20,7 @@
 	
 ### Architecture / Moteur
 
-* Factoriser le code (via un objet Group Set ?)
+* Factoriser le code (via une classe abstraite Track ?)
 * Gestion des pistes
 * Playlist / TrackList
 * Bases de séquençage pour les clips
