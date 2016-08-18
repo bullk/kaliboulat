@@ -17,10 +17,13 @@ public:
 	void tick (RtMidiOut *);
     void stopAll ();
 	inline std::vector<MidiClip *> * getClipSet () { return this->ClipSet; }
+    inline RtMidi * getOutput () { return output_; }
+    inline void setOutput (RtMidi * o) { output_ = o; }
 	
 private:
 	std::vector<MidiClip *> * ClipSet;
-	unsigned int selected;
+	//unsigned int selected;
+	RtMidi * output_;
 
 };
 

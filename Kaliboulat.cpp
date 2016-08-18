@@ -92,9 +92,13 @@ void audioInit (RtAudio * dac, AudioTrack * audiotrack_p)
 	Stk::showWarnings (true);
 	
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
-	RtAudio::StreamParameters parameters;
-	parameters.deviceId = dac -> getDefaultOutputDevice ();
-	parameters.nChannels = 1;
+	RtAudio::StreamParameters input_parameters;
+	input_parameters.deviceId = dac -> getDefaultInputDevice ();
+	input_parameters.nChannels = AUDIO_INPUTS;
+	
+	RtAudio::StreamParameters output_parameters;
+	output_parameters.deviceId = dac -> getDefaultOutputDevice ();
+	output_parameters.nChannels = AUDIO_OUTPUTS;
 	
 	RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
 	
@@ -103,7 +107,7 @@ void audioInit (RtAudio * dac, AudioTrack * audiotrack_p)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiotrack_p, &options ); }
+	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiotrack_p, &options ); }
 	catch ( RtError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }

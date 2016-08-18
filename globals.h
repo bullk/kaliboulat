@@ -5,6 +5,8 @@
 #define FILE_EXT ".kal"
 #define USER_DIR "/home/jeandamme/src/kaliboulat/user"
 #define GLOBAL_SAMPLE_RATE 44100
+#define AUDIO_INPUTS 4
+#define AUDIO_OUTPUTS 4
 
 //const int GLOBAL_SAMPLE_RATE = 44100;
 
