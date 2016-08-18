@@ -3,8 +3,6 @@
 ---------------
 ## MAINTENANT
 
-* Renommer mes fichiers h en hpp
-
 ### Fonctionnalités
 
 * Import de fichiers

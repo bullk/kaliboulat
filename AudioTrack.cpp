@@ -1,10 +1,10 @@
-#include "AudioGroup.hpp"
+#include "AudioTrack.hpp"
 
 //-------------
 // Constructor 
 //-------------
 
-AudioGroup::AudioGroup ()
+AudioTrack::AudioTrack ()
 {
 	ClipSet = new std::vector<AudioClip *>;
 }
@@ -14,7 +14,7 @@ AudioGroup::AudioGroup ()
 // Destructor 
 //------------
 
-AudioGroup::~AudioGroup ()
+AudioTrack::~AudioTrack ()
 {
     //delete each audio file object (and corresponding buffer, etc.)
 	if ( ClipSet != NULL )
@@ -23,31 +23,23 @@ AudioGroup::~AudioGroup ()
 }
 
 
-//---------------------------------------------------------------------------
-// Access file set externally (note this is not thread safe)
-//---------------------------------------------------------------------------
-std::vector<AudioClip *> * AudioGroup::getClipSet ()
-{
-    return ClipSet;
-}
-
 //------------
 // Add a clip
 //------------
 
-void AudioGroup::addClip (std::string path)
+void AudioTrack::addClip (std::string path)
 {
 	ClipSet -> push_back (new AudioClip(path));
 }
 
-void AudioGroup::deleteClip (unsigned int i)
+void AudioTrack::deleteClip (unsigned int i)
 {
 	AudioClip * clip = ClipSet -> at(i);
 	ClipSet -> erase (ClipSet -> begin() + i);
 	delete clip;
 }
 
-void AudioGroup::stopAll ()
+void AudioTrack::stopAll ()
 {
 	for ( unsigned int i=0; i < ClipSet -> size(); i++ )
 		ClipSet -> at(i) -> setState (CS_STOPPED);

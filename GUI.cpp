@@ -1,5 +1,4 @@
 #include "GUI.hpp"
-#include "MidiFile.hpp"
 
 using namespace std;
 
@@ -88,7 +87,7 @@ void displayMidiClipDetails (MidiClip * daClip)
 }
 
 
-void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p, MidiGroup* midigroup_p, Project* project_p)
+void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p, MidiGroup* midigroup_p, Project* project_p)
 {
 	static Screen details = { Screen::PROJECT, 0 };
 	SDL_Event event;
@@ -173,7 +172,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
 			if (ImGui::Button("STOP"))
 			{
-				audiogroup_p -> stopAll();
+				audiotrack_p -> stopAll();
 				midigroup_p -> stopAll();
 				main_clock_p -> stop();
 			}
@@ -200,9 +199,9 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 
 		// Audio Clips
-		for ( unsigned int i = 0; i < audiogroup_p -> getClipSet() -> size(); i++ )
+		for ( unsigned int i = 0; i < audiotrack_p -> getClipSet() -> size(); i++ )
 		{
-			AudioClip * daClip = audiogroup_p -> getClipSet() -> at(i);
+			AudioClip * daClip = audiotrack_p -> getClipSet() -> at(i);
 			bool lock = false;
 			float progress = 0.0f;
 			ImGui::PushID(i);
@@ -257,11 +256,11 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 				{
 					if (details.audioclip == 0)
 					{
-						if ( audiogroup_p -> getClipSet() -> size() == 1 ) 
+						if ( audiotrack_p -> getClipSet() -> size() == 1 ) 
 							details.context = Screen::PROJECT;
 					}
 					else details.audioclip--;
-					audiogroup_p -> deleteClip (i);
+					audiotrack_p -> deleteClip (i);
 				}
                 ImGui::EndPopup();
             }
@@ -355,7 +354,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 		// DETAILS WINDOW
 		ImGui::BeginChild ("Details", ImVec2(0,0), true);
 		if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
-		if ( audiogroup_p -> getClipSet() -> size() )
+		if ( audiotrack_p -> getClipSet() -> size() )
 			if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
 		if ( midigroup_p -> getClipSet() -> size() )
 			if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
@@ -373,7 +372,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 					list = project_p -> getAudioFiles ();
 					for ( unsigned int i=0; i < list -> size(); i++ )
 						if ( ImGui::Selectable(list -> at(i).c_str()) )
-							audiogroup_p -> addClip ( project_p->getAudioDir() + "/" + list -> at(i).c_str() );
+							audiotrack_p -> addClip ( project_p->getAudioDir() + "/" + list -> at(i).c_str() );
 				}
 				ImGui::SetNextTreeNodeOpen(true);
 				if (ImGui::CollapsingHeader("MIDI Files (click to import)"))
@@ -391,7 +390,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioGroup* audiogroup_p
 				break;
 			case Screen::AUDIOCLIP:
 			{
-				AudioClip * daClip = audiogroup_p -> getClipSet() -> at(details.audioclip);
+				AudioClip * daClip = audiotrack_p -> getClipSet() -> at(details.audioclip);
 				ImGui::PushItemWidth(100);
 				ImGui::TextColored(ImColor(255,255,0), "%s", daClip -> getName().c_str());
 				ImGui::Text("Location : %s", daClip -> getPath().c_str());

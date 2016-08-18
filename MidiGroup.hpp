@@ -12,11 +12,11 @@ public:
 	// Destructor 
 	~MidiGroup ();
 
-	std::vector<MidiClip *> * getClipSet ();
 	void addClip (MidiClip * daClip);
     void deleteClip (unsigned int i);
 	void tick (RtMidiOut *);
     void stopAll ();
+	inline std::vector<MidiClip *> * getClipSet () { return this->ClipSet; }
 	
 private:
 	std::vector<MidiClip *> * ClipSet;

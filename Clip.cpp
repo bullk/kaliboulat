@@ -28,7 +28,6 @@ Clip::~Clip()
 AudioClip::AudioClip(std::string path) : FileLoop(path)
 {
 	m_type = CT_AUDIO;
-	//static unsigned int clipAutoNumber = 0;
 	openFile(path);
 	setRate(1);
 	path_ = path;

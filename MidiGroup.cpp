@@ -26,14 +26,6 @@ MidiGroup::~MidiGroup ()
 }
 
 
-//---------------------------------------------------------------------------
-// Access file set externally (note this is not thread safe) ??? advise for AudioGroup
-//---------------------------------------------------------------------------
-std::vector<MidiClip *> * MidiGroup::getClipSet()
-{
-    return this->ClipSet;
-}
-
 //------------
 // Add a clip
 //------------

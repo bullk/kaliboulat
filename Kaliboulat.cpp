@@ -5,10 +5,11 @@
 
 #include <RtError.h>
 #include <RtAudio.h>
+#include <RtMidi.h>
 
 #include "globals.h"
 #include "Clock.hpp"
-#include "AudioGroup.hpp"
+#include "AudioTrack.hpp"
 #include "MidiGroup.hpp"
 #include "MidiFile.hpp"
 #include "Project.hpp"
@@ -28,8 +29,8 @@ void midiPanic (MidiGroup * midigroup_p);
 
 // Audio
 
-void audioInit ();
-void audioClose ();
+void audioInit (RtAudio * dac, AudioTrack * audiotrack_p);
+void audioClose (RtAudio * dac);
 
 
 
@@ -66,15 +67,15 @@ void midiPanic (RtMidiOut * midiout)
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer )
 {
-	AudioGroup * audiogroup_p = (AudioGroup *) dataPointer;
+	AudioTrack * audiotrack_p = (AudioTrack *) dataPointer;
 	register StkFloat * samples = (StkFloat *) outputBuffer;
 
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
-		for ( unsigned int j = 0; j < audiogroup_p -> getClipSet () -> size (); j++ )
+		for ( unsigned int j = 0; j < audiotrack_p -> getClipSet () -> size (); j++ )
 		{
-			AudioClip * daClip = audiogroup_p -> getClipSet () -> at (j);
+			AudioClip * daClip = audiotrack_p -> getClipSet () -> at (j);
 			if ( daClip -> getState () == CS_PLAYING )
 				*samples += daClip -> tick () * *(daClip -> getVolume ());
 		}
@@ -85,7 +86,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 
-void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
+void audioInit (RtAudio * dac, AudioTrack * audiotrack_p)
 {
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
@@ -102,7 +103,7 @@ void audioInit (RtAudio * dac, AudioGroup * audiogroup_p)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiogroup_p, &options ); }
+	try { dac->openStream ( &parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiotrack_p, &options ); }
 	catch ( RtError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
@@ -129,7 +130,7 @@ int main( int argc, char* args[] )
 	#else
 		RtAudio * dac = new RtAudio (); // main audio output
 	#endif
-	AudioGroup * audioMaster = new AudioGroup (); // Audio clips manager
+	AudioTrack * audioMaster = new AudioTrack (); // Audio clips manager
 	audioInit (dac, audioMaster);
 
 	// MIDI INIT
@@ -138,16 +139,16 @@ int main( int argc, char* args[] )
 	#else
 		RtMidiOut * midiout = new RtMidiOut(APP_NAME);
 	#endif
-	unsigned int nPorts = midiout -> getPortCount (); // Check available ports.
-	if ( nPorts == 0 )
-		std::cout << "No ports available !" << std::endl;
-	else
-	{
-		for ( unsigned int i=0; i < nPorts; i++ )
-			std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
+	//unsigned int nPorts = midiout -> getPortCount (); // Check available ports.
+	//if ( nPorts == 0 )
+		//std::cout << "No ports available !" << std::endl;
+	//else
+	//{
+		//for ( unsigned int i=0; i < nPorts; i++ )
+			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
 		//midiout -> openPort (); // Open first available port.
-		midiout -> openVirtualPort ();
-	}
+	//}
+	midiout -> openVirtualPort ();
 	MidiGroup * midiMaster = new MidiGroup (); // MIDI clips manager
 	midiInit (midiMaster);
 
