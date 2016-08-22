@@ -76,7 +76,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		for ( unsigned int j = 0; j < audiotrack_p -> getClipSet () -> size (); j++ )
 		{
 			AudioClip * daClip = audiotrack_p -> getClipSet () -> at (j);
-			if ( daClip -> getState () == CS_PLAYING )
+			if ( daClip -> getState () == Clip::PLAYING )
 				*samples += daClip -> tick () * *(daClip -> getVolume ());
 		}
 		samples++;

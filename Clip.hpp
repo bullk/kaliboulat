@@ -11,15 +11,15 @@
  *
  */
 
-enum ClipType { CT_AUDIO, CT_MIDI, CT_OSC, CT_COM };
-enum ClipState { CS_STOPPED, CS_PLAYING, CS_RECORDING };
 
 class Clip
 {
-enum LaunchStyle { FREE, BEAT, BAR };
-enum LoopStyle { ONESHOT, MANY, FOREVER };
+public:	
+	enum ClipType { AUDIO, MIDI, OSC, COM };
+	enum ClipState { STOPPED, PLAYING, RECORDING };
+	enum LaunchStyle { FREE, BEAT, BAR };
+	enum LoopStyle { ONESHOT, MANY, FOREVER };
 	
-public:
 	Clip ();
 	virtual ~Clip ();
 	inline ClipState getState () { return state_; }

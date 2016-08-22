@@ -225,12 +225,12 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 					ImGui::OpenPopup("popup-audioclip");
 				}
 			}
-			if ( daClip -> getState() == CS_PLAYING )
+			if ( daClip -> getState() == Clip::PLAYING )
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("STOP")) daClip -> setState(CS_STOPPED);
+				if (ImGui::Button("STOP")) daClip -> setState(Clip::STOPPED);
 				ImGui::PopStyleColor(3);
 			}
 			else
@@ -240,7 +240,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
 				if (ImGui::Button("PLAY"))
 				{
-					daClip -> setState(CS_PLAYING);
+					daClip -> setState(Clip::PLAYING);
 					main_clock_p -> start();
 				}
 				ImGui::PopStyleColor(3);
@@ -297,13 +297,13 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 					ImGui::OpenPopup("popup-midiclip");
 				}
 			}
-			if ( daClip -> getState() == CS_PLAYING )
+			if ( daClip -> getState() == Clip::PLAYING )
 			{
 				ImGui::PushID(4096 + i);
 				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("STOP")) daClip -> setState(CS_STOPPED);
+				if (ImGui::Button("STOP")) daClip -> setState(Clip::STOPPED);
 				ImGui::PopStyleColor(3);
 				ImGui::PopID();
 			}
@@ -315,7 +315,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
 				if (ImGui::Button("PLAY"))
 				{
-					daClip -> setState(CS_PLAYING);
+					daClip -> setState(Clip::PLAYING);
 					main_clock_p -> start();
 				}
 				ImGui::PopStyleColor(3);

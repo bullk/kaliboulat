@@ -45,13 +45,13 @@ void MidiTrack::deleteClip (unsigned int i)
 void MidiTrack::tick (RtMidiOut * midiout)
 {
 	for (unsigned int i = 0; i < ClipSet->size (); i++)
-		if (ClipSet->at(i)->getState () == CS_PLAYING)
+		if (ClipSet->at(i)->getState () == Clip::PLAYING)
 			ClipSet->at(i)->tick (midiout);
 }
 
 void MidiTrack::stopAll ()
 {
 	for (unsigned int i = 0; i < ClipSet->size(); i++)
-		ClipSet->at(i)->setState(CS_STOPPED);
+		ClipSet->at(i)->setState(Clip::STOPPED);
 }
 		

@@ -27,13 +27,13 @@ Clip::~Clip()
 
 AudioClip::AudioClip(std::string path) : FileLoop(path)
 {
-	m_type = CT_AUDIO;
+	m_type = AUDIO;
 	openFile(path);
 	setRate(1);
 	path_ = path;
 	int p = path_.rfind("/") + 1;
 	name_ = path_.substr(p, path_.length()-p);
-	state_ = CS_STOPPED;
+	state_ = STOPPED;
 	//angle_ = 0;
 	volume_ = 0.5f;
 	pitshift_ = new PitShift();

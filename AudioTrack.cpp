@@ -42,7 +42,7 @@ void AudioTrack::deleteClip (unsigned int i)
 void AudioTrack::stopAll ()
 {
 	for ( unsigned int i=0; i < ClipSet -> size(); i++ )
-		ClipSet -> at(i) -> setState (CS_STOPPED);
+		ClipSet -> at(i) -> setState (Clip::STOPPED);
 }
 		
 		
