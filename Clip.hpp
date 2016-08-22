@@ -23,7 +23,9 @@ public:
 	Clip ();
 	virtual ~Clip ();
 	inline ClipState getState () { return state_; }
-	inline void setState (ClipState s) { state_ = s; }
+	inline bool isPlaying () { return (state_ == PLAYING); }
+	inline void play () { state_ = PLAYING; }
+	inline void stop () { state_ = STOPPED; }
 	inline virtual std::string getPath ()  { return path_; }
 	inline virtual std::string getName () { return name_; }
 	inline void virtual setName (std::string s) { name_ = s; }

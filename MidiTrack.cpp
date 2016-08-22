@@ -52,6 +52,6 @@ void MidiTrack::tick (RtMidiOut * midiout)
 void MidiTrack::stopAll ()
 {
 	for (unsigned int i = 0; i < ClipSet->size(); i++)
-		ClipSet->at(i)->setState(Clip::STOPPED);
+		ClipSet -> at(i) -> stop();
 }
 		

@@ -7,6 +7,7 @@
 AudioTrack::AudioTrack ()
 {
 	ClipSet = new std::vector<AudioClip *>;
+	state_ = true;
 }
 
 
@@ -42,7 +43,7 @@ void AudioTrack::deleteClip (unsigned int i)
 void AudioTrack::stopAll ()
 {
 	for ( unsigned int i=0; i < ClipSet -> size(); i++ )
-		ClipSet -> at(i) -> setState (Clip::STOPPED);
+		ClipSet -> at(i) -> stop();
 }
 		
 		

@@ -16,6 +16,7 @@ public:
 	void rewind ();
 	unsigned int update ();
 	bool getState ();
+	inline bool isStarted () { return state; }
 	int getHour ();
 	int getMinute ();
 	int getSecond ();

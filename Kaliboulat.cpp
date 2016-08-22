@@ -1,5 +1,7 @@
 #define WITH_GUI
 
+#include <unistd.h>
+
 #include <stdio.h>
 #include <string>
 
@@ -32,6 +34,16 @@ void midiPanic (MidiTrack * miditrack_p);
 void audioInit (RtAudio * dac, AudioTrack * audiotrack_p);
 void audioClose (RtAudio * dac);
 
+//----------------------------------------------------------------------
+
+struct App
+{
+	bool * main_switch;
+	Clock * clock;
+	AudioTrack * audioMaster;
+	MidiTrack * midiMaster;
+	//Project * project;
+};
 
 
 //----------------------------------------------------------------------
@@ -67,26 +79,28 @@ void midiPanic (RtMidiOut * midiout)
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer )
 {
-	AudioTrack * audiotrack_p = (AudioTrack *) dataPointer;
+	App * diApp = (App *) dataPointer;
+	AudioTrack * audiotrack = diApp -> audioMaster;
 	register StkFloat * samples = (StkFloat *) outputBuffer;
 
-	for ( unsigned int i=0; i<nBufferFrames; i++ )
-	{
-		*samples = 0;
-		for ( unsigned int j = 0; j < audiotrack_p -> getClipSet () -> size (); j++ )
+	if ( diApp -> clock -> isStarted () )
+		for ( unsigned int i=0; i<nBufferFrames; i++ )
 		{
-			AudioClip * daClip = audiotrack_p -> getClipSet () -> at (j);
-			if ( daClip -> getState () == Clip::PLAYING )
-				*samples += daClip -> tick () * *(daClip -> getVolume ());
+			*samples = 0;
+			for ( unsigned int j = 0; j < audiotrack -> getClipSet () -> size (); j++ )
+			{
+				AudioClip * daClip = audiotrack -> getClipSet () -> at (j);
+				if ( daClip -> isPlaying () )
+					*samples += daClip -> tick () * *(daClip -> getVolume ());
+			}
+			samples++;
 		}
-		samples++;
-	}
-	
+
 	return 0;
 }
 
 
-void audioInit (RtAudio * dac, AudioTrack * audiotrack_p)
+void audioInit (RtAudio * dac, App * diApp)
 {
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
@@ -107,11 +121,13 @@ void audioInit (RtAudio * dac, AudioTrack * audiotrack_p)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)audiotrack_p, &options ); }
+	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)diApp, &options ); }
 	catch ( RtError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
 	catch ( RtError &error ) { error.printMessage (); }
+	//sleep ( 1 );	cout << "bonjour" << endl;
+	//cout << "bonjour" << endl;
 } 
 
 void audioClose (RtAudio * dac)
@@ -128,14 +144,22 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
+	App diApp = { NULL, NULL, NULL, NULL };
+
+	bool go_on = true;
+	diApp.main_switch = &go_on;
+
+	diApp.clock = new Clock ();
+	diApp.audioMaster = new AudioTrack (); // Audio clips manager
+	diApp.midiMaster = new MidiTrack (); // MIDI clips manager
+		
 	// AUDIO INIT
 	#ifdef __UNIX_JACK__
 		RtAudio * dac = new RtAudio (RtAudio::UNIX_JACK); // main audio output
 	#else
 		RtAudio * dac = new RtAudio (); // main audio output
 	#endif
-	AudioTrack * audioMaster = new AudioTrack (); // Audio clips manager
-	audioInit (dac, audioMaster);
+	audioInit (dac, &diApp);
 
 	// MIDI INIT
 	#ifdef __UNIX_JACK__
@@ -153,11 +177,8 @@ int main( int argc, char* args[] )
 		//midiout -> openPort (); // Open first available port.
 	//}
 	midiout -> openVirtualPort ();
-	MidiTrack * midiMaster = new MidiTrack (); // MIDI clips manager
-	midiInit (midiMaster);
+	midiInit (diApp.midiMaster);
 
-	// CLOCK INIT
-	Clock * daClock = new Clock ();
 	
 	// GUI INIT
 	#ifdef WITH_GUI
@@ -169,26 +190,25 @@ int main( int argc, char* args[] )
 	
 	// MAIN LOOP
 	
-	bool go_on = true;
 	unsigned int midi_ticks = 0;
 	
 	while (go_on)
 	{
 		// Clock update
-		if ( daClock -> getState () ) 
+		if ( diApp.clock -> getState () ) 
 		{
-			midi_ticks = daClock -> update ();
+			midi_ticks = diApp.clock -> update ();
 			//char bbt[13];
-			//sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), daClock -> getTick());
+			//sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), diApp.clock -> getTick());
 			//std::cout << bbt << midi_ticks << std::endl;
 			// MIDI flow
 			for (unsigned int i=0; i<midi_ticks; i++) 
-				midiMaster -> tick (midiout);
+				diApp.midiMaster -> tick (midiout);
 		}
 
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (&go_on, daClock, audioMaster, midiMaster, project);
+			GUI_Main (&go_on, diApp.clock, diApp.audioMaster, diApp.midiMaster, project);
 		#endif
 
 	}
@@ -204,11 +224,12 @@ int main( int argc, char* args[] )
 	midiout -> closePort ();
 	audioClose (dac);
 
-	delete daClock;
-	delete midiMaster;
 	delete midiout;
-	delete audioMaster;
 	delete dac;
+	//delete diApp;
+	delete diApp.clock;
+	delete diApp.midiMaster;
+	delete diApp.audioMaster;
 
 	return 0; /* ISO C requires main to return int. */
 

@@ -1,5 +1,6 @@
 #include "Clock.hpp"
 
+
 Clock::Clock ()
 {
 	state = false;

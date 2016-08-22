@@ -46,6 +46,25 @@ void GUI_Close()
 	SDL_Quit();
 }
 
+void clipPlayButton (Clip * clip)
+{
+	if ( clip -> isPlaying () )
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button("STOP")) clip -> stop ();
+		ImGui::PopStyleColor(3);
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button("PLAY")) clip -> play ();
+		ImGui::PopStyleColor(3);
+	}
+}
 
 void displayMidiClipDetails (MidiClip * daClip)
 {
@@ -87,15 +106,18 @@ void displayMidiClipDetails (MidiClip * daClip)
 }
 
 
-void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p, MidiTrack* miditrack_p, Project* project_p)
+//======================================================================
+
+
+void GUI_Main(bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project)
 {
-	static Screen details = { Screen::PROJECT, 0 };
+	static Screen details = { Screen::PROJECT, 0, 0 };
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
 		ImGui_ImplSdl_ProcessEvent(&event);
 		if (event.type == SDL_QUIT)
-			*main_switch_p = false;
+			*main_switch = false;
 	}
 
 	ImGui_ImplSdl_NewFrame(window);
@@ -111,11 +133,11 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 		ImGui::SetNextWindowPos(ImVec2(0,0));
 		char buf[64];
-		sprintf (buf, "%s - Kaliboulat", project_p -> getName().c_str());
-		ImGui::Begin(buf, main_switch_p, flags);
+		sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
+		ImGui::Begin(buf, main_switch, flags);
 		
 		static bool about_open = false;
-		bool enabled = not(main_clock_p -> getState());
+		bool enabled = not(main_clock -> getState());
 
 		if (ImGui::BeginMenuBar())
 		{
@@ -127,7 +149,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 				if (ImGui::MenuItem("Save As..", NULL, false, enabled)) {}
 				ImGui::Separator();
 				if (ImGui::MenuItem("Options")) {}
-				if (ImGui::MenuItem("Quit", "Alt+F4")) *main_switch_p = false;
+				if (ImGui::MenuItem("Quit", "Alt+F4")) *main_switch = false;
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Import"))
@@ -165,17 +187,12 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		ImGui::BeginChild("Master Controls", ImVec2(0, 50), true);
 
 		//TODO : Intégrer les images de commandes
-		if ( main_clock_p -> getState() )
+		if ( main_clock -> getState() )
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-			if (ImGui::Button("STOP"))
-			{
-				audiotrack_p -> stopAll();
-				miditrack_p -> stopAll();
-				main_clock_p -> stop();
-			}
+			if (ImGui::Button("STOP")) main_clock -> stop();
 			ImGui::PopStyleColor(3);
 		}
 		else
@@ -183,15 +200,15 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 			ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-			if (ImGui::Button("PLAY")) main_clock_p -> start();
+			if (ImGui::Button("PLAY")) main_clock -> start();
 			ImGui::PopStyleColor(3);
 		}
 		// Clock
-		ImGui::SameLine(); ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", main_clock_p -> getHour(), main_clock_p -> getMinute(), main_clock_p -> getSecond());
+		ImGui::SameLine(); ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", main_clock -> getHour(), main_clock -> getMinute(), main_clock -> getSecond());
 		//ImGui::SameLine(); ImGui::TextColored(ImColor(127,127,127), "%d", mcDelta);
 
 		// MIDI Clock
-		ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", main_clock_p -> getBar(), main_clock_p -> getBeat(), main_clock_p -> getTick());
+		ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", main_clock -> getBar(), main_clock -> getBeat(), main_clock -> getTick());
 		ImGui::EndChild();
 		
 		// MAIN BOARD
@@ -199,9 +216,9 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 
 		// Audio Clips
-		for ( unsigned int i = 0; i < audiotrack_p -> getClipSet() -> size(); i++ )
+		for ( unsigned int i = 0; i < audiotrack -> getClipSet() -> size(); i++ )
 		{
-			AudioClip * daClip = audiotrack_p -> getClipSet() -> at(i);
+			AudioClip * daClip = audiotrack -> getClipSet() -> at(i);
 			bool lock = false;
 			float progress = 0.0f;
 			ImGui::PushID(i);
@@ -222,45 +239,22 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 				{
 					details.context = Screen::AUDIOCLIP;
 					details.audioclip = i;
-					ImGui::OpenPopup("popup-audioclip");
+					ImGui::OpenPopup("popup-clip");
 				}
 			}
-			if ( daClip -> getState() == Clip::PLAYING )
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("STOP")) daClip -> setState(Clip::STOPPED);
-				ImGui::PopStyleColor(3);
-			}
-			else
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("PLAY"))
-				{
-					daClip -> setState(Clip::PLAYING);
-					main_clock_p -> start();
-				}
-				ImGui::PopStyleColor(3);
-			}
+			clipPlayButton ( daClip );
 			ImGui::SameLine(); // Progress bar
 			progress = daClip -> getTime() / daClip -> getLength();
 			ImGui::ProgressBar(progress, ImVec2(100, 0.f),""); 
 			ImGui::SameLine(); ImGui::Text("%s", daClip -> getName().c_str());
 
-            if (ImGui::BeginPopup("popup-audioclip"))
+            if (ImGui::BeginPopup("popup-clip"))
             {
                 if ( ImGui::Selectable("delete this clip") )
 				{
-					if (details.audioclip == 0)
-					{
-						if ( audiotrack_p -> getClipSet() -> size() == 1 ) 
-							details.context = Screen::PROJECT;
-					}
-					else details.audioclip--;
-					audiotrack_p -> deleteClip (i);
+					//details.audioclip = 0;
+					details.context = Screen::NONE;
+					audiotrack -> deleteClip (i);
 				}
                 ImGui::EndPopup();
             }
@@ -271,9 +265,9 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		}
 		
 		// MIDI Clips
-		for ( unsigned int i = 0; i < miditrack_p -> getClipSet() -> size(); i++ )
+		for ( unsigned int i = 0; i < miditrack -> getClipSet() -> size(); i++ )
 		{
-			MidiClip * daClip = miditrack_p -> getClipSet() -> at(i);
+			MidiClip * daClip = miditrack -> getClipSet() -> at(i);
 			bool lock = false;
 			float progress = 0.0f;
 			ImGui::PushID(4096 + i);
@@ -297,30 +291,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 					ImGui::OpenPopup("popup-midiclip");
 				}
 			}
-			if ( daClip -> getState() == Clip::PLAYING )
-			{
-				ImGui::PushID(4096 + i);
-				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("STOP")) daClip -> setState(Clip::STOPPED);
-				ImGui::PopStyleColor(3);
-				ImGui::PopID();
-			}
-			else
-			{
-				ImGui::PushID(4096 + i);
-				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-				if (ImGui::Button("PLAY"))
-				{
-					daClip -> setState(Clip::PLAYING);
-					main_clock_p -> start();
-				}
-				ImGui::PopStyleColor(3);
-				ImGui::PopID();
-			}
+			clipPlayButton (daClip);
 			ImGui::SameLine(); // Progress bar
 			progress = (float) daClip -> getTime() / daClip -> getLength();
 			ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
@@ -330,13 +301,9 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
             {
                 if ( ImGui::Selectable("delete this clip") )
 				{
-					if (details.midiclip == 0)
-					{
-						if ( miditrack_p -> getClipSet() -> size() == 1 ) 
-							details.context = Screen::PROJECT;
-					}
-					else details.midiclip--;
-					miditrack_p -> deleteClip (i);
+					//details.midiclip = 0;
+					details.context = Screen::NONE;
+					miditrack -> deleteClip (i);
 				}
                 ImGui::EndPopup();
             }
@@ -354,9 +321,9 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		// DETAILS WINDOW
 		ImGui::BeginChild ("Details", ImVec2(0,0), true);
 		if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
-		if ( audiotrack_p -> getClipSet() -> size() )
+		if ( audiotrack -> getClipSet() -> size() )
 			if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
-		if ( miditrack_p -> getClipSet() -> size() )
+		if ( miditrack -> getClipSet() -> size() )
 			if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
 		ImGui::Separator();
 		
@@ -364,25 +331,25 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 		{
 			case Screen::PROJECT:
 			{
-				std::vector<std::string> * list = NULL;
-				std::string str;
+				vector<std::string> * list = NULL;
+				string str;
 				ImGui::SetNextTreeNodeOpen(true);
 				if (ImGui::CollapsingHeader("Audio Files (click to import)"))
 				{
-					list = project_p -> getAudioFiles ();
+					list = project -> getAudioFiles ();
 					for ( unsigned int i=0; i < list -> size(); i++ )
 						if ( ImGui::Selectable(list -> at(i).c_str()) )
-							audiotrack_p -> addClip ( project_p->getAudioDir() + "/" + list -> at(i).c_str() );
+							audiotrack -> addClip ( project->getAudioDir() + "/" + list -> at(i).c_str() );
 				}
 				ImGui::SetNextTreeNodeOpen(true);
 				if (ImGui::CollapsingHeader("MIDI Files (click to import)"))
 				{
-					list = project_p -> getMIDIFiles ();
+					list = project -> getMIDIFiles ();
 					for ( unsigned int i=0; i < list -> size(); i++ )
 						if ( ImGui::Selectable(list -> at(i).c_str()) )
 						{
-							MidiFile * midifile = new MidiFile ( project_p->getMIDIDir() + "/" + list -> at(i).c_str() );
-							midifile -> parse (miditrack_p);
+							MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
+							midifile -> parse (miditrack);
 							delete midifile;
 						}
 				}
@@ -390,7 +357,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 				break;
 			case Screen::AUDIOCLIP:
 			{
-				AudioClip * daClip = audiotrack_p -> getClipSet() -> at(details.audioclip);
+				AudioClip * daClip = audiotrack -> getClipSet() -> at(details.audioclip);
 				ImGui::PushItemWidth(100);
 				ImGui::TextColored(ImColor(255,255,0), "%s", daClip -> getName().c_str());
 				ImGui::Text("Location : %s", daClip -> getPath().c_str());
@@ -404,7 +371,7 @@ void GUI_Main(bool* main_switch_p, Clock* main_clock_p, AudioTrack* audiotrack_p
 			}
 				break;
 			case Screen::MIDICLIP:
-				displayMidiClipDetails (miditrack_p -> getClipSet() -> at(details.midiclip));
+				displayMidiClipDetails (miditrack -> getClipSet() -> at(details.midiclip));
 				break;
 			default:
 				break;
