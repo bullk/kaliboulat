@@ -95,7 +95,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 			}
 			samples++;
 		}
-
+	else for ( unsigned int i=0; i<nBufferFrames; i++ ) *samples = 0;
 	return 0;
 }
 
