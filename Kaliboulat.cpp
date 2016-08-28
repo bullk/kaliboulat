@@ -83,19 +83,22 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	AudioTrack * audiotrack = diApp -> audioMaster;
 	register StkFloat * samples = (StkFloat *) outputBuffer;
 
-	if ( diApp -> clock -> isStarted () )
-		for ( unsigned int i=0; i<nBufferFrames; i++ )
+	if ( diApp -> clock -> isStarted () ) for ( unsigned int i=0; i<nBufferFrames; i++ )
+	{
+		*samples = 0;
+		for ( unsigned int j = 0; j < audiotrack -> getClipSet () -> size (); j++ )
 		{
-			*samples = 0;
-			for ( unsigned int j = 0; j < audiotrack -> getClipSet () -> size (); j++ )
-			{
-				AudioClip * daClip = audiotrack -> getClipSet () -> at (j);
-				if ( daClip -> isPlaying () )
-					*samples += daClip -> tick () * *(daClip -> getVolume ());
-			}
-			samples++;
+			AudioClip * daClip = audiotrack -> getClipSet () -> at (j);
+			if ( daClip -> isPlaying () )
+				*samples += daClip -> tick () * *(daClip -> getVolume ());
 		}
-	else for ( unsigned int i=0; i<nBufferFrames; i++ ) *samples = 0;
+		samples++;
+	}
+	else for ( unsigned int i=0; i<nBufferFrames; i++ ) 
+	{
+		*samples = 0;
+		samples++;
+	}
 	return 0;
 }
 
