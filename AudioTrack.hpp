@@ -18,11 +18,11 @@ public:
 	// Destructor 
 	~AudioTrack();
 
-	inline void setState (bool s) { state_ = s; }
-	inline bool isPlaying () { return state_; }
     void addClip (std::string path);
     void deleteClip (unsigned int i);
     void stopAll ();
+	inline void setState (bool s) { state_ = s; }
+	inline bool isPlaying () { return state_; }
     inline std::vector<AudioClip *> * getClipSet () { return ClipSet; }
     inline RtAudio * getOutput () { return output_; }
     inline void setOutput (RtAudio * o) { output_ = o; }
