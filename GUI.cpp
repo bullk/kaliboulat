@@ -108,19 +108,53 @@ void displayMidiClipDetails (MidiClip * daClip)
 
 //======================================================================
 
+void TitleScreen() {}
+
+void ProjectScreen()
+{
+}
+
+void ConsoleScreen() {}
+
+void SequencerScreen() {}
+
+//======================================================================
+
 
 void GUI_Main(bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project)
 {
-	static Screen details = { Screen::PROJECT, 0, 0 };
+	static Screen details = { Screen::TITLE, Screen::PROJECT, 0, 0 };
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
 		ImGui_ImplSdl_ProcessEvent(&event);
-		if (event.type == SDL_QUIT)
-			*main_switch = false;
+		switch ( event.type )
+		{
+			case SDL_QUIT:
+				*main_switch = false;
+				break;
+				
+			case SDL_KEYUP:
+				switch ( event.key.keysym.scancode )
+				{
+					case SDL_SCANCODE_F1:
+						details.type = Screen::RESSOURCES;
+						break;
+					case SDL_SCANCODE_F2:
+						details.type = Screen::CONSOLE;
+						break;
+					case SDL_SCANCODE_F3:
+						details.type = Screen::SEQUENCER;
+						break;
+					default:
+						break;
+				}
+				break;
+		}
 	}
 
 	ImGui_ImplSdl_NewFrame(window);
+	if ( details.type == Screen::RESSOURCES )
 	// Main window
 	{
 		ImGuiWindowFlags flags = 0;
@@ -185,7 +219,6 @@ void GUI_Main(bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, Midi
 		ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
 
 		ImGui::BeginChild("Master Controls", ImVec2(0, 50), true);
-
 		//TODO : Intégrer les images de commandes
 		if ( main_clock -> getState() )
 		{

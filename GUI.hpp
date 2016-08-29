@@ -19,8 +19,9 @@
 
 struct Screen
 {
-	//enum Type { MAIN }; // For later use
+	enum Type { TITLE, RESSOURCES, CONSOLE, SEQUENCER };
 	enum Context { NONE, PROJECT, AUDIOCLIP, MIDICLIP }; 
+	Type type;
 	Context context;
 	unsigned int audioclip, midiclip;
 };
