@@ -119,9 +119,11 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 	flags |= ImGuiWindowFlags_NoMove;
 	flags |= ImGuiWindowFlags_NoCollapse;
 	flags |= ImGuiWindowFlags_MenuBar;
+	
 	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 	ImGui::SetNextWindowPos(ImVec2(0,0));
+	
 	char buf[64];
 	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
 	ImGui::Begin(buf, main_switch, flags);
@@ -372,9 +374,56 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 	ImGui::End();
 }
 
-void ConsoleScreen () {}
+void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project) 
+{	
+	ImGuiWindowFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoTitleBar;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoMove;
+	flags |= ImGuiWindowFlags_NoCollapse;
+	//flags |= ImGuiWindowFlags_MenuBar;
 
-void SequencerScreen () {}
+	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
+	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
+	ImGui::SetNextWindowPos(ImVec2(0,0));
+
+	char buf[64];
+	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
+	ImGui::Begin(buf, main_switch, flags);
+	
+	ImGui::Text(" OOOO  OOO  O   O  OOO   OOO  OO    OOOOO");
+	ImGui::Text("O     O   O OO  O O     O   O O     O");
+	ImGui::Text("O     O   O O O O  OOO  O   O O     OOOO");
+	ImGui::Text("O     O   O O  OO     O O   O O     O");
+	ImGui::Text(" OOOO  OOO  O   O  OOO   OOO  OOOOO OOOOO");
+	
+	ImGui::End();
+}
+
+void SequencerScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project) 
+{
+	ImGuiWindowFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoTitleBar;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoMove;
+	flags |= ImGuiWindowFlags_NoCollapse;
+	//flags |= ImGuiWindowFlags_MenuBar;
+
+	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
+	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
+	ImGui::SetNextWindowPos(ImVec2(0,0));
+
+	char buf[64];
+	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
+	ImGui::Begin(buf, main_switch, flags);
+	
+	ImGui::Text(" OOO  OOOOO  OOO  O   O OOOOO O   O  OOOO OOOOO OOOO");
+	ImGui::Text("O     O     O   O O   O O     OO  O O     O     O   O");
+	ImGui::Text(" OOO  OOOO  O   O O   O OOOO  O O O O     OOOO  OOO");
+	ImGui::Text("    O O     O  O  O   O O     O  OO O     O     O  O");
+	ImGui::Text(" OOO  OOOOO  OOOO  OOO  OOOOO O   O  OOOO OOOOO O   O");
+	ImGui::End();
+}
 
 //======================================================================
 
@@ -420,11 +469,11 @@ void GUI_Main(bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, Midi
 			break;
 			
 		case Screen::CONSOLE:
-			ConsoleScreen ();
+			ConsoleScreen (main_switch, main_clock, audiotrack, miditrack, project);
 			break;
 		
 		case Screen::SEQUENCER:
-			SequencerScreen ();
+			SequencerScreen (main_switch, main_clock, audiotrack, miditrack, project);
 			break;
 		
 		default:
