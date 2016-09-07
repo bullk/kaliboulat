@@ -8,7 +8,7 @@
 #include "imgui/imgui_impl_sdl.h"
 
 #include "Clock.hpp"
-#include "AudioTrack.hpp"
+#include "Modules.hpp"
 #include "MidiTrack.hpp"
 #include "Project.hpp"
 #include "MidiFile.hpp"
@@ -36,7 +36,7 @@ class GUI
 
 int GUI_Init();
 void GUI_Close();
-void GUI_Main(bool*, Clock*, AudioTrack*, MidiTrack*, Project*);
+void GUI_Main(bool*, Clock*, AudioModule*, MidiTrack*, Project*);
 
 
 #endif

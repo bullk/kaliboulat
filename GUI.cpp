@@ -47,6 +47,54 @@ void GUI_Close()
 	SDL_Quit();
 }
 
+//======================================================================
+
+void mainMenu (bool enabled, bool * main_switch)
+{
+	static bool about_open = false;
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("New", "Ctrl+N", false, enabled)) {}
+			if (ImGui::MenuItem("Open", "Ctrl+O", false, enabled)) {}
+			if (ImGui::MenuItem("Save", "Ctrl+S", false, enabled)) {}
+			if (ImGui::MenuItem("Save As..", NULL, false, enabled)) {}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Options")) {}
+			if (ImGui::MenuItem("Quit", "Alt+F4")) *main_switch = false;
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Import"))
+		{
+			if (ImGui::MenuItem("Audio File", NULL, false, enabled)) {}
+			if (ImGui::MenuItem("MIDI File", NULL, false, enabled)) {}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Help"))
+		{
+			ImGui::MenuItem("About this software", NULL, &about_open);
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+	
+	if (about_open) 
+		ImGui::OpenPopup("About");
+	if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("      Kaliboulat / Fullbox Project\n\n    Alien sequencer by BullK Studio\nCoded by Olivier Cadiou aka Al Kali Boul\n");
+		ImGui::Columns(3, NULL, false); ImGui::NextColumn();
+		if (ImGui::Button("Close", ImVec2(80,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			about_open = false;
+		}
+		ImGui::NextColumn(); ImGui::NextColumn(); ImGui::Columns(1);
+		ImGui::EndPopup();
+	}	
+}
+
 void clipPlayButton (Clip * clip)
 {
 	if ( clip -> isPlaying () )
@@ -111,7 +159,7 @@ void displayMidiClipDetails (MidiClip * daClip)
 
 void TitleScreen () {}
 
-void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project)
+void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project)
 {
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -128,50 +176,8 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
 	ImGui::Begin(buf, main_switch, flags);
 	
-	static bool about_open = false;
 	bool enabled = not(main_clock -> getState());
-
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::BeginMenu("File"))
-		{
-			if (ImGui::MenuItem("New", "Ctrl+N", false, enabled)) {}
-			if (ImGui::MenuItem("Open", "Ctrl+O", false, enabled)) {}
-			if (ImGui::MenuItem("Save", "Ctrl+S", false, enabled)) {}
-			if (ImGui::MenuItem("Save As..", NULL, false, enabled)) {}
-			ImGui::Separator();
-			if (ImGui::MenuItem("Options")) {}
-			if (ImGui::MenuItem("Quit", "Alt+F4")) *main_switch = false;
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Import"))
-		{
-			if (ImGui::MenuItem("Audio File", NULL, false, enabled)) {}
-			if (ImGui::MenuItem("MIDI File", NULL, false, enabled)) {}
-			ImGui::EndMenu();
-		}
-		if (ImGui::BeginMenu("Help"))
-		{
-			ImGui::MenuItem("About this software", NULL, &about_open);
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenuBar();
-	}
-	
-	if (about_open) 
-		ImGui::OpenPopup("About");
-	if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-	{
-		ImGui::Text("      Kaliboulat / Fullbox Project\n\n    Alien sequencer by BullK Studio\nCoded by Olivier Cadiou aka Al Kali Boul\n");
-		ImGui::Columns(3, NULL, false); ImGui::NextColumn();
-		if (ImGui::Button("Close", ImVec2(80,0))) 
-		{
-			ImGui::CloseCurrentPopup();
-			about_open = false;
-		}
-		ImGui::NextColumn(); ImGui::NextColumn(); ImGui::Columns(1);
-		ImGui::EndPopup();
-	}
+	mainMenu (enabled, main_switch);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
 	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
@@ -207,9 +213,9 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 
 	// Audio Clips
-	for ( unsigned int i = 0; i < audiotrack -> getClipSet() -> size(); i++ )
+	for ( unsigned int i = 0; i < audio -> getClipSet() -> size(); i++ )
 	{
-		AudioClip * daClip = audiotrack -> getClipSet() -> at(i);
+		AudioClip * daClip = audio -> getClipSet() -> at(i);
 		bool lock = false;
 		float progress = 0.0f;
 		ImGui::PushID(i);
@@ -245,7 +251,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 			{
 				//details.audioclip = 0;
 				details.context = Screen::NONE;
-				audiotrack -> deleteClip (i);
+				audio -> deleteClip (i);
 			}
 			ImGui::EndPopup();
 		}
@@ -312,7 +318,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 	// DETAILS WINDOW
 	ImGui::BeginChild ("Details", ImVec2(0,0), true);
 	if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
-	if ( audiotrack -> getClipSet() -> size() )
+	if ( audio -> getClipSet() -> size() )
 		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
 	if ( miditrack -> getClipSet() -> size() )
 		if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
@@ -330,7 +336,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 				list = project -> getAudioFiles ();
 				for ( unsigned int i=0; i < list -> size(); i++ )
 					if ( ImGui::Selectable(list -> at(i).c_str()) )
-						audiotrack -> addClip ( project->getAudioDir() + "/" + list -> at(i).c_str() );
+						audio -> addClip ( project->getAudioDir() + "/" + list -> at(i).c_str() );
 			}
 			ImGui::SetNextTreeNodeOpen(true);
 			if (ImGui::CollapsingHeader("MIDI Files (click to import)"))
@@ -348,7 +354,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 			break;
 		case Screen::AUDIOCLIP:
 		{
-			AudioClip * daClip = audiotrack -> getClipSet() -> at(details.audioclip);
+			AudioClip * daClip = audio -> getClipSet() -> at(details.audioclip);
 			ImGui::PushItemWidth(100);
 			ImGui::TextColored(ImColor(255,255,0), "%s", daClip -> getName().c_str());
 			ImGui::Text("Location : %s", daClip -> getPath().c_str());
@@ -374,14 +380,14 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 	ImGui::End();
 }
 
-void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project) 
+void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project) 
 {	
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
 	flags |= ImGuiWindowFlags_NoResize;
 	flags |= ImGuiWindowFlags_NoMove;
 	flags |= ImGuiWindowFlags_NoCollapse;
-	//flags |= ImGuiWindowFlags_MenuBar;
+	flags |= ImGuiWindowFlags_MenuBar;
 
 	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
@@ -391,23 +397,78 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack
 	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
 	ImGui::Begin(buf, main_switch, flags);
 	
-	ImGui::Text(" OOOO  OOO  O   O  OOO   OOO  OO    OOOOO");
-	ImGui::Text("O     O   O OO  O O     O   O O     O");
-	ImGui::Text("O     O   O O O O  OOO  O   O O     OOOO");
-	ImGui::Text("O     O   O O  OO     O O   O O     O");
-	ImGui::Text(" OOOO  OOO  O   O  OOO   OOO  OOOOO OOOOO");
+	bool enabled = not(main_clock -> getState());
+	mainMenu (enabled, main_switch);
 	
-	ImGui::End();
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
+	ImGui::BeginChild("Title", ImVec2(305, 90));
+	ImGui::Text(" ####  ###  #   #  ###   ###  #     #####");
+	ImGui::Text("#     #   # ##  # #     #   # #     #");
+	ImGui::Text("#     #   # # # #  ###  #   # #     ####");
+	ImGui::Text("#     #   # #  ##     # #   # #     #");
+	ImGui::Text(" ####  ###  #   #  ###   ###  ##### #####");
+	ImGui::EndChild();
+	ImGui::PopStyleVar();
+	
+	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
+
+	ImGui::SameLine();
+	ImGui::BeginChild("Master Controls", ImVec2(0, 85), true);
+	//TODO : Intégrer les images de commandes
+	if ( main_clock -> getState () )
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button ("STOP")) main_clock -> stop();
+		ImGui::PopStyleColor (3);
+	}
+	else
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button ("PLAY")) main_clock -> start();
+		ImGui::PopStyleColor(3);
+	}
+	// Clock
+	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", main_clock -> getHour(), main_clock -> getMinute(), main_clock -> getSecond());
+	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
+
+	// MIDI Clock
+	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", main_clock -> getBar(), main_clock -> getBeat(), main_clock -> getTick());
+	ImGui::EndChild ();
+
+	// TODO : Afficher les pistes
+	ImGui::BeginChild("Board", ImVec2(0, 0), true);
+	for (unsigned int i=0; i < project -> nTracks (); i++)
+	{
+		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
+		ImGui::PushID (2048 + i);
+		if ( i > 0 ) ImGui::SameLine ();
+		ImGui::BeginChild (2048 + i, ImVec2(100, 0), true);
+		ImGui::Text ( project -> getTrack(i) -> getName().c_str() );
+		ImGui::EndChild ();
+		ImGui::PopID ();
+		ImGui::PopStyleVar ();
+	}
+	ImGui::EndChild ();
+
+	ImGui::PopStyleColor ();
+	ImGui::PopStyleVar ();
+
+	ImGui::End ();
 }
 
-void SequencerScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project) 
+void SequencerScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project) 
 {
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
 	flags |= ImGuiWindowFlags_NoResize;
 	flags |= ImGuiWindowFlags_NoMove;
 	flags |= ImGuiWindowFlags_NoCollapse;
-	//flags |= ImGuiWindowFlags_MenuBar;
+	flags |= ImGuiWindowFlags_MenuBar;
 
 	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
@@ -417,18 +478,21 @@ void SequencerScreen (bool* main_switch, Clock* main_clock, AudioTrack* audiotra
 	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
 	ImGui::Begin(buf, main_switch, flags);
 	
-	ImGui::Text(" OOO  OOOOO  OOO  O   O OOOOO O   O  OOOO OOOOO OOOO");
-	ImGui::Text("O     O     O   O O   O O     OO  O O     O     O   O");
-	ImGui::Text(" OOO  OOOO  O   O O   O OOOO  O O O O     OOOO  OOO");
-	ImGui::Text("    O O     O  O  O   O O     O  OO O     O     O  O");
-	ImGui::Text(" OOO  OOOOO  OOOO  OOO  OOOOO O   O  OOOO OOOOO O   O");
+	bool enabled = not(main_clock -> getState());
+	mainMenu (enabled, main_switch);
+	
+	ImGui::Text(" XXX  XXXXX  XXX  X   X XXXXX X   X  XXXX XXXXX XXXX");
+	ImGui::Text("X     X     X   X X   X X     XX  X X     X     X   X");
+	ImGui::Text(" XXX  XXXX  X   X X   X XXXX  X X X X     XXXX  XXX");
+	ImGui::Text("    X X     X  X  X   X X     X  XX X     X     X  X");
+	ImGui::Text(" XXX  XXXXX  XXXX  XXX  XXXXX X   X  XXXX XXXXX X   X");
 	ImGui::End();
 }
 
 //======================================================================
 
 
-void GUI_Main(bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, MidiTrack* miditrack, Project* project)
+void GUI_Main(bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project)
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -465,15 +529,15 @@ void GUI_Main(bool* main_switch, Clock* main_clock, AudioTrack* audiotrack, Midi
 	switch ( details.type )
 	{
 		case Screen::RESSOURCES:
-			ProjectScreen (main_switch, main_clock, audiotrack, miditrack, project);
+			ProjectScreen (main_switch, main_clock, audio, miditrack, project);
 			break;
 			
 		case Screen::CONSOLE:
-			ConsoleScreen (main_switch, main_clock, audiotrack, miditrack, project);
+			ConsoleScreen (main_switch, main_clock, audio, miditrack, project);
 			break;
 		
 		case Screen::SEQUENCER:
-			SequencerScreen (main_switch, main_clock, audiotrack, miditrack, project);
+			SequencerScreen (main_switch, main_clock, audio, miditrack, project);
 			break;
 		
 		default:

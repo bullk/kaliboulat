@@ -44,7 +44,7 @@ protected:
 };
 
 
-class AudioClip : public Clip, public stk::FileLoop
+class AudioClip : public Clip, public stk::FileWvIn
 {
 	
 public:

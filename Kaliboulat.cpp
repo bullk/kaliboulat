@@ -15,6 +15,7 @@
 #include "MidiTrack.hpp"
 #include "MidiFile.hpp"
 #include "Project.hpp"
+#include "Modules.hpp"
 
 #ifdef WITH_GUI
 #include "GUI.hpp"
@@ -40,7 +41,7 @@ struct App
 {
 	bool * main_switch;
 	Clock * clock;
-	AudioTrack * audioMaster;
+	AudioModule * audio;
 	MidiTrack * midiMaster;
 	//Project * project;
 };
@@ -80,23 +81,27 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer )
 {
 	App * diApp = (App *) dataPointer;
-	AudioTrack * audiotrack = diApp -> audioMaster;
+	//AudioTrack * audiotrack = diApp -> audio;
 	register StkFloat * samples = (StkFloat *) outputBuffer;
-
-	if ( diApp -> clock -> isStarted () ) for ( unsigned int i=0; i<nBufferFrames; i++ )
+	
+	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
-		for ( unsigned int j = 0; j < audiotrack -> getClipSet () -> size (); j++ )
+		if ( diApp -> clock -> isStarted () ) 
 		{
-			AudioClip * daClip = audiotrack -> getClipSet () -> at (j);
+			for ( unsigned int j = 0; j < diApp -> audio -> getTrackSet () -> size (); j++ )
+			{
+				AudioTrack * daTrack = diApp -> audio -> getTrackSet () -> at (j);
+				if ( daTrack -> isPlaying () )
+					*samples += daTrack -> tick () * *(daTrack -> getVolume ());
+			}
+		}
+		for ( unsigned int j = 0; j < diApp -> audio -> getClipSet () -> size (); j++ )
+		{
+			AudioClip * daClip = diApp -> audio -> getClipSet () -> at (j);
 			if ( daClip -> isPlaying () )
 				*samples += daClip -> tick () * *(daClip -> getVolume ());
 		}
-		samples++;
-	}
-	else for ( unsigned int i=0; i<nBufferFrames; i++ ) 
-	{
-		*samples = 0;
 		samples++;
 	}
 	return 0;
@@ -117,10 +122,10 @@ void audioInit (RtAudio * dac, App * diApp)
 	output_parameters.deviceId = dac -> getDefaultOutputDevice ();
 	output_parameters.nChannels = AUDIO_OUTPUTS;
 	
-	RtAudioFormat format = ( sizeof(StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
+	RtAudioFormat format = ( sizeof (StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
 	
 	RtAudio::StreamOptions options;
-	options.streamName = APP_NAME;
+	options.streamName = AUDIO_MODULE_NAME;
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
@@ -151,10 +156,9 @@ int main( int argc, char* args[] )
 
 	bool go_on = true;
 	diApp.main_switch = &go_on;
-
 	diApp.clock = new Clock ();
-	diApp.audioMaster = new AudioTrack (); // Audio clips manager
-	diApp.midiMaster = new MidiTrack (); // MIDI clips manager
+	diApp.audio = new AudioModule (); // Audio clips manager
+	diApp.midiMaster = new MidiTrack ("MidiTrack1"); // MIDI clips manager
 		
 	// AUDIO INIT
 	#ifdef __UNIX_JACK__
@@ -165,11 +169,21 @@ int main( int argc, char* args[] )
 	audioInit (dac, &diApp);
 
 	// MIDI INIT
+	RtMidiOut * midiout = 0;
+	try { 
 	#ifdef __UNIX_JACK__
-		RtMidiOut * midiout = new RtMidiOut (RtMidi::UNIX_JACK, APP_NAME);
+		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDI_MODULE_NAME);
+		cout << "midiout" << endl;
 	#else
-		RtMidiOut * midiout = new RtMidiOut(APP_NAME);
+		RtMidiOut * midiout = new RtMidiOut (MIDI_MODULE_NAME);
 	#endif
+	}
+	catch ( RtError &error ) 
+	{
+		error.printMessage ();
+		exit ( EXIT_FAILURE );
+	}
+	
 	//unsigned int nPorts = midiout -> getPortCount (); // Check available ports.
 	//if ( nPorts == 0 )
 		//std::cout << "No ports available !" << std::endl;
@@ -179,7 +193,17 @@ int main( int argc, char* args[] )
 			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
 		//midiout -> openPort (); // Open first available port.
 	//}
-	midiout -> openVirtualPort ();
+	
+	try { 
+		midiout -> openVirtualPort ();
+		cout << "open port" << endl;
+	}
+	catch ( RtError &error ) 
+	{
+		error.printMessage();
+		exit( EXIT_FAILURE );
+	}
+	
 	midiInit (diApp.midiMaster);
 
 	
@@ -190,6 +214,9 @@ int main( int argc, char* args[] )
 	
 	// INIT PROJECT
 	Project * project = new Project("test");
+	
+	project -> addTrack ( diApp.audio -> addTrack ("AudioTrack1") );
+	project -> addTrack ( diApp.audio -> addTrack ("AudioTrack2") );
 	
 	// MAIN LOOP
 	
@@ -211,7 +238,7 @@ int main( int argc, char* args[] )
 
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (&go_on, diApp.clock, diApp.audioMaster, diApp.midiMaster, project);
+			GUI_Main (&go_on, diApp.clock, diApp.audio, diApp.midiMaster, project);
 		#endif
 
 	}
@@ -232,7 +259,7 @@ int main( int argc, char* args[] )
 	//delete diApp;
 	delete diApp.clock;
 	delete diApp.midiMaster;
-	delete diApp.audioMaster;
+	delete diApp.audio;
 
 	return 0; /* ISO C requires main to return int. */
 

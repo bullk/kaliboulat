@@ -4,10 +4,10 @@
 // Constructor 
 //-------------
 
-AudioTrack::AudioTrack ()
+AudioTrack::AudioTrack (std::string s) : Track (s)
 {
-	ClipSet = new std::vector<AudioClip *>;
-	state_ = true;
+	clipset_ = new std::vector<AudioClip *>;
+	volume_ = 1.0f;
 }
 
 
@@ -18,9 +18,9 @@ AudioTrack::AudioTrack ()
 AudioTrack::~AudioTrack ()
 {
     //delete each audio file object (and corresponding buffer, etc.)
-	if ( ClipSet != NULL )
-		for (unsigned int i=0; i < ClipSet -> size(); i++)
-			delete ClipSet -> at (i);
+	if ( clipset_ != NULL )
+		for (unsigned int i=0; i < clipset_ -> size(); i++)
+			delete clipset_ -> at (i);
 }
 
 
@@ -30,20 +30,34 @@ AudioTrack::~AudioTrack ()
 
 void AudioTrack::addClip (std::string path)
 {
-	ClipSet -> push_back (new AudioClip(path));
+	clipset_ -> push_back (new AudioClip(path));
 }
 
 void AudioTrack::deleteClip (unsigned int i)
 {
-	AudioClip * clip = ClipSet -> at(i);
-	ClipSet -> erase (ClipSet -> begin() + i);
+	AudioClip * clip = clipset_ -> at(i);
+	clipset_ -> erase (clipset_ -> begin() + i);
 	delete clip;
 }
 
 void AudioTrack::stopAll ()
 {
-	for ( unsigned int i=0; i < ClipSet -> size(); i++ )
-		ClipSet -> at(i) -> stop();
+	for ( unsigned int i=0; i < clipset_ -> size(); i++ )
+		clipset_ -> at(i) -> stop();
 }
 		
+stk::StkFloat AudioTrack::tick()
+{
+	register stk::StkFloat sample;
+
+	sample = 0;
+	for ( unsigned int j = 0; j < clipset_ -> size (); j++ )
+	{
+		AudioClip * daClip = clipset_ -> at (j);
+		if ( daClip -> isPlaying () )
+			sample += daClip -> tick () * *(daClip -> getVolume ());
+	}
+	return sample;
+}
+
 		

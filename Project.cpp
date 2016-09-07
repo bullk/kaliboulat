@@ -63,3 +63,13 @@ void Project::updateRessources ()
 	closedir (mididir);
 	
 }
+
+void Project::addTrack (Track * t)
+{
+	tracks_.push_back (t);
+}
+
+void Project::deleteTrack (unsigned int i)
+{
+	tracks_.erase (tracks_.begin() + i);
+}

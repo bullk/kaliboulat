@@ -5,31 +5,31 @@
 #include <vector>
 #include <RtAudio.h>
 #include "Clip.hpp"
+#include "Track.hpp"
 
 
-// TODO : convertir en piste
- 
-class AudioTrack
+class AudioTrack : public Track
 {
 	
 public:
 	// Constructor 
-	AudioTrack();
+	AudioTrack (std::string s);
 	// Destructor 
-	~AudioTrack();
+	~AudioTrack ();
 
     void addClip (std::string path);
     void deleteClip (unsigned int i);
     void stopAll ();
-	inline void setState (bool s) { state_ = s; }
-	inline bool isPlaying () { return state_; }
-    inline std::vector<AudioClip *> * getClipSet () { return ClipSet; }
+    inline std::vector<AudioClip *> * getClipSet () { return clipset_; }
     inline RtAudio * getOutput () { return output_; }
     inline void setOutput (RtAudio * o) { output_ = o; }
+	inline float * getVolume () { return &volume_; }
+    stk::StkFloat tick ();
+    
     
 protected:
-	bool state_;
-	std::vector<AudioClip *> * ClipSet;
+	float volume_;
+	std::vector<AudioClip *> * clipset_;
 	RtAudio * output_;
 
 };

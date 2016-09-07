@@ -25,7 +25,7 @@ Clip::~Clip()
 // Constructor 
 //-------------
 
-AudioClip::AudioClip(std::string path) : FileLoop(path)
+AudioClip::AudioClip(std::string path) : FileWvIn(path)
 {
 	m_type = AUDIO;
 	openFile(path);
@@ -82,7 +82,13 @@ void AudioClip::updatePitch ()
 
 StkFloat AudioClip::tick (unsigned int channel)
 {
-	return pitshift_->tick(FileLoop::tick(channel));
+	if ( isFinished () )
+	{
+		stop ();
+		reset ();
+		return 0;
+	}
+	else return pitshift_->tick(FileWvIn::tick(channel));
 }
 
 

@@ -2,13 +2,14 @@
 #define INC_MIDITRACK_H
 
 #include "MidiClip.hpp"
+#include "Track.hpp"
 
-class MidiTrack
+class MidiTrack : public Track
 {
 
 public:
 	// Constructor 
-	MidiTrack ();
+	MidiTrack (std::string s);
 	// Destructor 
 	~MidiTrack ();
 
@@ -22,7 +23,6 @@ public:
 	
 private:
 	std::vector<MidiClip *> * ClipSet;
-	//unsigned int selected;
 	RtMidi * output_;
 
 };

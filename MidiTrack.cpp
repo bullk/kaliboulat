@@ -4,7 +4,7 @@
 // Constructor 
 //-------------
 
-MidiTrack::MidiTrack ()
+MidiTrack::MidiTrack (std::string s) : Track (s)
 {
 	ClipSet = new std::vector<MidiClip *>;
 }

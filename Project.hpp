@@ -11,6 +11,7 @@
 #endif 
 
 #include "globals.h"
+#include "Track.hpp"
 
 
 //void SplitFilename (const std::string& str)
@@ -31,6 +32,10 @@ public:
 	inline std::string getName () { return name_; }
 	inline std::string getAudioDir () { return dir_ + "/Audio"; }
 	inline std::string getMIDIDir () { return dir_ + "/MIDI"; }
+	void addTrack (Track * t);
+	void deleteTrack (unsigned int i);
+	inline unsigned int nTracks () { return tracks_.size (); }
+	inline Track * getTrack (unsigned int i) { return tracks_[i]; }
 	inline std::vector<std::string> * getAudioFiles () { return audiofiles_; }
 	inline std::vector<std::string> * getMIDIFiles () { return midifiles_; }
 	
@@ -40,6 +45,7 @@ protected:
 	std::string file_;
 	std::vector<std::string> * audiofiles_;
 	std::vector<std::string> * midifiles_;
+	std::vector<Track *> tracks_;
 
 };
 
