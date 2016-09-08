@@ -1,7 +1,7 @@
+#include <typeinfo>
 #include "GUI.hpp"
 
 using namespace std;
-
 
 SDL_GLContext glcontext;
 SDL_Window * window = NULL;
@@ -49,7 +49,7 @@ void GUI_Close()
 
 //======================================================================
 
-void mainMenu (bool enabled, bool * main_switch)
+void mainMenu (bool enabled, bool * main_switch, AudioModule * audio, Project * project)
 {
 	static bool about_open = false;
 	if (ImGui::BeginMenuBar())
@@ -69,6 +69,12 @@ void mainMenu (bool enabled, bool * main_switch)
 		{
 			if (ImGui::MenuItem("Audio File", NULL, false, enabled)) {}
 			if (ImGui::MenuItem("MIDI File", NULL, false, enabled)) {}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("New"))
+		{
+			if (ImGui::MenuItem("Audio Track", NULL, false, enabled)) project -> addTrack ( audio -> addTrack ("AudioTrack") );
+			if (ImGui::MenuItem("MIDI Track", NULL, false, false)) {}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help"))
@@ -177,7 +183,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	ImGui::Begin(buf, main_switch, flags);
 	
 	bool enabled = not(main_clock -> getState());
-	mainMenu (enabled, main_switch);
+	mainMenu (enabled, main_switch, audio, project);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
 	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
@@ -245,7 +251,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 		ImGui::ProgressBar(progress, ImVec2(100, 0.f),""); 
 		ImGui::SameLine(); ImGui::Text("%s", daClip -> getName().c_str());
 
-		if (ImGui::BeginPopup("popup-clip"))
+		if ( ImGui::BeginPopup("popup-clip") )
 		{
 			if ( ImGui::Selectable("delete this clip") )
 			{
@@ -253,12 +259,12 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 				details.context = Screen::NONE;
 				audio -> deleteClip (i);
 			}
-			ImGui::EndPopup();
+			ImGui::EndPopup ();
 		}
 
-		ImGui::EndChild();
-		if ( lock ) ImGui::PopStyleColor();
-		ImGui::PopID();
+		ImGui::EndChild ();
+		if ( lock ) ImGui::PopStyleColor ();
+		ImGui::PopID ();
 	}
 	
 	// MIDI Clips
@@ -291,7 +297,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 		clipPlayButton (daClip);
 		ImGui::SameLine(); // Progress bar
 		progress = (float) daClip -> getTime() / daClip -> getLength();
-		ImGui::ProgressBar(progress, ImVec2(100, 0.f),"");
+		ImGui::ProgressBar(progress, ImVec2(100, 0.f), "");
 		ImGui::SameLine(); ImGui::Text("%s", daClip -> getName().c_str());
 		
 		if (ImGui::BeginPopup("popup-midiclip"))
@@ -398,7 +404,7 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	ImGui::Begin(buf, main_switch, flags);
 	
 	bool enabled = not(main_clock -> getState());
-	mainMenu (enabled, main_switch);
+	mainMenu (enabled, main_switch, audio, project);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 	ImGui::BeginChild("Title", ImVec2(305, 90));
@@ -441,14 +447,46 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	ImGui::EndChild ();
 
 	// TODO : Afficher les pistes
-	ImGui::BeginChild("Board", ImVec2(0, 0), true);
+	ImGui::BeginChild("Board", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{
 		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
 		ImGui::PushID (2048 + i);
 		if ( i > 0 ) ImGui::SameLine ();
-		ImGui::BeginChild (2048 + i, ImVec2(100, 0), true);
-		ImGui::Text ( project -> getTrack(i) -> getName().c_str() );
+		ImGui::BeginChild (2048 + i, ImVec2(120, 0), true);
+
+		if ( ImGui::Button("X") ) 
+		{
+			Track * track = project -> getTrack (i);
+			project -> deleteTrack (i);
+			if ( typeid(*track) == typeid(AudioTrack) ) audio -> deleteTrack ((AudioTrack *)track);
+		}
+		
+		if ( i > 0 ) 
+		{
+			ImGui::SameLine ();
+			if ( ImGui::Button("<") ) {}
+		}
+		
+		if ( i < project->nTracks()-1 ) 
+		{
+			ImGui::SameLine ();
+			if ( ImGui::Button(">") ) {}
+		}
+		
+		ImGui::Text ( "%s", project -> getTrack(i) -> getName().c_str() );
+		if (ImGui::BeginPopupContextItem("rename test"))
+		{
+			char buf[20];
+			sprintf (buf, "%s", project -> getTrack(i) -> getName().c_str());
+			if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+			{
+				project -> getTrack(i) -> setName(buf);
+				ImGui::CloseCurrentPopup ();
+			}
+			ImGui::EndPopup ();
+		}
+
 		ImGui::EndChild ();
 		ImGui::PopID ();
 		ImGui::PopStyleVar ();
@@ -479,7 +517,7 @@ void SequencerScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, 
 	ImGui::Begin(buf, main_switch, flags);
 	
 	bool enabled = not(main_clock -> getState());
-	mainMenu (enabled, main_switch);
+	mainMenu (enabled, main_switch, audio, project);
 	
 	ImGui::Text(" XXX  XXXXX  XXX  X   X XXXXX X   X  XXXX XXXXX XXXX");
 	ImGui::Text("X     X     X   X X   X X     XX  X X     X     X   X");
