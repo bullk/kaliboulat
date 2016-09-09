@@ -49,9 +49,9 @@ struct App
 // MIDI FUNCTIONS
 //----------------------------------------------------------------------
 
-void midiInit (MidiTrack * miditrack_p)
-{
-}
+//void midiInit (MidiTrack * miditrack_p)
+//{
+//}
 
 void midiPanic (RtMidiOut * midiout)
 {
@@ -151,13 +151,13 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
-	cout << "creating the app..." << endl;
+	cout << "creating the app" << endl;
 	App diApp = { NULL, NULL };
 	bool go_on = true;
 	diApp.main_switch = &go_on;
 	diApp.midiMaster = new MidiTrack ("MidiTrack1"); // MIDI clips manager
 
-	cout << "project init..." << endl;
+	cout << "\n----- project init -----" << endl;
 	// INIT PROJECT
 	Project * project = new Project("test");
 	
@@ -165,7 +165,7 @@ int main( int argc, char* args[] )
 	project -> addTrack ( "AudioTrack2" );
 	
 	
-	cout << "audio init..." << endl;
+	cout << "\n----- audio init -----" << endl;
 	// AUDIO INIT
 	#ifdef __UNIX_JACK__
 		RtAudio * dac = new RtAudio (RtAudio::UNIX_JACK); // main audio output
@@ -175,16 +175,16 @@ int main( int argc, char* args[] )
 	audioInit (dac, project);
 
 	// MIDI INIT
-	cout << "MIDI init..." << endl;
-	cout << "creating RtMidiOut" << endl;
+	cout << "\n----- MIDI init -----" << endl;
+	cout << "...creating RtMidiOut" << endl;
 	RtMidiOut * midiout = NULL;
 	try { 
 	#ifdef __UNIX_JACK__
+		cout << "...with JACK" << endl;
 		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDI_MODULE_NAME);
-		cout << "with JACK" << endl;
 	#else
+		cout << "...without JACK !!!" << endl;
 		RtMidiOut * midiout = new RtMidiOut (MIDI_MODULE_NAME);
-		cout << "no JACK !!!" << endl;
 	#endif
 	}
 	catch ( RtError &error ) 
@@ -202,10 +202,9 @@ int main( int argc, char* args[] )
 			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
 		//midiout -> openPort (); // Open first available port.
 	//}
-	cout << "opening virtual MIDI port" << endl;
+	cout << "...opening virtual MIDI port" << endl;
 	try { 
 		midiout -> openVirtualPort ();
-		cout << "open port" << endl;
 	}
 	catch ( RtError &error ) 
 	{
@@ -213,10 +212,10 @@ int main( int argc, char* args[] )
 		exit( EXIT_FAILURE );
 	}
 	
-	cout << "MIDI module init" << endl;
-	midiInit (diApp.midiMaster);
+	//cout << "...MIDI module" << endl;
+	//midiInit (diApp.midiMaster);
 
-	cout << "GUI init..." << endl;
+	cout << "\n----- GUI init -----" << endl;
 	// GUI INIT
 	#ifdef WITH_GUI
 		if ( GUI_Init () != 0 )	return -1;
@@ -224,7 +223,7 @@ int main( int argc, char* args[] )
 	
 	// MAIN LOOP
 	
-	cout << "starting main loop" << endl;
+	cout << "\n----- starting main loop -----" << endl;
 	unsigned int midi_ticks = 0;
 	
 	while (go_on)

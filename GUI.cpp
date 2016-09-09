@@ -6,7 +6,7 @@ using namespace std;
 SDL_GLContext glcontext;
 SDL_Window * window = NULL;
 ImVec4 clear_color;
-Screen details = { Screen::TITLE, Screen::PROJECT, 0, 0 };
+Screen details = { Screen::CONSOLE, Screen::PROJECT, 0, 0 };
 
 int GUI_Init ()
 {
