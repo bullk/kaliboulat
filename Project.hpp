@@ -33,15 +33,20 @@ public:
 	inline std::string getName () { return name_; }
 	inline Clock * getClock () { return clock_; }
 	inline AudioModule * getAudio () { return audio_; }
+	inline MidiModule * getMIDI () { return midi_; }
 	inline std::string getAudioDir () { return dir_ + "/Audio"; }
 	inline std::string getMIDIDir () { return dir_ + "/MIDI"; }
-	void addTrack (std::string s);
+	void addAudioTrack (std::string s);
+	void addMidiTrack (std::string s);
 	void deleteTrack (unsigned int i);
 	void swapTracks (unsigned int i, unsigned int j);
 	inline unsigned int nTracks () { return tracks_.size (); }
 	inline Track * getTrack (unsigned int i) { return tracks_[i]; }
 	inline std::vector<std::string> * getAudioFiles () { return audiofiles_; }
 	inline std::vector<std::string> * getMIDIFiles () { return midifiles_; }
+	inline bool ctrlPressed () { return ctrl_; }
+	inline void ctrlDown () { ctrl_ = true; }
+	inline void ctrlUp () { ctrl_ = false; }
 	
 protected:
 	std::string name_;
@@ -49,9 +54,11 @@ protected:
 	std::string file_;
 	Clock * clock_;
 	AudioModule * audio_;
+	MidiModule * midi_;
 	std::vector<Track *> tracks_;
 	std::vector<std::string> * audiofiles_;
 	std::vector<std::string> * midifiles_;
+	bool ctrl_;
 };
 
 #endif

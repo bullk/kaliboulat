@@ -9,10 +9,12 @@ Project::Project (std::string str)
 	dir_ += "/" + str;
 	file_ = dir_ + "/" + name_ + FILE_EXT;
 	clock_ = new Clock ();
-	audio_ = new AudioModule (); // Audio clips manager
+	audio_ = new AudioModule ();
+	midi_ = new MidiModule ();
 	audiofiles_ = new std::vector<std::string>;
 	midifiles_ = new std::vector<std::string>;
 	updateRessources ();
+	ctrl_ = false;
 }
 
 Project::~Project () {
@@ -20,6 +22,7 @@ Project::~Project () {
 		//for (unsigned int i=0; i < tracks_ -> size(); i++)
 			//delete tracks_ -> at (i);
 	delete audio_;
+	delete midi_;
 	delete clock_;
 }
 
@@ -74,9 +77,14 @@ void Project::updateRessources ()
 	
 }
 
-void Project::addTrack (std::string s)
+void Project::addAudioTrack ( std::string s )
 {
 	tracks_.push_back ( audio_ -> addTrack (s) );
+}
+
+void Project::addMidiTrack ( std::string s )
+{
+	tracks_.push_back ( midi_ -> addTrack (s) );
 }
 
 void Project::deleteTrack (unsigned int i)

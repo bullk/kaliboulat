@@ -49,9 +49,12 @@ void GUI_Close()
 
 //======================================================================
 
-void mainMenu (bool enabled, bool * main_switch, AudioModule * audio, Project * project)
+void mainMenu (bool enabled, bool * main_switch, Project * project)
 {
 	static bool about_open = false;
+	static bool new_audio_track = false;
+	static bool new_midi_track = false;
+	
 	if (ImGui::BeginMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -73,8 +76,10 @@ void mainMenu (bool enabled, bool * main_switch, AudioModule * audio, Project * 
 		}
 		if (ImGui::BeginMenu("New"))
 		{
-			if (ImGui::MenuItem("Audio Track", NULL, false, enabled)) project -> addTrack ( "AudioTrack" );
-			if (ImGui::MenuItem("MIDI Track", NULL, false, false)) {}
+			//if (ImGui::MenuItem("Audio Track", "", false, enabled)) project -> addAudioTrack ( "AudioTrack" );
+			//if (ImGui::MenuItem("MIDI Track", "", false, enabled)) project -> addMidiTrack ( "MidiTrack" );
+			if (ImGui::MenuItem("Audio Track", "", false, enabled)) new_audio_track = true;
+			if (ImGui::MenuItem("MIDI Track", "", false, enabled)) new_midi_track = true;
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help"))
@@ -85,8 +90,38 @@ void mainMenu (bool enabled, bool * main_switch, AudioModule * audio, Project * 
 		ImGui::EndMenuBar();
 	}
 	
-	if (about_open) 
-		ImGui::OpenPopup("About");
+	if (new_audio_track) ImGui::OpenPopup("New Audio Track");
+	if (new_midi_track) ImGui::OpenPopup("New Midi Track");
+	if (about_open) ImGui::OpenPopup("About");
+	
+	if (ImGui::BeginPopupModal("New Audio Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		char buf[20];
+		sprintf (buf, "%s", "");
+		if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+		{
+			project -> addAudioTrack (buf);
+			ImGui::CloseCurrentPopup ();
+			new_audio_track = false;
+		}
+		if (ImGui::Button("Close", ImVec2(200,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			new_audio_track = false;
+		}
+		ImGui::EndPopup();
+	}
+	
+	if (ImGui::BeginPopupModal("New Midi Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		if (ImGui::Button("Close", ImVec2(200,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			new_midi_track = false;
+		}
+		ImGui::EndPopup();
+	}
+	
 	if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("      Kaliboulat / Fullbox Project\n\n    Alien sequencer by BullK Studio\nCoded by Olivier Cadiou aka Al Kali Boul\n");
@@ -165,7 +200,7 @@ void displayMidiClipDetails (MidiClip * daClip)
 
 void TitleScreen () {}
 
-void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
+void ProjectScreen (bool* main_switch, Project* project)
 {
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -183,7 +218,7 @@ void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 	ImGui::Begin(buf, main_switch, flags);
 	
 	bool enabled = not(project -> getClock() -> getState());
-	mainMenu (enabled, main_switch, project -> getAudio (), project);
+	mainMenu (enabled, main_switch, project);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
 	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
@@ -268,9 +303,9 @@ void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 	}
 	
 	// MIDI Clips
-	for ( unsigned int i = 0; i < miditrack -> getClipSet() -> size(); i++ )
+	for ( unsigned int i = 0; i < project -> getMIDI () -> getClipSet() -> size(); i++ )
 	{
-		MidiClip * daClip = miditrack -> getClipSet() -> at(i);
+		MidiClip * daClip = project -> getMIDI () -> getClipSet() -> at(i);
 		bool lock = false;
 		float progress = 0.0f;
 		ImGui::PushID(4096 + i);
@@ -306,7 +341,7 @@ void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 			{
 				//details.midiclip = 0;
 				details.context = Screen::NONE;
-				miditrack -> deleteClip (i);
+				project -> getMIDI () -> deleteClip (i);
 			}
 			ImGui::EndPopup();
 		}
@@ -326,7 +361,7 @@ void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 	if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
 	if ( project -> getAudio () -> getClipSet() -> size() )
 		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
-	if ( miditrack -> getClipSet() -> size() )
+	if ( project -> getMIDI () -> getClipSet() -> size() )
 		if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
 	ImGui::Separator();
 	
@@ -351,9 +386,9 @@ void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 				for ( unsigned int i=0; i < list -> size(); i++ )
 					if ( ImGui::Selectable(list -> at(i).c_str()) )
 					{
-						MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
-						midifile -> parse (miditrack);
-						delete midifile;
+						//MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
+						//midifile -> parse (miditrack);
+						//delete midifile;
 					}
 			}
 		}	
@@ -374,7 +409,7 @@ void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 		}
 			break;
 		case Screen::MIDICLIP:
-			displayMidiClipDetails (miditrack -> getClipSet() -> at(details.midiclip));
+			displayMidiClipDetails (project -> getMIDI () -> getClipSet() -> at(details.midiclip));
 			break;
 		default:
 			break;
@@ -386,7 +421,7 @@ void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 	ImGui::End();
 }
 
-void ConsoleScreen (bool* main_switch, MidiTrack* miditrack, Project* project) 
+void ConsoleScreen (bool* main_switch, Project* project) 
 {	
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -404,7 +439,7 @@ void ConsoleScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 	ImGui::Begin(buf, main_switch, flags);
 	
 	bool enabled = not(project -> getClock() -> getState());
-	mainMenu (enabled, main_switch, project -> getAudio (), project);
+	mainMenu (enabled, main_switch, project);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 	ImGui::BeginChild("Title", ImVec2(305, 90));
@@ -444,6 +479,7 @@ void ConsoleScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 
 	// MIDI Clock
 	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
+	if ( project -> ctrlPressed () ) ImGui::TextColored (ImColor(192,64,64), "CTRL");
 	ImGui::EndChild ();
 
 	// TODO : Afficher les pistes
@@ -494,7 +530,7 @@ void ConsoleScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 	ImGui::End ();
 }
 
-void SequencerScreen (bool* main_switch, MidiTrack* miditrack, Project* project) 
+void SequencerScreen (bool* main_switch, Project* project) 
 {
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -512,7 +548,7 @@ void SequencerScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 	ImGui::Begin(buf, main_switch, flags);
 	
 	bool enabled = not(project -> getClock() -> getState());
-	mainMenu (enabled, main_switch, project -> getAudio (), project);
+	mainMenu (enabled, main_switch, project);
 	
 	ImGui::Text(" XXX  XXXXX  XXX  X   X XXXXX X   X  XXXX XXXXX XXXX");
 	ImGui::Text("X     X     X   X X   X X     XX  X X     X     X   X");
@@ -525,7 +561,7 @@ void SequencerScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 //======================================================================
 
 
-void GUI_Main(bool* main_switch, MidiTrack* miditrack, Project* project)
+void GUI_Main(bool* main_switch, Project* project)
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -537,7 +573,7 @@ void GUI_Main(bool* main_switch, MidiTrack* miditrack, Project* project)
 				*main_switch = false;
 				break;
 				
-			case SDL_KEYUP:
+			case SDL_KEYDOWN:
 				switch ( event.key.keysym.scancode )
 				{
 					case SDL_SCANCODE_F1:
@@ -549,10 +585,31 @@ void GUI_Main(bool* main_switch, MidiTrack* miditrack, Project* project)
 					case SDL_SCANCODE_F3:
 						details.type = Screen::SEQUENCER;
 						break;
+					//case SDL_SCANCODE_F5:
+						//if ( project -> ctrlPressed () ) project -> addAudioTrack ("AudioTrack");
+						//break;
+					//case SDL_SCANCODE_F6:
+						//if ( project -> ctrlPressed () ) project -> addMidiTrack ("MidiTrack");
+						//break;
+					case SDL_SCANCODE_LCTRL:
+					case SDL_SCANCODE_RCTRL:
+						project -> ctrlDown ();
+						break;
 					default:
 						break;
 				}
 				break;
+			
+			case SDL_KEYUP:
+				switch ( event.key.keysym.scancode )
+				{
+					case SDL_SCANCODE_LCTRL:
+					case SDL_SCANCODE_RCTRL:
+						project -> ctrlUp ();
+						break;
+					default:
+						break;
+				}
 		}
 	}
 
@@ -562,15 +619,15 @@ void GUI_Main(bool* main_switch, MidiTrack* miditrack, Project* project)
 	switch ( details.type )
 	{
 		case Screen::RESSOURCES:
-			ProjectScreen (main_switch, miditrack, project);
+			ProjectScreen (main_switch, project);
 			break;
 			
 		case Screen::CONSOLE:
-			ConsoleScreen (main_switch, miditrack, project);
+			ConsoleScreen (main_switch, project);
 			break;
 		
 		case Screen::SEQUENCER:
-			SequencerScreen (main_switch, miditrack, project);
+			SequencerScreen (main_switch, project);
 			break;
 		
 		default:

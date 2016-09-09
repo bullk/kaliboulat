@@ -37,19 +37,12 @@ void audioClose (RtAudio * dac);
 
 //----------------------------------------------------------------------
 
-struct App
-{
-	bool * main_switch;
-	MidiTrack * midiMaster;
-	//Project * project;
-};
-
 
 //----------------------------------------------------------------------
 // MIDI FUNCTIONS
 //----------------------------------------------------------------------
 
-//void midiInit (MidiTrack * miditrack_p)
+//void midiInit ()
 //{
 //}
 
@@ -151,18 +144,14 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
-	cout << "creating the app" << endl;
-	App diApp = { NULL, NULL };
-	bool go_on = true;
-	diApp.main_switch = &go_on;
-	diApp.midiMaster = new MidiTrack ("MidiTrack1"); // MIDI clips manager
 
 	cout << "\n----- project init -----" << endl;
 	// INIT PROJECT
 	Project * project = new Project("test");
 	
-	project -> addTrack ( "AudioTrack1" );
-	project -> addTrack ( "AudioTrack2" );
+	project -> addAudioTrack ( "AudioTrack1" );
+	project -> addAudioTrack ( "AudioTrack2" );
+	project -> addMidiTrack ( "MidiTrack1" );
 	
 	
 	cout << "\n----- audio init -----" << endl;
@@ -213,7 +202,7 @@ int main( int argc, char* args[] )
 	}
 	
 	//cout << "...MIDI module" << endl;
-	//midiInit (diApp.midiMaster);
+	//midiInit ();
 
 	cout << "\n----- GUI init -----" << endl;
 	// GUI INIT
@@ -225,8 +214,9 @@ int main( int argc, char* args[] )
 	
 	cout << "\n----- starting main loop -----" << endl;
 	unsigned int midi_ticks = 0;
+	bool main_switch = true;
 	
-	while (go_on)
+	while (main_switch)
 	{
 		// Clock update
 		if ( project -> getClock () -> getState () ) 
@@ -237,12 +227,12 @@ int main( int argc, char* args[] )
 			//std::cout << bbt << midi_ticks << std::endl;
 			// MIDI flow
 			for (unsigned int i=0; i<midi_ticks; i++) 
-				diApp.midiMaster -> tick (midiout);
+				project -> getMIDI () -> tick (midiout);
 		}
 
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (&go_on, diApp.midiMaster, project);
+			GUI_Main (&main_switch, project);
 		#endif
 
 	}
@@ -261,7 +251,6 @@ int main( int argc, char* args[] )
 	delete project;
 	delete midiout;
 	delete dac;
-	delete diApp.midiMaster;
 	//delete diApp;
 
 	return 0; /* ISO C requires main to return int. */

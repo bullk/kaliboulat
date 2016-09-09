@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "AudioTrack.hpp"
+#include "MidiTrack.hpp"
 
 class AudioModule
 {
@@ -27,6 +28,32 @@ public:
 protected:
 	std::vector<AudioTrack *> * trackset_;
 	std::vector<AudioClip *> * clipset_;
+
+};
+
+class MidiModule
+{
+	
+public:
+	// Constructor 
+	MidiModule ();
+	// Destructor 
+	~MidiModule ();
+
+    MidiTrack * addTrack (std::string s);
+    void deleteTrack (unsigned int i);
+    void deleteTrack (MidiTrack * t);
+    //inline MidiTrack * getTrack (unsigned int i) { return trackset_ -> at(i); }
+    inline std::vector<MidiTrack *> * getTrackSet () { return trackset_; }
+    void addClip (std::string path);
+    void deleteClip (unsigned int i);
+    inline std::vector<MidiClip *> * getClipSet () { return clipset_; }
+    void stopAll ();
+    void tick (RtMidiOut * midiout);
+    
+protected:
+	std::vector<MidiTrack *> * trackset_;
+	std::vector<MidiClip *> * clipset_;
 
 };
 
