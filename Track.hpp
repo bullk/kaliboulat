@@ -15,6 +15,7 @@ public:
 	// Destructor 
 	virtual ~Track ();
 
+	inline TrackType getType () { return type_; }
 	inline std::string getName () { return name_; }
 	inline void setName (std::string s) { name_ = s; }
 	inline void setState (bool b) { state_ = b; }
@@ -25,6 +26,7 @@ public:
     virtual void stopAll () = 0;
     
 protected:
+	TrackType type_;
 	std::string name_;
 	bool state_;
 

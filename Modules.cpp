@@ -22,6 +22,10 @@ AudioModule::~AudioModule ()
 	if ( clipset_ != NULL )
 		for (unsigned int i=0; i < clipset_ -> size(); i++)
 			delete clipset_ -> at (i);
+    //delete each track
+	if ( trackset_ != NULL )
+		for (unsigned int i=0; i < trackset_ -> size(); i++)
+			delete trackset_ -> at (i);
 }
 
 //==================

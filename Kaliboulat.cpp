@@ -40,8 +40,6 @@ void audioClose (RtAudio * dac);
 struct App
 {
 	bool * main_switch;
-	Clock * clock;
-	AudioModule * audio;
 	MidiTrack * midiMaster;
 	//Project * project;
 };
@@ -80,25 +78,26 @@ void midiPanic (RtMidiOut * midiout)
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer )
 {
-	App * diApp = (App *) dataPointer;
-	//AudioTrack * audiotrack = diApp -> audio;
+	Project * project = (Project *) dataPointer;
 	register StkFloat * samples = (StkFloat *) outputBuffer;
 	
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
-		if ( diApp -> clock -> isStarted () ) 
+		if ( project -> getClock () -> isStarted () ) 
 		{
-			for ( unsigned int j = 0; j < diApp -> audio -> getTrackSet () -> size (); j++ )
+			std::vector<AudioTrack *> * trackset = project -> getAudio () -> getTrackSet ();
+			for ( unsigned int j = 0; j < trackset -> size (); j++ )
 			{
-				AudioTrack * daTrack = diApp -> audio -> getTrackSet () -> at (j);
+				AudioTrack * daTrack = trackset -> at (j);
 				if ( daTrack -> isPlaying () )
 					*samples += daTrack -> tick () * *(daTrack -> getVolume ());
 			}
 		}
-		for ( unsigned int j = 0; j < diApp -> audio -> getClipSet () -> size (); j++ )
+		std::vector<AudioClip *> * clipset = project -> getAudio () -> getClipSet ();
+		for ( unsigned int j = 0; j < clipset -> size (); j++ )
 		{
-			AudioClip * daClip = diApp -> audio -> getClipSet () -> at (j);
+			AudioClip * daClip = clipset -> at (j);
 			if ( daClip -> isPlaying () )
 				*samples += daClip -> tick () * *(daClip -> getVolume ());
 		}
@@ -108,7 +107,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 
-void audioInit (RtAudio * dac, App * diApp)
+void audioInit (RtAudio * dac, Project * project)
 {
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
@@ -129,7 +128,7 @@ void audioInit (RtAudio * dac, App * diApp)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)diApp, &options ); }
+	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)project, &options ); }
 	catch ( RtError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
@@ -152,30 +151,40 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
-	App diApp = { NULL, NULL, NULL, NULL };
-
+	cout << "creating the app..." << endl;
+	App diApp = { NULL, NULL };
 	bool go_on = true;
 	diApp.main_switch = &go_on;
-	diApp.clock = new Clock ();
-	diApp.audio = new AudioModule (); // Audio clips manager
 	diApp.midiMaster = new MidiTrack ("MidiTrack1"); // MIDI clips manager
-		
+
+	cout << "project init..." << endl;
+	// INIT PROJECT
+	Project * project = new Project("test");
+	
+	project -> addTrack ( "AudioTrack1" );
+	project -> addTrack ( "AudioTrack2" );
+	
+	
+	cout << "audio init..." << endl;
 	// AUDIO INIT
 	#ifdef __UNIX_JACK__
 		RtAudio * dac = new RtAudio (RtAudio::UNIX_JACK); // main audio output
 	#else
 		RtAudio * dac = new RtAudio (); // main audio output
 	#endif
-	audioInit (dac, &diApp);
+	audioInit (dac, project);
 
 	// MIDI INIT
-	RtMidiOut * midiout = 0;
+	cout << "MIDI init..." << endl;
+	cout << "creating RtMidiOut" << endl;
+	RtMidiOut * midiout = NULL;
 	try { 
 	#ifdef __UNIX_JACK__
 		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDI_MODULE_NAME);
-		cout << "midiout" << endl;
+		cout << "with JACK" << endl;
 	#else
 		RtMidiOut * midiout = new RtMidiOut (MIDI_MODULE_NAME);
+		cout << "no JACK !!!" << endl;
 	#endif
 	}
 	catch ( RtError &error ) 
@@ -193,7 +202,7 @@ int main( int argc, char* args[] )
 			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
 		//midiout -> openPort (); // Open first available port.
 	//}
-	
+	cout << "opening virtual MIDI port" << endl;
 	try { 
 		midiout -> openVirtualPort ();
 		cout << "open port" << endl;
@@ -204,30 +213,26 @@ int main( int argc, char* args[] )
 		exit( EXIT_FAILURE );
 	}
 	
+	cout << "MIDI module init" << endl;
 	midiInit (diApp.midiMaster);
 
-	
+	cout << "GUI init..." << endl;
 	// GUI INIT
 	#ifdef WITH_GUI
 		if ( GUI_Init () != 0 )	return -1;
 	#endif
 	
-	// INIT PROJECT
-	Project * project = new Project("test");
-	
-	project -> addTrack ( diApp.audio -> addTrack ("AudioTrack1") );
-	project -> addTrack ( diApp.audio -> addTrack ("AudioTrack2") );
-	
 	// MAIN LOOP
 	
+	cout << "starting main loop" << endl;
 	unsigned int midi_ticks = 0;
 	
 	while (go_on)
 	{
 		// Clock update
-		if ( diApp.clock -> getState () ) 
+		if ( project -> getClock () -> getState () ) 
 		{
-			midi_ticks = diApp.clock -> update ();
+			midi_ticks = project -> getClock () -> update ();
 			//char bbt[13];
 			//sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), diApp.clock -> getTick());
 			//std::cout << bbt << midi_ticks << std::endl;
@@ -238,7 +243,7 @@ int main( int argc, char* args[] )
 
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (&go_on, diApp.clock, diApp.audio, diApp.midiMaster, project);
+			GUI_Main (&go_on, diApp.midiMaster, project);
 		#endif
 
 	}
@@ -254,12 +259,11 @@ int main( int argc, char* args[] )
 	midiout -> closePort ();
 	audioClose (dac);
 
+	delete project;
 	delete midiout;
 	delete dac;
-	//delete diApp;
-	delete diApp.clock;
 	delete diApp.midiMaster;
-	delete diApp.audio;
+	//delete diApp;
 
 	return 0; /* ISO C requires main to return int. */
 

@@ -6,6 +6,7 @@
 
 AudioTrack::AudioTrack (std::string s) : Track (s)
 {
+	type_ = AUDIO;
 	clipset_ = new std::vector<AudioClip *>;
 	volume_ = 1.0f;
 }

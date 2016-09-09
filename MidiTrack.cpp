@@ -6,6 +6,7 @@
 
 MidiTrack::MidiTrack (std::string s) : Track (s)
 {
+	type_ = MIDI;
 	ClipSet = new std::vector<MidiClip *>;
 }
 

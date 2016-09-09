@@ -1,4 +1,6 @@
 #include "Project.hpp"
+#include <algorithm>
+
 
 Project::Project (std::string str)
 {
@@ -6,12 +8,20 @@ Project::Project (std::string str)
 	dir_ = USER_DIR;
 	dir_ += "/" + str;
 	file_ = dir_ + "/" + name_ + FILE_EXT;
+	clock_ = new Clock ();
+	audio_ = new AudioModule (); // Audio clips manager
 	audiofiles_ = new std::vector<std::string>;
 	midifiles_ = new std::vector<std::string>;
 	updateRessources ();
 }
 
-Project::~Project () {}
+Project::~Project () {
+	//if ( tracks_ != NULL )
+		//for (unsigned int i=0; i < tracks_ -> size(); i++)
+			//delete tracks_ -> at (i);
+	delete audio_;
+	delete clock_;
+}
 
 void Project::updateRessources ()
 {
@@ -64,12 +74,30 @@ void Project::updateRessources ()
 	
 }
 
-void Project::addTrack (Track * t)
+void Project::addTrack (std::string s)
 {
-	tracks_.push_back (t);
+	tracks_.push_back ( audio_ -> addTrack (s) );
 }
 
 void Project::deleteTrack (unsigned int i)
 {
+	Track * track = tracks_[i];
 	tracks_.erase (tracks_.begin() + i);
+	switch ( track -> getType () )
+	{
+	case Track::AUDIO:
+		audio_ -> deleteTrack ((AudioTrack *)track);
+		break;
+	//case Track::MIDI:
+		//midi -> deleteTrack ((MidiTrack *)track);
+		//break;
+	default:
+		break;
+	}
+}
+
+void Project::swapTracks ( unsigned int i, unsigned int j )
+{
+	//std::iter_swap (tracks_->begin()+i, tracks_->begin()+j);
+	std::swap ( tracks_[i], tracks_[j] );
 }

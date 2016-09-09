@@ -1,4 +1,4 @@
-#include <typeinfo>
+//#include <typeinfo>
 #include "GUI.hpp"
 
 using namespace std;
@@ -73,7 +73,7 @@ void mainMenu (bool enabled, bool * main_switch, AudioModule * audio, Project * 
 		}
 		if (ImGui::BeginMenu("New"))
 		{
-			if (ImGui::MenuItem("Audio Track", NULL, false, enabled)) project -> addTrack ( audio -> addTrack ("AudioTrack") );
+			if (ImGui::MenuItem("Audio Track", NULL, false, enabled)) project -> addTrack ( "AudioTrack" );
 			if (ImGui::MenuItem("MIDI Track", NULL, false, false)) {}
 			ImGui::EndMenu();
 		}
@@ -165,7 +165,7 @@ void displayMidiClipDetails (MidiClip * daClip)
 
 void TitleScreen () {}
 
-void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project)
+void ProjectScreen (bool* main_switch, MidiTrack* miditrack, Project* project)
 {
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -182,20 +182,20 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
 	ImGui::Begin(buf, main_switch, flags);
 	
-	bool enabled = not(main_clock -> getState());
-	mainMenu (enabled, main_switch, audio, project);
+	bool enabled = not(project -> getClock() -> getState());
+	mainMenu (enabled, main_switch, project -> getAudio (), project);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
 	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
 
 	ImGui::BeginChild("Master Controls", ImVec2(0, 50), true);
 	//TODO : Intégrer les images de commandes
-	if ( main_clock -> getState() )
+	if ( project -> getClock() -> getState() )
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("STOP")) main_clock -> stop();
+		if (ImGui::Button("STOP")) project -> getClock() -> stop();
 		ImGui::PopStyleColor(3);
 	}
 	else
@@ -203,15 +203,15 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("PLAY")) main_clock -> start();
+		if (ImGui::Button("PLAY")) project -> getClock() -> start();
 		ImGui::PopStyleColor(3);
 	}
 	// Clock
-	ImGui::SameLine(); ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", main_clock -> getHour(), main_clock -> getMinute(), main_clock -> getSecond());
+	ImGui::SameLine(); ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
 	//ImGui::SameLine(); ImGui::TextColored(ImColor(127,127,127), "%d", mcDelta);
 
 	// MIDI Clock
-	ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", main_clock -> getBar(), main_clock -> getBeat(), main_clock -> getTick());
+	ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
 	ImGui::EndChild();
 	
 	// MAIN BOARD
@@ -219,9 +219,9 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 
 	// Audio Clips
-	for ( unsigned int i = 0; i < audio -> getClipSet() -> size(); i++ )
+	for ( unsigned int i = 0; i < project -> getAudio () -> getClipSet() -> size(); i++ )
 	{
-		AudioClip * daClip = audio -> getClipSet() -> at(i);
+		AudioClip * daClip = project -> getAudio () -> getClipSet() -> at(i);
 		bool lock = false;
 		float progress = 0.0f;
 		ImGui::PushID(i);
@@ -257,7 +257,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 			{
 				//details.audioclip = 0;
 				details.context = Screen::NONE;
-				audio -> deleteClip (i);
+				project -> getAudio () -> deleteClip (i);
 			}
 			ImGui::EndPopup ();
 		}
@@ -324,7 +324,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	// DETAILS WINDOW
 	ImGui::BeginChild ("Details", ImVec2(0,0), true);
 	if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
-	if ( audio -> getClipSet() -> size() )
+	if ( project -> getAudio () -> getClipSet() -> size() )
 		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
 	if ( miditrack -> getClipSet() -> size() )
 		if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
@@ -342,7 +342,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 				list = project -> getAudioFiles ();
 				for ( unsigned int i=0; i < list -> size(); i++ )
 					if ( ImGui::Selectable(list -> at(i).c_str()) )
-						audio -> addClip ( project->getAudioDir() + "/" + list -> at(i).c_str() );
+						project -> getAudio () -> addClip ( project->getAudioDir() + "/" + list -> at(i).c_str() );
 			}
 			ImGui::SetNextTreeNodeOpen(true);
 			if (ImGui::CollapsingHeader("MIDI Files (click to import)"))
@@ -360,7 +360,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 			break;
 		case Screen::AUDIOCLIP:
 		{
-			AudioClip * daClip = audio -> getClipSet() -> at(details.audioclip);
+			AudioClip * daClip = project -> getAudio () -> getClipSet() -> at(details.audioclip);
 			ImGui::PushItemWidth(100);
 			ImGui::TextColored(ImColor(255,255,0), "%s", daClip -> getName().c_str());
 			ImGui::Text("Location : %s", daClip -> getPath().c_str());
@@ -386,7 +386,7 @@ void ProjectScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	ImGui::End();
 }
 
-void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project) 
+void ConsoleScreen (bool* main_switch, MidiTrack* miditrack, Project* project) 
 {	
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -403,8 +403,8 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
 	ImGui::Begin(buf, main_switch, flags);
 	
-	bool enabled = not(main_clock -> getState());
-	mainMenu (enabled, main_switch, audio, project);
+	bool enabled = not(project -> getClock() -> getState());
+	mainMenu (enabled, main_switch, project -> getAudio (), project);
 	
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 	ImGui::BeginChild("Title", ImVec2(305, 90));
@@ -422,12 +422,12 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	ImGui::SameLine();
 	ImGui::BeginChild("Master Controls", ImVec2(0, 85), true);
 	//TODO : Intégrer les images de commandes
-	if ( main_clock -> getState () )
+	if ( project -> getClock() -> getState () )
 	{
 		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button ("STOP")) main_clock -> stop();
+		if (ImGui::Button ("STOP")) project -> getClock() -> stop();
 		ImGui::PopStyleColor (3);
 	}
 	else
@@ -435,15 +435,15 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button ("PLAY")) main_clock -> start();
+		if (ImGui::Button ("PLAY")) project -> getClock() -> start();
 		ImGui::PopStyleColor(3);
 	}
 	// Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", main_clock -> getHour(), main_clock -> getMinute(), main_clock -> getSecond());
+	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
 	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
 
 	// MIDI Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", main_clock -> getBar(), main_clock -> getBeat(), main_clock -> getTick());
+	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
 	ImGui::EndChild ();
 
 	// TODO : Afficher les pistes
@@ -455,23 +455,18 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 		if ( i > 0 ) ImGui::SameLine ();
 		ImGui::BeginChild (2048 + i, ImVec2(120, 0), true);
 
-		if ( ImGui::Button("X") ) 
-		{
-			Track * track = project -> getTrack (i);
-			project -> deleteTrack (i);
-			if ( typeid(*track) == typeid(AudioTrack) ) audio -> deleteTrack ((AudioTrack *)track);
-		}
+		if ( ImGui::Button("X") ) project -> deleteTrack (i);
 		
 		if ( i > 0 ) 
 		{
 			ImGui::SameLine ();
-			if ( ImGui::Button("<") ) {}
+			if ( ImGui::Button("<") ) { project -> swapTracks (i, i-1); }
 		}
 		
 		if ( i < project->nTracks()-1 ) 
 		{
 			ImGui::SameLine ();
-			if ( ImGui::Button(">") ) {}
+			if ( ImGui::Button(">") ) { project -> swapTracks (i, i+1); }
 		}
 		
 		ImGui::Text ( "%s", project -> getTrack(i) -> getName().c_str() );
@@ -499,7 +494,7 @@ void ConsoleScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, Mi
 	ImGui::End ();
 }
 
-void SequencerScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project) 
+void SequencerScreen (bool* main_switch, MidiTrack* miditrack, Project* project) 
 {
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -516,8 +511,8 @@ void SequencerScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, 
 	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
 	ImGui::Begin(buf, main_switch, flags);
 	
-	bool enabled = not(main_clock -> getState());
-	mainMenu (enabled, main_switch, audio, project);
+	bool enabled = not(project -> getClock() -> getState());
+	mainMenu (enabled, main_switch, project -> getAudio (), project);
 	
 	ImGui::Text(" XXX  XXXXX  XXX  X   X XXXXX X   X  XXXX XXXXX XXXX");
 	ImGui::Text("X     X     X   X X   X X     XX  X X     X     X   X");
@@ -530,7 +525,7 @@ void SequencerScreen (bool* main_switch, Clock* main_clock, AudioModule* audio, 
 //======================================================================
 
 
-void GUI_Main(bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrack* miditrack, Project* project)
+void GUI_Main(bool* main_switch, MidiTrack* miditrack, Project* project)
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -567,15 +562,15 @@ void GUI_Main(bool* main_switch, Clock* main_clock, AudioModule* audio, MidiTrac
 	switch ( details.type )
 	{
 		case Screen::RESSOURCES:
-			ProjectScreen (main_switch, main_clock, audio, miditrack, project);
+			ProjectScreen (main_switch, miditrack, project);
 			break;
 			
 		case Screen::CONSOLE:
-			ConsoleScreen (main_switch, main_clock, audio, miditrack, project);
+			ConsoleScreen (main_switch, miditrack, project);
 			break;
 		
 		case Screen::SEQUENCER:
-			SequencerScreen (main_switch, main_clock, audio, miditrack, project);
+			SequencerScreen (main_switch, miditrack, project);
 			break;
 		
 		default:
