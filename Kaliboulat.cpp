@@ -149,9 +149,9 @@ int main( int argc, char* args[] )
 	// INIT PROJECT
 	Project * project = new Project("test");
 	
-	project -> addAudioTrack ( "AudioTrack1" );
-	project -> addAudioTrack ( "AudioTrack2" );
-	project -> addMidiTrack ( "MidiTrack1" );
+	//project -> addAudioTrack ( "AudioTrack1" );
+	//project -> addAudioTrack ( "AudioTrack2" );
+	//project -> addMidiTrack ( "MidiTrack1" );
 	
 	
 	cout << "\n----- audio init -----" << endl;
@@ -165,14 +165,14 @@ int main( int argc, char* args[] )
 
 	// MIDI INIT
 	cout << "\n----- MIDI init -----" << endl;
-	cout << "...creating RtMidiOut" << endl;
+	cout << "creating RtMidiOut";
 	RtMidiOut * midiout = NULL;
 	try { 
 	#ifdef __UNIX_JACK__
-		cout << "...with JACK" << endl;
+		cout << " with JACK" << endl;
 		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDI_MODULE_NAME);
 	#else
-		cout << "...without JACK !!!" << endl;
+		cout << " without JACK !!!" << endl;
 		RtMidiOut * midiout = new RtMidiOut (MIDI_MODULE_NAME);
 	#endif
 	}
@@ -191,7 +191,7 @@ int main( int argc, char* args[] )
 			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
 		//midiout -> openPort (); // Open first available port.
 	//}
-	cout << "...opening virtual MIDI port" << endl;
+	cout << "opening virtual MIDI port" << endl;
 	try { 
 		midiout -> openVirtualPort ();
 	}

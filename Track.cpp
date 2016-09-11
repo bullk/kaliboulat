@@ -6,8 +6,9 @@
 
 Track::Track (std::string s)
 {
-	state_ = true;
 	setName (s);
+	state_ = true;
+	hue_ = 0.0f;
 }
 
 

@@ -96,9 +96,9 @@ void Project::deleteTrack (unsigned int i)
 	case Track::AUDIO:
 		audio_ -> deleteTrack ((AudioTrack *)track);
 		break;
-	//case Track::MIDI:
-		//midi -> deleteTrack ((MidiTrack *)track);
-		//break;
+	case Track::MIDI:
+		midi_ -> deleteTrack ((MidiTrack *)track);
+		break;
 	default:
 		break;
 	}

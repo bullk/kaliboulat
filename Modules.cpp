@@ -33,8 +33,9 @@ AudioModule::~AudioModule ()
 AudioTrack * AudioModule::addTrack (std::string s)
 {
 	AudioTrack * track = new AudioTrack (s);
+	track -> setHue ( 0.0f +  0.01f * trackset_->size() );
 	trackset_ -> push_back (track);
-	std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
+	//std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
 	return track;
 }
 
@@ -42,7 +43,7 @@ void AudioModule::deleteTrack (unsigned int i)
 {
 	AudioTrack * track = trackset_ -> at(i);
 	trackset_ -> erase (trackset_ -> begin() + i);
-	std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
+	//std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
 	delete track;
 }
 
@@ -101,7 +102,8 @@ MidiTrack * MidiModule::addTrack (std::string s)
 {
 	MidiTrack * track = new MidiTrack (s);
 	trackset_ -> push_back (track);
-	std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
+	track -> setHue ( 0.5f +  0.01f * trackset_->size() );
+	//std::cout << "Midi Module has " << trackset_ -> size () << " tracks." << std::endl;
 	return track;
 }
 
@@ -109,7 +111,7 @@ void MidiModule::deleteTrack (unsigned int i)
 {
 	MidiTrack * track = trackset_ -> at(i);
 	trackset_ -> erase (trackset_ -> begin() + i);
-	std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
+	//std::cout << "Midi Module has " << trackset_ -> size () << " tracks." << std::endl;
 	delete track;
 }
 

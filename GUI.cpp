@@ -97,26 +97,31 @@ void mainMenu (bool enabled, bool * main_switch, Project * project)
 	if (ImGui::BeginPopupModal("New Audio Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		char buf[20];
-		sprintf (buf, "%s", "");
+		sprintf (buf, "%s", "AudioTrack");
+		ImGui::SetKeyboardFocusHere ();
 		if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
 			project -> addAudioTrack (buf);
 			ImGui::CloseCurrentPopup ();
 			new_audio_track = false;
 		}
-		if (ImGui::Button("Close", ImVec2(200,0))) 
-		{
-			ImGui::CloseCurrentPopup();
-			new_audio_track = false;
-		}
+		//if (ImGui::Button("Close", ImVec2(200,0))) 
+		//{
+			//ImGui::CloseCurrentPopup();
+			//new_audio_track = false;
+		//}
 		ImGui::EndPopup();
 	}
 	
 	if (ImGui::BeginPopupModal("New Midi Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		if (ImGui::Button("Close", ImVec2(200,0))) 
+		char buf[20];
+		sprintf (buf, "%s", "MidiTrack");
+		ImGui::SetKeyboardFocusHere ();
+		if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
-			ImGui::CloseCurrentPopup();
+			project -> addMidiTrack (buf);
+			ImGui::CloseCurrentPopup ();
 			new_midi_track = false;
 		}
 		ImGui::EndPopup();
@@ -441,20 +446,20 @@ void ConsoleScreen (bool* main_switch, Project* project)
 	bool enabled = not(project -> getClock() -> getState());
 	mainMenu (enabled, main_switch, project);
 	
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
-	ImGui::BeginChild("Title", ImVec2(305, 90));
-	ImGui::Text(" ####  ###  #   #  ###   ###  #     #####");
-	ImGui::Text("#     #   # ##  # #     #   # #     #");
-	ImGui::Text("#     #   # # # #  ###  #   # #     ####");
-	ImGui::Text("#     #   # #  ##     # #   # #     #");
-	ImGui::Text(" ####  ###  #   #  ###   ###  ##### #####");
-	ImGui::EndChild();
-	ImGui::PopStyleVar();
+	//ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
+	//ImGui::BeginChild("Title", ImVec2(305, 90));
+	//ImGui::Text(" ####  ###  #   #  ###   ###  #     #####");
+	//ImGui::Text("#     #   # ##  # #     #   # #     #");
+	//ImGui::Text("#     #   # # # #  ###  #   # #     ####");
+	//ImGui::Text("#     #   # #  ##     # #   # #     #");
+	//ImGui::Text(" ####  ###  #   #  ###   ###  ##### #####");
+	//ImGui::EndChild();
+	//ImGui::PopStyleVar();
+
+	//ImGui::SameLine();
 	
 	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
-
-	ImGui::SameLine();
 	ImGui::BeginChild("Master Controls", ImVec2(0, 85), true);
 	//TODO : Intégrer les images de commandes
 	if ( project -> getClock() -> getState () )
@@ -486,24 +491,43 @@ void ConsoleScreen (bool* main_switch, Project* project)
 	ImGui::BeginChild("Board", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{
+		ImColor child_bg = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
+		std::string logo = "";
+		switch ( project -> getTrack(i) -> getType () )
+		{
+		case Track::AUDIO:
+			child_bg = ImColor::HSV(project -> getTrack(i) -> getHue (), 0.4f, 0.2f, 1.00f);
+			logo = "~ "; 
+			break;
+		case Track::MIDI:
+			child_bg = ImColor::HSV(project -> getTrack(i) -> getHue (), 0.4f, 0.2f, 1.00f);
+			logo = "# ";
+			break;
+		default:
+			break;
+		}
 		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
+		//ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, child_bg);
 		ImGui::PushID (2048 + i);
 		if ( i > 0 ) ImGui::SameLine ();
 		ImGui::BeginChild (2048 + i, ImVec2(120, 0), true);
 
-		if ( ImGui::Button("X") ) project -> deleteTrack (i);
-		
-		if ( i > 0 ) 
-		{
-			ImGui::SameLine ();
-			if ( ImGui::Button("<") ) { project -> swapTracks (i, i-1); }
-		}
-		
-		if ( i < project->nTracks()-1 ) 
-		{
-			ImGui::SameLine ();
-			if ( ImGui::Button(">") ) { project -> swapTracks (i, i+1); }
-		}
+		// TODO : secure deleteTrack !!!
+		if ( ImGui::Button("X") ) project -> deleteTrack (i); 
+		ImGui::SameLine (); ImGui::Text("%02d", i+1);
+		ImGui::SameLine (); ImGui::Text("%s", logo.c_str());
+		ImGui::SameLine ();
+		if ( i == 0 ) 
+			ImGui::Button(" ");
+		else
+			if ( ImGui::Button("<") ) project -> swapTracks (i, i-1);
+
+		ImGui::SameLine ();
+		if ( i == project->nTracks()-1 ) 
+			ImGui::Button(" ");
+		else
+			if ( ImGui::Button(">") ) project -> swapTracks (i, i+1);
 		
 		ImGui::Text ( "%s", project -> getTrack(i) -> getName().c_str() );
 		if (ImGui::BeginPopupContextItem("rename test"))
@@ -517,9 +541,24 @@ void ConsoleScreen (bool* main_switch, Project* project)
 			}
 			ImGui::EndPopup ();
 		}
-
+		
+		//ImGui::SliderFloat("Hue", project->getTrack(i)->getHueP(), 0.0f, 1.0f);
+		ImGui::Separator ();
+		// Clips
+		char buf[32];
+		sprintf(buf, "%08x", i*5731);
+		//ImGui::Button(buf, ImVec2(-1.0f, 0.0f));
+		
+		// Empty slot
+		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.0f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.3f, 1.00f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.6f, 1.00f));
+		ImGui::Button("Add a clip", ImVec2(-1.0f, 0.0f));
+		ImGui::PopStyleColor(3);
+		
 		ImGui::EndChild ();
 		ImGui::PopID ();
+		ImGui::PopStyleColor ();
 		ImGui::PopStyleVar ();
 	}
 	ImGui::EndChild ();
@@ -585,12 +624,14 @@ void GUI_Main(bool* main_switch, Project* project)
 					case SDL_SCANCODE_F3:
 						details.type = Screen::SEQUENCER;
 						break;
-					//case SDL_SCANCODE_F5:
+					case SDL_SCANCODE_F5:
 						//if ( project -> ctrlPressed () ) project -> addAudioTrack ("AudioTrack");
-						//break;
-					//case SDL_SCANCODE_F6:
+						project -> addAudioTrack ("AudioTrack");
+						break;
+					case SDL_SCANCODE_F6:
 						//if ( project -> ctrlPressed () ) project -> addMidiTrack ("MidiTrack");
-						//break;
+						project -> addMidiTrack ("MidiTrack");
+						break;
 					case SDL_SCANCODE_LCTRL:
 					case SDL_SCANCODE_RCTRL:
 						project -> ctrlDown ();
