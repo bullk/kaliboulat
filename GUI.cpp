@@ -200,12 +200,34 @@ void displayMidiClipDetails (MidiClip * daClip)
 	ImGui::Separator();
 }
 
+int displayAudioClipSet (Project* project, int selected)
+{
+		vector<std::string> * list = NULL;
+		list = project -> getAudioFiles ();
+		int res = selected;
+		for (unsigned int i=0; i < list -> size(); i++ )
+			if ( ImGui::Selectable(list -> at(i).c_str(), int(i)==selected) ) res = i;
+		return res;
+}
+	
+void displayMidiClipSet (Project* project)
+{
+	vector<std::string> * list = NULL;
+	ImGui::SetNextTreeNodeOpen(true);
+	if (ImGui::CollapsingHeader("MIDI Files"))
+	{
+		list = project -> getMIDIFiles ();
+		for ( unsigned int i=0; i < list -> size(); i++ )
+			if ( ImGui::Selectable(list -> at(i).c_str()) )
+			{
+				//MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
+				//midifile -> parse (miditrack);
+				//delete midifile;
+			}
+	}
+}
 
-//======================================================================
-
-void TitleScreen () {}
-
-void ProjectScreen (bool* main_switch, Project* project)
+void BeginScreen ()
 {
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
@@ -214,45 +236,76 @@ void ProjectScreen (bool* main_switch, Project* project)
 	flags |= ImGuiWindowFlags_NoCollapse;
 	flags |= ImGuiWindowFlags_MenuBar;
 	
-	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
 	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 	ImGui::SetNextWindowPos(ImVec2(0,0));
 	
-	char buf[64];
-	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
-	ImGui::Begin(buf, main_switch, flags);
+	ImGui::Begin("main window", NULL, flags);
+	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 5.0f);
+}
+
+void EndScreen ()
+{
+	ImGui::PopStyleColor ();
+	ImGui::PopStyleVar ();
+	ImGui::End();
+}
+
+void ControlPanel (Project * project, void (*title_func)())
+// TODO : factoriser le panneau de commande (boutons, horloges...)
+{
+	ImGui::BeginChild ("Master Controls", ImVec2(0, 64), true);
+
+	ImGui::Columns (8);
+	title_func ();
+	ImGui::NextColumn ();
 	
+	//TODO : Intégrer les images de boutons
+	if ( project -> getClock() -> getState () )
+	{ // STOP button
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button ("STOP")) project -> getClock() -> stop();
+		ImGui::PopStyleColor (3);
+	}
+	else
+	{ // PLAY button
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button ("PLAY")) project -> getClock() -> start();
+		ImGui::PopStyleColor(3);
+	}
+	
+	// Clock
+	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
+	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
+
+	// MIDI Clock
+	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
+	if ( project -> ctrlPressed () ) ImGui::TextColored (ImColor(192,64,64), "CTRL");
+	ImGui::Columns(1);
+
+	ImGui::EndChild ();
+}
+
+void TitleScreen () {}
+
+void ProjectTitle ()
+{
+	ImGui::Text("   ##  ##  #   # ###  ## ###");
+	ImGui::Text("  # # ##  # #  # #   #    #");
+	ImGui::Text("  #   # #  #  #   ##  ##  #");
+}
+
+void ProjectScreen (bool* main_switch, Project* project)
+{
+	BeginScreen ();
 	bool enabled = not(project -> getClock() -> getState());
 	mainMenu (enabled, main_switch, project);
 	
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
-	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-
-	ImGui::BeginChild("Master Controls", ImVec2(0, 50), true);
-	//TODO : Intégrer les images de commandes
-	if ( project -> getClock() -> getState() )
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("STOP")) project -> getClock() -> stop();
-		ImGui::PopStyleColor(3);
-	}
-	else
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("PLAY")) project -> getClock() -> start();
-		ImGui::PopStyleColor(3);
-	}
-	// Clock
-	ImGui::SameLine(); ImGui::TextColored(ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
-	//ImGui::SameLine(); ImGui::TextColored(ImColor(127,127,127), "%d", mcDelta);
-
-	// MIDI Clock
-	ImGui::SameLine(); ImGui::TextColored(ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
-	ImGui::EndChild();
+	ControlPanel (project, ProjectTitle);
 	
 	// MAIN BOARD
 	ImGui::BeginChild("Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), true);
@@ -373,30 +426,10 @@ void ProjectScreen (bool* main_switch, Project* project)
 	switch (details.context)
 	{
 		case Screen::PROJECT:
-		{
-			vector<std::string> * list = NULL;
-			string str;
 			ImGui::SetNextTreeNodeOpen(true);
-			if (ImGui::CollapsingHeader("Audio Files (click to import)"))
-			{
-				list = project -> getAudioFiles ();
-				for ( unsigned int i=0; i < list -> size(); i++ )
-					if ( ImGui::Selectable(list -> at(i).c_str()) )
-						project -> getAudio () -> addClip ( project->getAudioDir() + "/" + list -> at(i).c_str() );
-			}
-			ImGui::SetNextTreeNodeOpen(true);
-			if (ImGui::CollapsingHeader("MIDI Files (click to import)"))
-			{
-				list = project -> getMIDIFiles ();
-				for ( unsigned int i=0; i < list -> size(); i++ )
-					if ( ImGui::Selectable(list -> at(i).c_str()) )
-					{
-						//MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
-						//midifile -> parse (miditrack);
-						//delete midifile;
-					}
-			}
-		}	
+			if (ImGui::CollapsingHeader("Audio Files"))
+				displayAudioClipSet (project, -1);
+			displayMidiClipSet (project);
 			break;
 		case Screen::AUDIOCLIP:
 		{
@@ -420,79 +453,32 @@ void ProjectScreen (bool* main_switch, Project* project)
 			break;
 	}
 	ImGui::EndChild();
-	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
+	EndScreen();
+}
 
-	ImGui::End();
+void ConsoleTitle ()
+{
+	ImGui::Text("   ##  #   #    #  #  #  ##");
+	ImGui::Text("  #   # # # #  #  # # #  #  ");
+	ImGui::Text("   ##  #  # # #    #  ## ##");
 }
 
 void ConsoleScreen (bool* main_switch, Project* project) 
 {	
-	ImGuiWindowFlags flags = 0;
-	flags |= ImGuiWindowFlags_NoTitleBar;
-	flags |= ImGuiWindowFlags_NoResize;
-	flags |= ImGuiWindowFlags_NoMove;
-	flags |= ImGuiWindowFlags_NoCollapse;
-	flags |= ImGuiWindowFlags_MenuBar;
-
-	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
-	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
-	ImGui::SetNextWindowPos(ImVec2(0,0));
-
-	char buf[64];
-	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
-	ImGui::Begin(buf, main_switch, flags);
-	
+	BeginScreen ();
 	bool enabled = not(project -> getClock() -> getState());
 	mainMenu (enabled, main_switch, project);
 	
-	//ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
-	//ImGui::BeginChild("Title", ImVec2(305, 90));
-	//ImGui::Text(" ####  ###  #   #  ###   ###  #     #####");
-	//ImGui::Text("#     #   # ##  # #     #   # #     #");
-	//ImGui::Text("#     #   # # # #  ###  #   # #     ####");
-	//ImGui::Text("#     #   # #  ##     # #   # #     #");
-	//ImGui::Text(" ####  ###  #   #  ###   ###  ##### #####");
-	//ImGui::EndChild();
-	//ImGui::PopStyleVar();
-
-	//ImGui::SameLine();
+	ControlPanel (project, ConsoleTitle);
 	
-	ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 5.0f);
-	ImGui::BeginChild("Master Controls", ImVec2(0, 85), true);
-	//TODO : Intégrer les images de commandes
-	if ( project -> getClock() -> getState () )
-	{
-		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button ("STOP")) project -> getClock() -> stop();
-		ImGui::PopStyleColor (3);
-	}
-	else
-	{
-		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button ("PLAY")) project -> getClock() -> start();
-		ImGui::PopStyleColor(3);
-	}
-	// Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
-	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
-
-	// MIDI Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
-	if ( project -> ctrlPressed () ) ImGui::TextColored (ImColor(192,64,64), "CTRL");
-	ImGui::EndChild ();
-
 	// TODO : Afficher les pistes
-	ImGui::BeginChild("Board", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::BeginChild ("Board", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	static int add_a_clip = -1;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{
 		ImColor child_bg = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
 		std::string logo = "";
+		
 		switch ( project -> getTrack(i) -> getType () )
 		{
 		case Track::AUDIO:
@@ -506,95 +492,118 @@ void ConsoleScreen (bool* main_switch, Project* project)
 		default:
 			break;
 		}
+		
 		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
 		//ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, child_bg);
-		ImGui::PushID (2048 + i);
+		ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, child_bg);
 		if ( i > 0 ) ImGui::SameLine ();
-		ImGui::BeginChild (2048 + i, ImVec2(120, 0), true);
+		char buf[32];
+		sprintf(buf, "Track%03d", i*5731);
+		ImGui::BeginChild (buf, ImVec2(120, 0), true);
 
-		// TODO : secure deleteTrack !!!
-		if ( ImGui::Button("X") ) project -> deleteTrack (i); 
-		ImGui::SameLine (); ImGui::Text("%02d", i+1);
-		ImGui::SameLine (); ImGui::Text("%s", logo.c_str());
-		ImGui::SameLine ();
-		if ( i == 0 ) 
-			ImGui::Button(" ");
+		if ( ImGui::Button("X") ) project -> deleteTrack (i);
 		else
-			if ( ImGui::Button("<") ) project -> swapTracks (i, i-1);
-
-		ImGui::SameLine ();
-		if ( i == project->nTracks()-1 ) 
-			ImGui::Button(" ");
-		else
-			if ( ImGui::Button(">") ) project -> swapTracks (i, i+1);
-		
-		ImGui::Text ( "%s", project -> getTrack(i) -> getName().c_str() );
-		if (ImGui::BeginPopupContextItem("rename test"))
 		{
-			char buf[20];
-			sprintf (buf, "%s", project -> getTrack(i) -> getName().c_str());
-			if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+			ImGui::SameLine (); ImGui::Text("%02d", i+1);
+			ImGui::SameLine (); ImGui::Text("%s", logo.c_str());
+			ImGui::SameLine ();
+			if ( i == 0 ) 
+				ImGui::Button(" ");
+			else
+				if ( ImGui::Button("<") ) project -> swapTracks (i, i-1);
+
+			ImGui::SameLine ();
+			if ( i == project->nTracks()-1 ) 
+				ImGui::Button(" ");
+			else
+				if ( ImGui::Button(">") ) project -> swapTracks (i, i+1);
+			
+			ImGui::Text ( "%s", project -> getTrack(i) -> getName().c_str() );
+			if ( ImGui::BeginPopupContextItem ("rename test") )
 			{
-				project -> getTrack(i) -> setName(buf);
-				ImGui::CloseCurrentPopup ();
+				char buf[20];
+				sprintf (buf, "%s", project -> getTrack(i) -> getName().c_str());
+				if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+				{
+					project -> getTrack(i) -> setName(buf);
+					ImGui::CloseCurrentPopup ();
+				}
+				ImGui::EndPopup ();
 			}
-			ImGui::EndPopup ();
+			
+			//ImGui::SliderFloat ("Color", project->getTrack(i)->getHueP(), 0.0f, 1.0f);
+			ImGui::Separator ();
+			
+			// Clips
+			for ( unsigned int j=0; j < project -> getTrack(i) -> nClips(); j++)
+			{
+				ImGui::Button (project -> getTrack(i) -> getClip(j) -> getName().c_str(), ImVec2(-1.0f, 0.0f));
+			}
+			
+			// Empty slot
+			ImGui::PushID (i);
+			ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.0f, 1.00f));
+			ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.3f, 1.00f));
+			ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.6f, 1.00f));
+			if ( ImGui::Button("Add a clip", ImVec2(-1.0f, 0.0f)) ) add_a_clip = i;
+			ImGui::PopStyleColor (3);
+			
+			ImGui::PopID ();
 		}
 		
-		//ImGui::SliderFloat("Hue", project->getTrack(i)->getHueP(), 0.0f, 1.0f);
-		ImGui::Separator ();
-		// Clips
-		char buf[32];
-		sprintf(buf, "%08x", i*5731);
-		//ImGui::Button(buf, ImVec2(-1.0f, 0.0f));
-		
-		// Empty slot
-		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.0f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.3f, 1.00f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.6f, 1.00f));
-		ImGui::Button("Add a clip", ImVec2(-1.0f, 0.0f));
-		ImGui::PopStyleColor(3);
-		
 		ImGui::EndChild ();
-		ImGui::PopID ();
 		ImGui::PopStyleColor ();
 		ImGui::PopStyleVar ();
 	}
+	if ( add_a_clip != -1 ) ImGui::OpenPopup ("Add audio clip");
+	if ( ImGui::BeginPopupModal ("Add audio clip", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
+	{
+		static int selected_clip = -1;
+		selected_clip = displayAudioClipSet (project, selected_clip);
+		//ImGui::Text("%d", selected_clip);
+		if ( selected_clip == -1 ) 
+		{
+			ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.4f));
+			ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.4f));
+			ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.4f));
+			ImGui::Button ("OK", ImVec2(80,0));
+			ImGui::PopStyleColor (3);
+		}
+		else if ( ImGui::Button ("OK", ImVec2(80,0)) ) 
+		{
+			project -> getTrack(add_a_clip) -> addClip ( project->getAudioDir() + "/" + project -> getAudioFiles() -> at(selected_clip).c_str() );
+			ImGui::CloseCurrentPopup ();
+			add_a_clip = -1;
+			selected_clip = -1;
+		}
+		ImGui::SameLine ();
+		if ( ImGui::Button ("Cancel", ImVec2(80,0)) ) 
+		{
+			ImGui::CloseCurrentPopup ();
+			add_a_clip = -1;
+			selected_clip = -1;
+		}
+		ImGui::EndPopup ();
+	}
 	ImGui::EndChild ();
 
-	ImGui::PopStyleColor ();
-	ImGui::PopStyleVar ();
+	EndScreen ();
+}
 
-	ImGui::End ();
+void SequencerTitle ()
+{
+	ImGui::Text("  # ##  #  # # ## ##   ## ##  ##");
+	ImGui::Text(" #  #  # # # # #  # # #   #  ##");
+	ImGui::Text("#   ##  ## ##  ## # #  ## ## # #");
 }
 
 void SequencerScreen (bool* main_switch, Project* project) 
 {
-	ImGuiWindowFlags flags = 0;
-	flags |= ImGuiWindowFlags_NoTitleBar;
-	flags |= ImGuiWindowFlags_NoResize;
-	flags |= ImGuiWindowFlags_NoMove;
-	flags |= ImGuiWindowFlags_NoCollapse;
-	flags |= ImGuiWindowFlags_MenuBar;
-
-	//ImGui::SetNextWindowSize(ImVec2(1920,1080));
-	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
-	ImGui::SetNextWindowPos(ImVec2(0,0));
-
-	char buf[64];
-	sprintf (buf, "%s - Kaliboulat", project -> getName().c_str());
-	ImGui::Begin(buf, main_switch, flags);
-	
+	BeginScreen ();
 	bool enabled = not(project -> getClock() -> getState());
 	mainMenu (enabled, main_switch, project);
-	
-	ImGui::Text(" XXX  XXXXX  XXX  X   X XXXXX X   X  XXXX XXXXX XXXX");
-	ImGui::Text("X     X     X   X X   X X     XX  X X     X     X   X");
-	ImGui::Text(" XXX  XXXX  X   X X   X XXXX  X X X X     XXXX  XXX");
-	ImGui::Text("    X X     X  X  X   X X     X  XX X     X     X  X");
-	ImGui::Text(" XXX  XXXXX  XXXX  XXX  XXXXX X   X  XXXX XXXXX X   X");
-	ImGui::End();
+	ControlPanel (project, SequencerTitle);
+	EndScreen ();
 }
 
 //======================================================================

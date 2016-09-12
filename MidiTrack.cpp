@@ -7,7 +7,8 @@
 MidiTrack::MidiTrack (std::string s) : Track (s)
 {
 	type_ = MIDI;
-	ClipSet = new std::vector<MidiClip *>;
+	clipset_ = new std::vector<MidiClip *>;
+	hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
 }
 
 
@@ -18,10 +19,10 @@ MidiTrack::MidiTrack (std::string s) : Track (s)
 MidiTrack::~MidiTrack ()
 {
     //delete each audio file object (and corresponding buffer, etc.)
-    if (ClipSet != NULL){
-        for (unsigned int i = 0; i < ClipSet->size (); i++)
+    if (clipset_ != NULL){
+        for (unsigned int i = 0; i < clipset_->size (); i++)
         {
-            delete ClipSet->at(i);
+            delete clipset_->at(i);
         }
     }
 }
@@ -33,26 +34,30 @@ MidiTrack::~MidiTrack ()
 
 void MidiTrack::addClip(MidiClip * daClip)
 {
-		ClipSet->push_back (daClip);
+		clipset_->push_back (daClip);
+}
+
+void MidiTrack::addClip (std::string path)
+{
 }
 
 void MidiTrack::deleteClip (unsigned int i)
 {
-	MidiClip * clip = ClipSet -> at(i);
-	ClipSet -> erase (ClipSet -> begin() + i);
+	MidiClip * clip = clipset_ -> at(i);
+	clipset_ -> erase (clipset_ -> begin() + i);
 	delete clip;
 }
 
 void MidiTrack::tick (RtMidiOut * midiout)
 {
-	for (unsigned int i = 0; i < ClipSet->size (); i++)
-		if (ClipSet->at(i)->getState () == Clip::PLAYING)
-			ClipSet->at(i)->tick (midiout);
+	for (unsigned int i = 0; i < clipset_->size (); i++)
+		if (clipset_->at(i)->getState () == Clip::PLAYING)
+			clipset_->at(i)->tick (midiout);
 }
 
 void MidiTrack::stopAll ()
 {
-	for (unsigned int i = 0; i < ClipSet->size(); i++)
-		ClipSet -> at(i) -> stop();
+	for (unsigned int i = 0; i < clipset_->size(); i++)
+		clipset_ -> at(i) -> stop();
 }
 		

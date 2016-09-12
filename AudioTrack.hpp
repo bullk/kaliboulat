@@ -19,8 +19,9 @@ public:
 
     void addClip (std::string path);
     void deleteClip (unsigned int i);
+    inline Clip * getClip (unsigned int i) { return clipset_ -> at(i); }
+    inline unsigned int nClips () { return clipset_ -> size(); }
     void stopAll ();
-    inline std::vector<AudioClip *> * getClipSet () { return clipset_; }
     inline RtAudio * getOutput () { return output_; }
     inline void setOutput (RtAudio * o) { output_ = o; }
 	inline float * getVolume () { return &volume_; }

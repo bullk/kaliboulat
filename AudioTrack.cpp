@@ -1,4 +1,6 @@
 #include "AudioTrack.hpp"
+#include <stdlib.h>
+
 
 //-------------
 // Constructor 
@@ -9,6 +11,7 @@ AudioTrack::AudioTrack (std::string s) : Track (s)
 	type_ = AUDIO;
 	clipset_ = new std::vector<AudioClip *>;
 	volume_ = 1.0f;
+	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
 }
 
 
