@@ -35,7 +35,7 @@ AudioClip::AudioClip(std::string path) : FileWvIn(path)
 	std::string file = path_.substr(p, path_.length()-p);
 	p = file.rfind(".");
 	name_ = file.substr(0, p);
-	state_ = STOPPED;
+	state_ = HALTED;
 	//angle_ = 0;
 	volume_ = 0.5f;
 	pitshift_ = new PitShift();

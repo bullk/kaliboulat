@@ -3,16 +3,28 @@
 ---------------
 ## MAINTENANT
 
+Panneau de détail des fichiers et clips à isoler pour l'emmener de ProjectScreen vers Console et Sequencer
+
+### Redéfinir le moteur 
+
+ * moteur = baie de brassage + centre de commande  avec à l'esprit le 
+ pattern Command
+ * entrées (canaux Audio | MIDI | OSC |..., sequenceur, horloge)
+ * commencer avec une approche de bourrin -> les signaux (bar, beat...) 
+ du séquenceur sont diffusés dans les tracks et de là dans les clips
+ * pour bénéficier d'une approche "cablage" (comme dans PureData) 
+ ouvrant la porte aux plugins et autres modules il faut au maximum gérer 
+ la connexion des objets par callback.
 
 ### Fonctionnalités
-
-* Import de fichiers
 
 * Propriétés de lecture des clips (single, loop, warped...)
 	* single
 	* looped
 	* warped ?
 	* free / next beat / next bar
+
+* Import de fichiers
 
 * Gestion des projets
 	* Nouveau
@@ -21,8 +33,6 @@
 	
 ### Architecture / Moteur
 
-* Factoriser le code (via une classe abstraite Track ?)
-* Gestion des pistes
 * Playlist / TrackList
 * Bases de séquençage pour les clips
 

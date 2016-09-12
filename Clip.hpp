@@ -16,7 +16,7 @@ class Clip
 {
 public:	
 	enum ClipType { AUDIO, MIDI, OSC, COM };
-	enum ClipState { STOPPED, PLAYING, RECORDING };
+	enum ClipState { HALTED, ARMED, PLAYING, RECORDING };
 	enum LaunchStyle { FREE, BEAT, BAR };
 	enum LoopStyle { ONESHOT, MANY, FOREVER };
 	
@@ -25,7 +25,7 @@ public:
 	inline ClipState getState () { return state_; }
 	inline bool isPlaying () { return (state_ == PLAYING); }
 	inline void play () { state_ = PLAYING; }
-	inline void stop () { state_ = STOPPED; }
+	inline void stop () { state_ = HALTED; }
 	inline virtual std::string getPath ()  { return path_; }
 	inline virtual std::string getName () { return name_; }
 	inline void virtual setName (std::string s) { name_ = s; }
