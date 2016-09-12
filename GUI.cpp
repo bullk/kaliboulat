@@ -499,7 +499,7 @@ void ConsoleScreen (bool* main_switch, Project* project)
 		if ( i > 0 ) ImGui::SameLine ();
 		char buf[32];
 		sprintf(buf, "Track%03d", i*5731);
-		ImGui::BeginChild (buf, ImVec2(120, 0), true);
+		ImGui::BeginChild (buf, ImVec2(150, 0), true);
 
 		if ( ImGui::Button("X") ) project -> deleteTrack (i);
 		else
@@ -537,6 +537,7 @@ void ConsoleScreen (bool* main_switch, Project* project)
 			// Clips
 			for ( unsigned int j=0; j < project -> getTrack(i) -> nClips(); j++)
 			{
+				ImGui::Button(">"); ImGui::SameLine ();
 				ImGui::Button (project -> getTrack(i) -> getClip(j) -> getName().c_str(), ImVec2(-1.0f, 0.0f));
 			}
 			

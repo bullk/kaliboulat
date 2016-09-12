@@ -32,12 +32,14 @@ AudioClip::AudioClip(std::string path) : FileWvIn(path)
 	setRate(1);
 	path_ = path;
 	int p = path_.rfind("/") + 1;
-	name_ = path_.substr(p, path_.length()-p);
+	std::string file = path_.substr(p, path_.length()-p);
+	p = file.rfind(".");
+	name_ = file.substr(0, p);
 	state_ = STOPPED;
 	//angle_ = 0;
 	volume_ = 0.5f;
 	pitshift_ = new PitShift();
-	pitshift_->setEffectMix(1.0);
+	pitshift_ -> setEffectMix(1.0);
 	gui_rate_ = 1.0f;
 	gui_pitch_ = 0;
 	//gui_data_[data_.size()];
