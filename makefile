@@ -13,17 +13,46 @@ GUI_OBJS = GUI.o
 MAIN_OBJS = Clock.o Clip.o Scheduled.o Track.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioTrack.o Project.o Modules.o Kaliboulat.o
 OBJS = $(EXT_OBJS) $(GUI_OBJS) $(MAIN_OBJS) 
 
+SUFFIXES = .cpp .o 
+.SUFFIXES: $(SUFFIXES) .
+
 new: Kaliboulat-rtmidi2.0.1
 old: Kaliboulat-rtmidi1.0.15
 
 Kaliboulat-rtmidi2.0.1: $(OBJS) globals.h
-	$(CC) $(CFLAGS) $(JACKFLAGS) $(LDFLAGS) -o Kaliboulat $(OBJS) $(LDLIBS) $(JACKLIBS)
+	$(CC) $(CFLAGS) $(JACKFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) $(JACKLIBS)
 
 Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
-	$(CC) $(CFLAGS) $(ALSAFLAGS) $(LDFLAGS) -o Kaliboulat $(OBJS) $(LDLIBS) $(ALSALIBS)
+	$(CC) $(CFLAGS) $(ALSAFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
 
-.cpp.o: $*.h $*.hpp $*.cpp 
+AudioGroup.o: AudioGroup.hpp AudioTrack.hpp Clip.hpp Track.hpp
+Clip.o: Clip.hpp
+Clock.o: Clock.hpp
+GUI.o: GUI.hpp Clock.hpp Modules.hpp MidiTrack.hpp Project.hpp MidiFile.hpp
+GUI.o: imgui/imgui.h imgui/imgui_impl_sdl.h
+midi.o: midi.hpp Scheduled.hpp
+MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp MidiFile.hpp MidiTrack.hpp
+MidiTrack.o: MidiTrack.hpp MidiClip.hpp Track.hpp
+Modules.o: Modules.hpp AudioTrack.hpp MidiTrack.hpp
+Project.o: Project.hpp globals.h Clock.hpp Modules.hpp
+Scheduled.o: Scheduled.hpp
+Track.o: Track.hpp Clip.hpp
+
+.cpp.o:
 	$(CC) $(CFLAGS) $(JACKFLAGS) -c $*.cpp
 	
 clean:
 	rm $(MAIN_OBJS) $(GUI_OBJS)
+
+#AudioTrack
+#Clip
+#Clock
+#GUI
+#midi
+#MidiClip
+#MidiFile
+#MidiTrack
+#Modules
+#Project
+#Scheduled
+#Track
