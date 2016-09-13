@@ -17,7 +17,7 @@ public:
 	void addClip (MidiClip * daClip);
 	void addClip (std::string path);
     void deleteClip (unsigned int i);
-    inline Clip * getClip (unsigned int i) { return clipset_ -> at(i); }
+    inline MidiClip * getClip (unsigned int i) { return clipset_ -> at(i); }
     inline unsigned int nClips () { return clipset_ -> size(); }
 	void tick (RtMidiOut *);
     void stopAll ();

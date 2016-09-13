@@ -10,7 +10,7 @@ ALSALIBS = -lasound -lpthread
 JACKLIBS = -ljack
 EXT_OBJS = imgui.o imgui_draw.o imgui_demo.o imgui_impl_sdl.o
 GUI_OBJS = GUI.o
-MAIN_OBJS = Clock.o Clip.o Scheduled.o Track.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioTrack.o Project.o Modules.o Kaliboulat.o
+MAIN_OBJS = Clock.o Clip.o Scheduled.o Track.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioClip.o AudioTrack.o Project.o Modules.o Kaliboulat.o
 OBJS = $(EXT_OBJS) $(GUI_OBJS) $(MAIN_OBJS) 
 
 SUFFIXES = .cpp .o 
@@ -24,8 +24,9 @@ Kaliboulat-rtmidi2.0.1: $(OBJS) globals.h
 
 Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
 	$(CC) $(CFLAGS) $(ALSAFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
-
-AudioGroup.o: AudioGroup.hpp AudioTrack.hpp Clip.hpp Track.hpp
+	
+AudioClip.o: AudioClip.hpp
+AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp
 Clip.o: Clip.hpp
 Clock.o: Clock.hpp
 GUI.o: GUI.hpp Clock.hpp Modules.hpp MidiTrack.hpp Project.hpp MidiFile.hpp

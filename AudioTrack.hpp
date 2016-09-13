@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <RtAudio.h>
-#include "Clip.hpp"
+#include "AudioClip.hpp"
 #include "Track.hpp"
 
 
@@ -19,7 +19,7 @@ public:
 
     void addClip (std::string path);
     void deleteClip (unsigned int i);
-    inline Clip * getClip (unsigned int i) { return clipset_ -> at(i); }
+    inline AudioClip * getClip (unsigned int i) { return clipset_ -> at(i); }
     inline unsigned int nClips () { return clipset_ -> size(); }
     void stopAll ();
     inline RtAudio * getOutput () { return output_; }
