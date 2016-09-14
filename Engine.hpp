@@ -21,10 +21,7 @@ class Command : public BaseCommand
 		object_ = object;
 		method_ = method;
 	}
-	void execute ()
-	{
-		(object_->*method_)();
-	}
+	void execute ()	{ (object_->*method_)(); }
 	protected:
 		O object_;
 		M method_;
@@ -50,8 +47,6 @@ class Waiter
 		inline void addMain (BaseCommand * command) { main_.push (command); }
 		
 		// Singleton
-		void setValue (int val) { _value = val; }
-		int getValue () { return _value; }
 		static Waiter *getInstance ()
 		{
 			if ( NULL == _singleton )
@@ -59,10 +54,6 @@ class Waiter
 					std::cout << "creating Waiter singleton." << std::endl;
 					_singleton =  new Waiter;
 				}
-			//else
-				//{
-					//std::cout << "WARNING (low) : Waiter singleton already created!" << std::endl;
-				//}
 
 			return _singleton;
 		}
@@ -76,10 +67,8 @@ class Waiter
 		}
 	
 	private:
-		// Variables membres
-		int _value;
-		static Waiter * _singleton;
 		std::queue<BaseCommand *> bar_, beat_, tick_, main_;
+		static Waiter * _singleton;
 		
 	};
 

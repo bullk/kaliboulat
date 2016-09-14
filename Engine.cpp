@@ -4,7 +4,7 @@
 Waiter *Waiter::_singleton = NULL;
 
 // Constructor
-Waiter::Waiter ()	: _value (0)
+Waiter::Waiter ()
 {
 }
 
