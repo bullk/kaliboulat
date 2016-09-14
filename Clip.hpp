@@ -2,12 +2,7 @@
 #define INC_CLIP_H
 
 #include <string>
-
-/*		Classes Clip, AudioClip
- * 
- *
- */
-
+#include "Engine.hpp"
 
 class Clip
 {
@@ -21,15 +16,19 @@ public:
 	virtual ~Clip ();
 	inline ClipState getState () { return state_; }
 	inline bool isPlaying () { return (state_ == PLAYING); }
-	inline void play () { state_ = PLAYING; }
+	void arm ();
+	inline void play () { std::cout << "clip started" << std::endl; state_ = PLAYING; }
 	inline void stop () { state_ = HALTED; }
 	inline virtual std::string getPath ()  { return path_; }
 	inline virtual std::string getName () { return name_; }
 	inline void virtual setName (std::string s) { name_ = s; }
+	inline void virtual setLaunchStyle (LaunchStyle ls) { launchstyle_ = ls; }
+	inline void virtual setStopStyle (LaunchStyle ls) { stopstyle_ = ls; }
+	inline void virtual setLoopStyle (LoopStyle ls) { loopstyle_ = ls; }
 	virtual unsigned long getLength() = 0;
 	//virtual int getAngle (void) = 0;
    
-protected:    
+protected:
 	ClipType m_type;
 	ClipState state_;
 	std::string path_;

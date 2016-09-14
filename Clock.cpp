@@ -30,8 +30,8 @@ void Clock::stop ()
 	
 void Clock::rewind ()
 {
-	bar = 1;
-	beat = 1;
+	bar = 0;
+	beat = 0;
 	tick = 0;
 	hour = 0;
 	minute = 0;
@@ -44,7 +44,10 @@ unsigned int Clock::update ()
 {
 	unsigned int midi_ticks = 0;
 	if (state) {
-
+		
+		int previous_bar = bar;
+		int previous_beat = beat;
+		
 		now = std::chrono::system_clock::now();
 		delta = std::chrono::duration_cast<std::chrono::microseconds> (now - startTime).count();
 		// h:m:s
@@ -59,7 +62,9 @@ unsigned int Clock::update ()
 		unsigned int nbeats = now_ticks / ticks_per_beat;
 		tick = now_ticks % ticks_per_beat;
 		beat = 1 + nbeats % beats_per_bar;
+		if ( previous_beat != beat ) Waiter::getInstance () -> beat ();
 		bar = 1 + nbeats / beats_per_bar;
+		if ( previous_bar != bar ) Waiter::getInstance () -> bar ();
 
 		// how many MIDI ticks ?
 		if (now_ticks < previous_ticks)

@@ -5,21 +5,20 @@
 // Constructor 
 //-------------
 
-AudioClip::AudioClip(std::string path) : FileWvIn(path)
+AudioClip::AudioClip(std::string path) : Clip(), FileWvIn(path)
 {
 	m_type = AUDIO;
 	openFile(path);
-	setRate(1);
 	path_ = path;
 	int p = path_.rfind("/") + 1;
 	std::string file = path_.substr(p, path_.length()-p);
 	p = file.rfind(".");
 	name_ = file.substr(0, p);
-	state_ = HALTED;
 	launchstyle_ = BAR;
 	stopstyle_ = FREE;
-	loopstyle_ = FOREVER;
+	loopstyle_ = ONESHOT;
 	//angle_ = 0;
+	setRate(1);
 	volume_ = 0.5f;
 	pitshift_ = new stk::PitShift();
 	pitshift_ -> setEffectMix(1.0);

@@ -9,7 +9,6 @@
 class MidiClip : public Clip
 {
 public:
-	MidiClip ();
 	MidiClip (std::string name);
 	~MidiClip ();
 	inline unsigned long getLength () { return length_; }

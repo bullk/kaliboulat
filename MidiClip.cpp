@@ -5,16 +5,9 @@
 // Constructor 
 //-------------
 
-MidiClip::MidiClip ()
+MidiClip::MidiClip (std::string name = "No name") : Clip()
 {
-	name_ = "No name";
-	length_ = 0;
-	time_ = 0;
-	data_ = new std::vector<ScheduledMidiMessage *>;
-}
-
-MidiClip::MidiClip (std::string name)
-{
+	m_type = MIDI;
 	//path_ = path;
 	//int p = path_.rfind("/") + 1;
 	//name_ = path_.substr(p, path_.length()-p);
@@ -23,8 +16,10 @@ MidiClip::MidiClip (std::string name)
 	time_ = 0;
 	index_ = 0;
 	data_ = new std::vector<ScheduledMidiMessage *>;
+	launchstyle_ = BAR;
+	stopstyle_ = BAR;
+	loopstyle_ = FOREVER;
 }
-
 
 //------------
 // Destructor 

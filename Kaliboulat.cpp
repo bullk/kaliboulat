@@ -24,6 +24,7 @@
 using namespace stk;
 using namespace std;
 
+
 // MIDI
 
 void midiInit (MidiTrack * miditrack_p);
@@ -144,6 +145,9 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
+	cout << "\n----- engine init -----" << endl;
+	Waiter * waiter;
+	waiter = Waiter::getInstance ();
 
 	cout << "\n----- project init -----" << endl;
 	// INIT PROJECT
@@ -229,7 +233,10 @@ int main( int argc, char* args[] )
 			for (unsigned int i=0; i<midi_ticks; i++) 
 				project -> getMIDI () -> tick (midiout);
 		}
-
+		
+		// Waiter
+		waiter -> main ();
+		
 		// GUI
 		#ifdef WITH_GUI
 			GUI_Main (&main_switch, project);
@@ -252,7 +259,8 @@ int main( int argc, char* args[] )
 	delete midiout;
 	delete dac;
 	//delete diApp;
-
+	waiter -> kill ();
+	
 	return 0; /* ISO C requires main to return int. */
 
 }

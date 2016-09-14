@@ -519,7 +519,7 @@ void ConsoleScreen (bool* main_switch, Project* project)
 				if ( ImGui::Button(">") ) project -> swapTracks (i, i+1);
 			
 			ImGui::Text ( "%s", project -> getTrack(i) -> getName().c_str() );
-			if ( ImGui::BeginPopupContextItem ("rename test") )
+			if ( ImGui::BeginPopupContextItem ("rename track") )
 			{
 				char buf[20];
 				sprintf (buf, "%s", project -> getTrack(i) -> getName().c_str());
@@ -537,8 +537,12 @@ void ConsoleScreen (bool* main_switch, Project* project)
 			// Clips
 			for ( unsigned int j=0; j < project -> getTrack(i) -> nClips(); j++)
 			{
-				ImGui::Button(">"); ImGui::SameLine ();
+				ImGui::PushID (j);
+				if ( ImGui::Button(">") ) project -> getTrack(i) -> getClip(j) -> arm() ; 
+				ImGui::SameLine (); 
 				ImGui::Button (project -> getTrack(i) -> getClip(j) -> getName().c_str(), ImVec2(-1.0f, 0.0f));
+				ImGui::PopID ();
+				
 			}
 			
 			// Empty slot
