@@ -171,13 +171,16 @@ int main( int argc, char* args[] )
 	cout << "\n----- MIDI init -----" << endl;
 	cout << "creating RtMidiOut";
 	RtMidiOut * midiout = NULL;
+	RtMidiIn * midiin = NULL;
 	try { 
 	#ifdef __UNIX_JACK__
 		cout << " with JACK" << endl;
-		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDI_MODULE_NAME);
+		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDIOUT_MODULE_NAME);
+		midiin = new RtMidiIn (RtMidi::UNIX_JACK, MIDIIN_MODULE_NAME);
 	#else
 		cout << " without JACK !!!" << endl;
-		RtMidiOut * midiout = new RtMidiOut (MIDI_MODULE_NAME);
+		midiout = new RtMidiOut (MIDI_MODULE_NAME);
+		midiin = new RtMidiIn (MIDI_MODULE_NAME);
 	#endif
 	}
 	catch ( RtError &error ) 
@@ -195,9 +198,19 @@ int main( int argc, char* args[] )
 			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
 		//midiout -> openPort (); // Open first available port.
 	//}
-	cout << "opening virtual MIDI port" << endl;
+	cout << "opening virtual MIDI out port" << endl;
 	try { 
 		midiout -> openVirtualPort ();
+	}
+	catch ( RtError &error ) 
+	{
+		error.printMessage();
+		exit( EXIT_FAILURE );
+	}
+	
+	cout << "opening virtual MIDI in port" << endl;
+	try { 
+		midiin -> openVirtualPort ();
 	}
 	catch ( RtError &error ) 
 	{
