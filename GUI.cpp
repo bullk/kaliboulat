@@ -8,6 +8,9 @@ SDL_Window * window = NULL;
 ImVec4 clear_color;
 Screen details = { Screen::CONSOLE, Screen::PROJECT, 0, 0 };
 
+int width1, width2, width3, width4, width5;
+bool ressources_panel = true;
+
 int GUI_Init ()
 {
 	// Setup SDL
@@ -37,7 +40,6 @@ int GUI_Init ()
 	return 0;
 }
 
-
 void GUI_Close()
 {
 	// Cleanup
@@ -48,6 +50,37 @@ void GUI_Close()
 }
 
 //======================================================================
+
+void BeginScreen ()
+{
+	ImGuiWindowFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoTitleBar;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoMove;
+	flags |= ImGuiWindowFlags_NoCollapse;
+	flags |= ImGuiWindowFlags_MenuBar;
+	
+	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
+	ImGui::SetNextWindowPos(ImVec2(0,0));
+	
+	ImGui::Begin("main window", NULL, flags);
+	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 5.0f);
+	
+	width1 = (int)ImGui::GetIO().DisplaySize.x / 6;
+	width2 = (int)ImGui::GetIO().DisplaySize.x / 3;
+	width3 = (int)ImGui::GetIO().DisplaySize.x / 2;
+	width4 = 2 * (int)ImGui::GetIO().DisplaySize.x / 3;
+	width5 = 5 * (int)ImGui::GetIO().DisplaySize.x / 6;
+
+}
+
+void EndScreen ()
+{
+	ImGui::PopStyleColor ();
+	ImGui::PopStyleVar ();
+	ImGui::End();
+}
 
 void mainMenu (bool enabled, bool * main_switch, Project * project)
 {
@@ -141,116 +174,6 @@ void mainMenu (bool enabled, bool * main_switch, Project * project)
 	}	
 }
 
-void clipPlayButton (Clip * clip)
-{
-	if ( clip -> isPlaying () )
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("STOP")) clip -> stop ();
-		ImGui::PopStyleColor(3);
-	}
-	else
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("PLAY")) clip -> play ();
-		ImGui::PopStyleColor(3);
-	}
-}
-
-void displayMidiClipDetails (MidiClip * daClip)
-{
-	unsigned short beats_per_bar = 4;
-	ImGui::PushItemWidth(100);
-	ImGui::TextColored(ImColor(255,255,0), "%s", daClip -> getName().c_str());
-	ImGui::Text("Location : %s", daClip -> getPath().c_str());
-	ImGui::Text("size : %lu events", daClip -> getSize());
-	ImGui::Text("division value : %d ticks/beat", daClip -> getDivision());
-	ImGui::Text("length : %lu ticks", daClip -> getLength());
-	ImGui::Text("time : %lu", daClip -> getTime());
-	ImGui::Separator();
-	ImGui::Text("time (BBT)  "); ImGui::SameLine();
-	ImGui::Text("Status  "); ImGui::SameLine();
-	ImGui::Text("DATA"); 
-	ImGui::Separator();
-
-	ScheduledMidiMessage * event = NULL;
-	for (unsigned long i=0; i < daClip -> getSize(); i++)
-	{
-		event = daClip -> getEvent(i);
-		int nbeats = event -> getTime() / daClip -> getDivision();
-		int tick = event -> getTime() % daClip -> getDivision();
-		int beat = 1 + nbeats % beats_per_bar;
-		int bar = 1 + nbeats / beats_per_bar;
-		
-		bool selected = ( daClip -> getIndex () == i );
-		char bbt[13];
-		sprintf (bbt, "%02d:%02d:%03d   ", bar, beat, tick);
-		ImGui::Selectable(bbt, selected); ImGui::SameLine();
-		ImGui::Text("%x      ", event -> getData() -> at (0)); ImGui::SameLine();
-		for (unsigned int j=1; j < event -> getData() -> size(); j++)
-		{
-			if (j>1) ImGui::SameLine();
-			ImGui::Text("%x", event -> getData() -> at (j));
-		}
-	}
-	ImGui::Separator();
-}
-
-int displayAudioClipSet (Project* project, int selected)
-{
-		vector<std::string> * list = NULL;
-		list = project -> getAudioFiles ();
-		int res = selected;
-		for (unsigned int i=0; i < list -> size(); i++ )
-			if ( ImGui::Selectable(list -> at(i).c_str(), int(i)==selected) ) res = i;
-		return res;
-}
-	
-void displayMidiClipSet (Project* project)
-{
-	vector<std::string> * list = NULL;
-	ImGui::SetNextTreeNodeOpen(true);
-	if (ImGui::CollapsingHeader("MIDI Files"))
-	{
-		list = project -> getMIDIFiles ();
-		for ( unsigned int i=0; i < list -> size(); i++ )
-			if ( ImGui::Selectable(list -> at(i).c_str()) )
-			{
-				//MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
-				//midifile -> parse (miditrack);
-				//delete midifile;
-			}
-	}
-}
-
-void BeginScreen ()
-{
-	ImGuiWindowFlags flags = 0;
-	flags |= ImGuiWindowFlags_NoTitleBar;
-	flags |= ImGuiWindowFlags_NoResize;
-	flags |= ImGuiWindowFlags_NoMove;
-	flags |= ImGuiWindowFlags_NoCollapse;
-	flags |= ImGuiWindowFlags_MenuBar;
-	
-	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
-	ImGui::SetNextWindowPos(ImVec2(0,0));
-	
-	ImGui::Begin("main window", NULL, flags);
-	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 5.0f);
-}
-
-void EndScreen ()
-{
-	ImGui::PopStyleColor ();
-	ImGui::PopStyleVar ();
-	ImGui::End();
-}
-
 void ControlPanel (Project * project, void (*title_func)())
 // TODO : factoriser le panneau de commande (boutons, horloges...)
 {
@@ -285,9 +208,147 @@ void ControlPanel (Project * project, void (*title_func)())
 	// MIDI Clock
 	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
 	if ( project -> ctrlPressed () ) ImGui::TextColored (ImColor(192,64,64), "CTRL");
+	ImGui::NextColumn ();
+	
+	ImGui::Checkbox ("Ressources panel", &ressources_panel);
+	ImGui::NextColumn ();
+	
+	ImGui::Text("width1 : %d", width1); ImGui::SameLine (); ImGui::Text("width4 : %d", width4);
+	ImGui::Text("width2 : %d", width2); ImGui::SameLine (); ImGui::Text("width5 : %d", width5);
+	ImGui::Text("width3 : %d", width3);
 	ImGui::Columns(1);
 
 	ImGui::EndChild ();
+}
+
+void clipPlayButton (Clip * clip)
+{
+	if ( clip -> isPlaying () )
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button("STOP")) clip -> stop ();
+		ImGui::PopStyleColor(3);
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+		if (ImGui::Button("PLAY")) clip -> play ();
+		ImGui::PopStyleColor(3);
+	}
+}
+
+void displayMidiClipDetails (MidiClip * clip)
+{
+	unsigned short beats_per_bar = 4;
+	ImGui::PushItemWidth(100);
+	ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
+	ImGui::Text("Location : %s", clip -> getPath().c_str());
+	ImGui::Text("size : %lu events", clip -> getSize());
+	ImGui::Text("division value : %d ticks/beat", clip -> getDivision());
+	ImGui::Text("length : %lu ticks", clip -> getLength());
+	ImGui::Text("time : %lu", clip -> getTime());
+	ImGui::Separator();
+	ImGui::Text("time (BBT)  "); ImGui::SameLine();
+	ImGui::Text("Status  "); ImGui::SameLine();
+	ImGui::Text("DATA"); 
+	ImGui::Separator();
+
+	ScheduledMidiMessage * event = NULL;
+	for (unsigned long i=0; i < clip -> getSize(); i++)
+	{
+		event = clip -> getEvent(i);
+		int nbeats = event -> getTime() / clip -> getDivision();
+		int tick = event -> getTime() % clip -> getDivision();
+		int beat = 1 + nbeats % beats_per_bar;
+		int bar = 1 + nbeats / beats_per_bar;
+		
+		bool selected = ( clip -> getIndex () == i );
+		char bbt[13];
+		sprintf (bbt, "%02d:%02d:%03d   ", bar, beat, tick);
+		ImGui::Selectable(bbt, selected); ImGui::SameLine();
+		ImGui::Text("%x      ", event -> getData() -> at (0)); ImGui::SameLine();
+		for (unsigned int j=1; j < event -> getData() -> size(); j++)
+		{
+			if (j>1) ImGui::SameLine();
+			ImGui::Text("%x", event -> getData() -> at (j));
+		}
+	}
+	ImGui::Separator();
+}
+
+void displayAudioClipDetails (AudioClip * clip)
+{
+	ImGui::PushItemWidth(100);
+	ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
+	ImGui::Text("Location : %s", clip -> getPath().c_str());
+	ImGui::Separator();
+	ImGui::SliderFloat("volume", clip -> getVolume(), 0.0f, 1.0f, "%.3f");
+	ImGui::SliderFloat("rate", clip -> getGUIRateP(), 0.125f, 8.0f, "%.3f"); clip -> updateRate();
+	ImGui::SliderInt("pitch", clip -> getGUIPitchP(), -12, 12); clip -> updatePitch();
+	ImGui::PopItemWidth();
+	//ImGui::PlotLines("DATA", clip -> getGUIData(), IM_ARRAYSIZE(clip -> getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
+	//ImGui::Text("size %d", IM_ARRAYSIZE(clip -> getGUIData()));
+}
+
+int displayAudioClipSet (Project* project, int selected)
+{
+		vector<std::string> * list = NULL;
+		list = project -> getAudioFiles ();
+		int res = selected;
+		for (unsigned int i=0; i < list -> size(); i++ )
+			if ( ImGui::Selectable(list -> at(i).c_str(), int(i)==selected) ) res = i;
+		return res;
+}
+	
+void displayMidiClipSet (Project* project)
+{
+	vector<std::string> * list = NULL;
+	ImGui::SetNextTreeNodeOpen(true);
+	if (ImGui::CollapsingHeader("MIDI Files"))
+	{
+		list = project -> getMIDIFiles ();
+		for ( unsigned int i=0; i < list -> size(); i++ )
+			if ( ImGui::Selectable(list -> at(i).c_str()) )
+			{
+				//MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
+				//midifile -> parse (miditrack);
+				//delete midifile;
+			}
+	}
+}
+
+void RessourcesPanel (Project* project)
+{
+	ImGui::BeginChild ("Ressources", ImVec2(0,0), true);
+	if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
+	if ( project -> getAudio () -> getClipSet() -> size() )
+		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
+	if ( project -> getMIDI () -> getClipSet() -> size() )
+		if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
+	ImGui::Separator();
+	
+	switch (details.context)
+	{
+		case Screen::PROJECT:
+			ImGui::SetNextTreeNodeOpen(true);
+			if (ImGui::CollapsingHeader("Audio Files"))
+				displayAudioClipSet (project, -1);
+			displayMidiClipSet (project);
+			break;
+		case Screen::AUDIOCLIP:
+			displayAudioClipDetails (project -> getAudio () -> getClipSet() -> at(details.audioclip));
+			break;
+		case Screen::MIDICLIP:
+			displayMidiClipDetails (project -> getMIDI () -> getClipSet() -> at(details.midiclip));
+			break;
+		default:
+			break;
+	}
+	ImGui::EndChild();
 }
 
 void TitleScreen () {}
@@ -308,7 +369,7 @@ void ProjectScreen (bool* main_switch, Project* project)
 	ControlPanel (project, ProjectTitle);
 	
 	// MAIN BOARD
-	ImGui::BeginChild("Clips", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 0), true);
+	ImGui::BeginChild("Clips", ImVec2(0, 0), true);
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
 
 	// Audio Clips
@@ -412,47 +473,6 @@ void ProjectScreen (bool* main_switch, Project* project)
 	ImGui::PopStyleVar ();
 	ImGui::EndChild ();
 
-	ImGui::SameLine ();
-
-	// DETAILS WINDOW
-	ImGui::BeginChild ("Details", ImVec2(0,0), true);
-	if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
-	if ( project -> getAudio () -> getClipSet() -> size() )
-		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
-	if ( project -> getMIDI () -> getClipSet() -> size() )
-		if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
-	ImGui::Separator();
-	
-	switch (details.context)
-	{
-		case Screen::PROJECT:
-			ImGui::SetNextTreeNodeOpen(true);
-			if (ImGui::CollapsingHeader("Audio Files"))
-				displayAudioClipSet (project, -1);
-			displayMidiClipSet (project);
-			break;
-		case Screen::AUDIOCLIP:
-		{
-			AudioClip * daClip = project -> getAudio () -> getClipSet() -> at(details.audioclip);
-			ImGui::PushItemWidth(100);
-			ImGui::TextColored(ImColor(255,255,0), "%s", daClip -> getName().c_str());
-			ImGui::Text("Location : %s", daClip -> getPath().c_str());
-			ImGui::Separator();
-			ImGui::SliderFloat("volume", daClip -> getVolume(), 0.0f, 1.0f, "%.3f");
-			ImGui::SliderFloat("rate", daClip -> getGUIRateP(), 0.125f, 8.0f, "%.3f"); daClip -> updateRate();
-			ImGui::SliderInt("pitch", daClip -> getGUIPitchP(), -12, 12); daClip -> updatePitch();
-			ImGui::PopItemWidth();
-			//ImGui::PlotLines("DATA", daClip -> getGUIData(), IM_ARRAYSIZE(daClip -> getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
-			//ImGui::Text("size %d", IM_ARRAYSIZE(daClip -> getGUIData()));
-		}
-			break;
-		case Screen::MIDICLIP:
-			displayMidiClipDetails (project -> getMIDI () -> getClipSet() -> at(details.midiclip));
-			break;
-		default:
-			break;
-	}
-	ImGui::EndChild();
 	EndScreen();
 }
 
@@ -472,10 +492,11 @@ void ConsoleScreen (bool* main_switch, Project* project)
 	ControlPanel (project, ConsoleTitle);
 	
 	// TODO : Afficher les pistes
-	ImGui::BeginChild ("Board", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	int w = ressources_panel * width4;
+	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	static int add_a_clip = -1;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
-	{
+	{ // Tracks
 		ImColor child_bg = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
 		std::string logo = "";
 		
@@ -503,7 +524,7 @@ void ConsoleScreen (bool* main_switch, Project* project)
 
 		if ( ImGui::Button("X") ) project -> deleteTrack (i);
 		else
-		{
+		{ // Display Track
 			ImGui::SameLine (); ImGui::Text("%02d", i+1);
 			ImGui::SameLine (); ImGui::Text("%s", logo.c_str());
 			ImGui::SameLine ();
@@ -533,16 +554,15 @@ void ConsoleScreen (bool* main_switch, Project* project)
 			
 			//ImGui::SliderFloat ("Color", project->getTrack(i)->getHueP(), 0.0f, 1.0f);
 			ImGui::Separator ();
-			
 			// Clips
 			for ( unsigned int j=0; j < project -> getTrack(i) -> nClips(); j++)
 			{
+				Clip * clip = project -> getTrack(i) -> getClip(j);
 				ImGui::PushID (j);
-				if ( ImGui::Button(">") ) project -> getTrack(i) -> getClip(j) -> arm() ; 
+				if ( ImGui::Button(">") ) clip -> arm() ; 
 				ImGui::SameLine (); 
-				ImGui::Button (project -> getTrack(i) -> getClip(j) -> getName().c_str(), ImVec2(-1.0f, 0.0f));
+				if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) ressources_panel = true;
 				ImGui::PopID ();
-				
 			}
 			
 			// Empty slot
@@ -591,7 +611,12 @@ void ConsoleScreen (bool* main_switch, Project* project)
 		ImGui::EndPopup ();
 	}
 	ImGui::EndChild ();
-
+	
+	if ( ressources_panel )
+	{
+		ImGui::SameLine ();
+		RessourcesPanel (project);
+	}
 	EndScreen ();
 }
 
