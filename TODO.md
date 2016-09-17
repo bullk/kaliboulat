@@ -3,9 +3,7 @@
 ---------------
 ## MAINTENANT
 
-Panneau de détail des fichiers et clips à isoler pour l'emmener de ProjectScreen vers Console et Sequencer
-
-* entrées (canaux Audio | MIDI | OSC |..., sequenceur, horloge)
+Z* entrées (canaux Audio | MIDI | OSC |..., sequenceur, horloge)
 * finir l'implémentation des Launch / Stop / Loop pour AudioClip
   et l'adapter pour MidiClip
 

@@ -82,7 +82,7 @@ void EndScreen ()
 	ImGui::End();
 }
 
-void mainMenu (bool enabled, bool * main_switch, Project * project)
+void mainMenu (bool clockOn, bool * main_switch, Project * project)
 {
 	static bool about_open = false;
 	static bool new_audio_track = false;
@@ -92,10 +92,10 @@ void mainMenu (bool enabled, bool * main_switch, Project * project)
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New", "Ctrl+N", false, enabled)) {}
-			if (ImGui::MenuItem("Open", "Ctrl+O", false, enabled)) {}
-			if (ImGui::MenuItem("Save", "Ctrl+S", false, enabled)) {}
-			if (ImGui::MenuItem("Save As..", NULL, false, enabled)) {}
+			if (ImGui::MenuItem("New", "Ctrl+N", false, clockOn)) {}
+			if (ImGui::MenuItem("Open", "Ctrl+O", false, clockOn)) {}
+			if (ImGui::MenuItem("Save", "Ctrl+S", false, clockOn)) {}
+			if (ImGui::MenuItem("Save As..", NULL, false, clockOn)) {}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Options")) {}
 			if (ImGui::MenuItem("Quit", "Alt+F4")) *main_switch = false;
@@ -103,16 +103,16 @@ void mainMenu (bool enabled, bool * main_switch, Project * project)
 		}
 		if (ImGui::BeginMenu("Import"))
 		{
-			if (ImGui::MenuItem("Audio File", NULL, false, enabled)) {}
-			if (ImGui::MenuItem("MIDI File", NULL, false, enabled)) {}
+			if (ImGui::MenuItem("Audio File", NULL, false, clockOn)) {}
+			if (ImGui::MenuItem("MIDI File", NULL, false, clockOn)) {}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("New"))
 		{
-			//if (ImGui::MenuItem("Audio Track", "", false, enabled)) project -> addAudioTrack ( "AudioTrack" );
-			//if (ImGui::MenuItem("MIDI Track", "", false, enabled)) project -> addMidiTrack ( "MidiTrack" );
-			if (ImGui::MenuItem("Audio Track", "", false, enabled)) new_audio_track = true;
-			if (ImGui::MenuItem("MIDI Track", "", false, enabled)) new_midi_track = true;
+			//if (ImGui::MenuItem("Audio Track", "", false, clockOn)) project -> addAudioTrack ( "AudioTrack" );
+			//if (ImGui::MenuItem("MIDI Track", "", false, clockOn)) project -> addMidiTrack ( "MidiTrack" );
+			if (ImGui::MenuItem("Audio Track", "", false, clockOn)) new_audio_track = true;
+			if (ImGui::MenuItem("MIDI Track", "", false, clockOn)) new_midi_track = true;
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help"))
@@ -324,9 +324,11 @@ void displayMidiClipSet (Project* project)
 void RessourcesPanel (Project* project)
 {
 	ImGui::BeginChild ("Ressources", ImVec2(0,0), true);
-	if (ImGui::Button ("Files")) details.context = Screen::PROJECT; ImGui::SameLine();
+	if (ImGui::Button ("Files")) details.context = Screen::PROJECT;
+	ImGui::SameLine();
 	if ( project -> getAudio () -> getClipSet() -> size() )
-		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP; ImGui::SameLine();
+		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP;
+	ImGui::SameLine();
 	if ( project -> getMIDI () -> getClipSet() -> size() )
 		if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
 	ImGui::Separator();
@@ -363,8 +365,8 @@ void ProjectTitle ()
 void ProjectScreen (bool* main_switch, Project* project)
 {
 	BeginScreen ();
-	bool enabled = not(project -> getClock() -> getState());
-	mainMenu (enabled, main_switch, project);
+	bool clockOn = not(project -> getClock() -> getState());
+	mainMenu (clockOn, main_switch, project);
 	
 	ControlPanel (project, ProjectTitle);
 	
@@ -486,12 +488,10 @@ void ConsoleTitle ()
 void ConsoleScreen (bool* main_switch, Project* project) 
 {	
 	BeginScreen ();
-	bool enabled = not(project -> getClock() -> getState());
-	mainMenu (enabled, main_switch, project);
-	
+	bool clockOn = not(project -> getClock() -> getState());
+	mainMenu (clockOn, main_switch, project);
 	ControlPanel (project, ConsoleTitle);
 	
-	// TODO : Afficher les pistes
 	int w = ressources_panel * width4;
 	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	static int add_a_clip = -1;
@@ -630,9 +630,20 @@ void SequencerTitle ()
 void SequencerScreen (bool* main_switch, Project* project) 
 {
 	BeginScreen ();
-	bool enabled = not(project -> getClock() -> getState());
-	mainMenu (enabled, main_switch, project);
+	bool clockOn = not(project -> getClock() -> getState());
+	mainMenu (clockOn, main_switch, project);
 	ControlPanel (project, SequencerTitle);
+
+	// TODO : Afficher les pistes
+	int w = ressources_panel * width4;
+	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::EndChild ();
+	
+	if ( ressources_panel )
+	{
+		ImGui::SameLine ();
+		RessourcesPanel (project);
+	}
 	EndScreen ();
 }
 
