@@ -10,15 +10,15 @@ class Clock
 {
 
 private:
-	bool state;
-	std::chrono::time_point<std::chrono::system_clock> startTime;
-	std::chrono::time_point<std::chrono::system_clock> now;
-	long long unsigned int delta;
-	int tempo, ticks_per_beat, beats_per_bar;
-	float tick_duration;
-	int bar, beat, tick;
-	int hour, minute, second;
-	long unsigned int previous_ticks, now_ticks;
+	bool state_;
+	std::chrono::time_point<std::chrono::system_clock> startTime_;
+	std::chrono::time_point<std::chrono::system_clock> now_;
+	long long unsigned int delta_;
+	int tempo_, ticks_per_beat_, beats_per_bar_;
+	float tick_duration_;
+	int bar_, beat_, tick_;
+	int hour_, minute_, second_;
+	long unsigned int previous_ticks_, now_ticks_;
 
 public:
 	Clock ();
@@ -27,14 +27,14 @@ public:
 	void stop ();
 	void rewind ();
 	unsigned int update ();
-	bool getState ();
-	inline bool isStarted () { return state; }
-	int getHour ();
-	int getMinute ();
-	int getSecond ();
-	int getBar ();
-	int getBeat ();
-	int getTick ();
+	bool getState () { return state_; }
+	inline bool isStarted () { return state_; }
+	int getHour () { return hour_; }
+	int getMinute () { return minute_; }
+	int getSecond () { return second_; }
+	int getBar () { return bar_; }
+	int getBeat () { return beat_; }
+	int getTick () { return tick_; }
 
 };
 

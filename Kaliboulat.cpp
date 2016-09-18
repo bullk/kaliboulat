@@ -145,13 +145,13 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
-	cout << "\n----- engine init -----" << endl;
-	State * state;
-	state = State::getInstance ();
-	Waiter * waiter;
-	waiter = Waiter::getInstance ();
+	cout << "----- engine init -----" << endl;
+	cout << "creating State" << endl;
+	State * state = State::getInstance ();
+	cout << "creating Waiter" << endl;
+	Waiter * waiter = Waiter::getInstance ();
 
-	cout << "\n----- project init -----" << endl;
+	cout << endl << "----- project init -----" << endl;
 	// INIT PROJECT
 	Project * project = new Project("test");
 	
@@ -160,7 +160,7 @@ int main( int argc, char* args[] )
 	//project -> addMidiTrack ( "MidiTrack1" );
 	
 	
-	cout << "\n----- audio init -----" << endl;
+	cout << endl << "----- audio init -----" << endl;
 	// AUDIO INIT
 	#ifdef __UNIX_JACK__
 		RtAudio * dac = new RtAudio (RtAudio::UNIX_JACK); // main audio output
@@ -170,7 +170,7 @@ int main( int argc, char* args[] )
 	audioInit (dac, project);
 
 	// MIDI INIT
-	cout << "\n----- MIDI init -----" << endl;
+	cout << endl << "----- MIDI init -----" << endl;
 	cout << "creating RtMidiOut";
 	RtMidiOut * midiout = NULL;
 	RtMidiIn * midiin = NULL;
@@ -223,7 +223,7 @@ int main( int argc, char* args[] )
 	//cout << "...MIDI module" << endl;
 	//midiInit ();
 
-	cout << "\n----- GUI init -----" << endl;
+	cout << endl << "----- GUI init -----" << endl;
 	// GUI INIT
 	#ifdef WITH_GUI
 		if ( GUI_Init () != 0 )	return -1;
@@ -231,7 +231,7 @@ int main( int argc, char* args[] )
 	
 	// MAIN LOOP
 	
-	cout << "\n----- starting main loop -----" << endl;
+	cout << endl << "----- starting main loop -----" << endl;
 	unsigned int midi_ticks = 0;
 	
 	while ( state -> isOn () )
@@ -240,9 +240,6 @@ int main( int argc, char* args[] )
 		if ( project -> getClock () -> getState () ) 
 		{
 			midi_ticks = project -> getClock () -> update ();
-			//char bbt[13];
-			//sprintf (bbt, "%02d:%02d:%03d   ", daClock -> getBar(), daClock -> getBeat(), diApp.clock -> getTick());
-			//std::cout << bbt << midi_ticks << std::endl;
 			// MIDI flow
 			for (unsigned int i=0; i<midi_ticks; i++) 
 				project -> getMIDI () -> tick (midiout);
