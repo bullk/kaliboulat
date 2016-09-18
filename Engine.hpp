@@ -4,6 +4,7 @@
 #include <iostream> // cout, endl
 #include <queue>
 
+
 enum DataType { AUDIO, MIDI, OSC, COM };
 
 class BaseCommand
@@ -27,7 +28,6 @@ class Command : public BaseCommand
 		M method_;
 };
 
-
 class Waiter
 {
 	private:
@@ -35,6 +35,8 @@ class Waiter
 		Waiter ();
 		// Destructor
 		~Waiter ();
+		std::queue<BaseCommand *> bar_, beat_, tick_, main_;
+		static Waiter * singleton_;
 		
 	public:
 		void bar ();
@@ -49,30 +51,21 @@ class Waiter
 		// Singleton
 		static Waiter *getInstance ()
 		{
-			if ( NULL == _singleton )
-				{
-					std::cout << "creating Waiter singleton." << std::endl;
-					_singleton =  new Waiter;
-				}
+			if ( NULL == singleton_ )
+				singleton_ =  new Waiter;
 
-			return _singleton;
+			return singleton_;
 		}
+
 		static void kill ()
 		{
-			if ( NULL != _singleton )
+			if ( NULL != singleton_ )
 				{
-					delete _singleton;
-					_singleton = NULL;
+					delete singleton_;
+					singleton_ = NULL;
 				}
 		}
 	
-	private:
-		std::queue<BaseCommand *> bar_, beat_, tick_, main_;
-		static Waiter * _singleton;
-		
-	};
-
+};
 
 #endif
-
-

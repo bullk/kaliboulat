@@ -13,6 +13,7 @@
 #include "globals.h"
 #include "Clock.hpp"
 #include "Modules.hpp"
+#include "State.hpp"
 
 
 //void SplitFilename (const std::string& str)

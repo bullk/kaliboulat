@@ -1,7 +1,7 @@
 #include "Engine.hpp"
 
 // Initialisation du singleton à NULL
-Waiter *Waiter::_singleton = NULL;
+Waiter *Waiter::singleton_ = NULL;
 
 // Constructor
 Waiter::Waiter ()
@@ -48,4 +48,3 @@ void Waiter::main ()
 		main_.pop();
 	}
 }
-

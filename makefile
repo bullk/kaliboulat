@@ -10,7 +10,7 @@ ALSALIBS = -lasound -lpthread
 JACKLIBS = -ljack
 EXT_OBJS = imgui.o imgui_draw.o imgui_demo.o imgui_impl_sdl.o
 GUI_OBJS = GUI.o
-MAIN_OBJS = Engine.o Clock.o Clip.o Scheduled.o Track.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioClip.o AudioTrack.o Project.o Modules.o Kaliboulat.o
+MAIN_OBJS = Engine.o Clock.o Clip.o Scheduled.o Track.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioClip.o AudioTrack.o Project.o Modules.o State.o Kaliboulat.o
 OBJS = $(EXT_OBJS) $(GUI_OBJS) $(MAIN_OBJS) 
 
 SUFFIXES = .cpp .o 
@@ -37,8 +37,9 @@ MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp MidiFile.hpp MidiTrack.hpp
 MidiFile.o: MidiFile.hpp MidiTrack.hpp
 MidiTrack.o: MidiTrack.hpp MidiClip.hpp Track.hpp
 Modules.o: Modules.hpp AudioTrack.hpp MidiTrack.hpp
-Project.o: Project.hpp globals.h Clock.hpp Modules.hpp
+Project.o: Project.hpp globals.h Clock.hpp Modules.hpp State.hpp
 Scheduled.o: Scheduled.hpp
+State.o: State.hpp Track.hpp
 Track.o: Track.hpp Clip.hpp
 
 .cpp.o:

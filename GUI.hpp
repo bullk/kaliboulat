@@ -36,7 +36,7 @@ class GUI
 
 int GUI_Init();
 void GUI_Close();
-void GUI_Main(bool*, Project*);
+void GUI_Main(Project * project);
 
 
 #endif

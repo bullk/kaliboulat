@@ -82,37 +82,38 @@ void EndScreen ()
 	ImGui::End();
 }
 
-void mainMenu (bool clockOn, bool * main_switch, Project * project)
+void mainMenu (Project * project)
 {
 	static bool about_open = false;
 	static bool new_audio_track = false;
 	static bool new_midi_track = false;
+	bool menu_mask = not(project -> getClock() -> getState());
 	
 	if (ImGui::BeginMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New", "Ctrl+N", false, clockOn)) {}
-			if (ImGui::MenuItem("Open", "Ctrl+O", false, clockOn)) {}
-			if (ImGui::MenuItem("Save", "Ctrl+S", false, clockOn)) {}
-			if (ImGui::MenuItem("Save As..", NULL, false, clockOn)) {}
+			if (ImGui::MenuItem("New", "Ctrl+N", false, menu_mask)) {}
+			if (ImGui::MenuItem("Open", "Ctrl+O", false, menu_mask)) {}
+			if (ImGui::MenuItem("Save", "Ctrl+S", false, menu_mask)) {}
+			if (ImGui::MenuItem("Save As..", NULL, false, menu_mask)) {}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Options")) {}
-			if (ImGui::MenuItem("Quit", "Alt+F4")) *main_switch = false;
+			if (ImGui::MenuItem("Quit", "Alt+F4")) State::getInstance() -> halt();
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Import"))
 		{
-			if (ImGui::MenuItem("Audio File", NULL, false, clockOn)) {}
-			if (ImGui::MenuItem("MIDI File", NULL, false, clockOn)) {}
+			if (ImGui::MenuItem("Audio File", NULL, false, menu_mask)) {}
+			if (ImGui::MenuItem("MIDI File", NULL, false, menu_mask)) {}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("New"))
 		{
-			//if (ImGui::MenuItem("Audio Track", "", false, clockOn)) project -> addAudioTrack ( "AudioTrack" );
-			//if (ImGui::MenuItem("MIDI Track", "", false, clockOn)) project -> addMidiTrack ( "MidiTrack" );
-			if (ImGui::MenuItem("Audio Track", "", false, clockOn)) new_audio_track = true;
-			if (ImGui::MenuItem("MIDI Track", "", false, clockOn)) new_midi_track = true;
+			//if (ImGui::MenuItem("Audio Track", "", false, menu_mask)) project -> addAudioTrack ( "AudioTrack" );
+			//if (ImGui::MenuItem("MIDI Track", "", false, menu_mask)) project -> addMidiTrack ( "MidiTrack" );
+			if (ImGui::MenuItem("Audio Track", "", false, menu_mask)) new_audio_track = true;
+			if (ImGui::MenuItem("MIDI Track", "", false, menu_mask)) new_midi_track = true;
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help"))
@@ -362,12 +363,10 @@ void ProjectTitle ()
 	ImGui::Text("  #   # #  #  #   ##  ##  #");
 }
 
-void ProjectScreen (bool* main_switch, Project* project)
+void ProjectScreen (Project* project)
 {
 	BeginScreen ();
-	bool clockOn = not(project -> getClock() -> getState());
-	mainMenu (clockOn, main_switch, project);
-	
+	mainMenu (project);
 	ControlPanel (project, ProjectTitle);
 	
 	// MAIN BOARD
@@ -485,11 +484,10 @@ void ConsoleTitle ()
 	ImGui::Text("   ##  #  # # #    #  ## ##");
 }
 
-void ConsoleScreen (bool* main_switch, Project* project) 
+void ConsoleScreen (Project* project) 
 {	
 	BeginScreen ();
-	bool clockOn = not(project -> getClock() -> getState());
-	mainMenu (clockOn, main_switch, project);
+	mainMenu (project);
 	ControlPanel (project, ConsoleTitle);
 	
 	int w = ressources_panel * width4;
@@ -497,18 +495,19 @@ void ConsoleScreen (bool* main_switch, Project* project)
 	static int add_a_clip = -1;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{ // Tracks
+		Track * track = project -> getTrack(i);
 		ImColor child_bg = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
 		std::string logo = "";
 		
-		switch ( project -> getTrack(i) -> getType () )
+		switch ( track -> getType () )
 		{
 		case Track::AUDIO:
-			child_bg = ImColor::HSV(project -> getTrack(i) -> getHue (), 0.4f, 0.2f, 1.00f);
-			logo = "~ "; 
+			child_bg = ImColor::HSV(track -> getHue (), 0.4f, 0.2f, 1.00f);
+			logo = " Audio "; 
 			break;
 		case Track::MIDI:
-			child_bg = ImColor::HSV(project -> getTrack(i) -> getHue (), 0.4f, 0.2f, 1.00f);
-			logo = "# ";
+			child_bg = ImColor::HSV(track -> getHue (), 0.4f, 0.2f, 1.00f);
+			logo = " MIDI ";
 			break;
 		default:
 			break;
@@ -539,14 +538,14 @@ void ConsoleScreen (bool* main_switch, Project* project)
 			else
 				if ( ImGui::Button(">") ) project -> swapTracks (i, i+1);
 			
-			ImGui::Text ( "%s", project -> getTrack(i) -> getName().c_str() );
+			ImGui::Text ( "%s", track -> getName().c_str() );
 			if ( ImGui::BeginPopupContextItem ("rename track") )
 			{
 				char buf[20];
-				sprintf (buf, "%s", project -> getTrack(i) -> getName().c_str());
+				sprintf (buf, "%s", track -> getName().c_str());
 				if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 				{
-					project -> getTrack(i) -> setName(buf);
+					track -> setName(buf);
 					ImGui::CloseCurrentPopup ();
 				}
 				ImGui::EndPopup ();
@@ -555,13 +554,18 @@ void ConsoleScreen (bool* main_switch, Project* project)
 			//ImGui::SliderFloat ("Color", project->getTrack(i)->getHueP(), 0.0f, 1.0f);
 			ImGui::Separator ();
 			// Clips
-			for ( unsigned int j=0; j < project -> getTrack(i) -> nClips(); j++)
+			for ( unsigned int j=0; j < track -> nClips(); j++)
 			{
-				Clip * clip = project -> getTrack(i) -> getClip(j);
+				Clip * clip = track -> getClip(j);
 				ImGui::PushID (j);
 				if ( ImGui::Button(">") ) clip -> arm() ; 
 				ImGui::SameLine (); 
-				if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) ressources_panel = true;
+				if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
+				{
+					State::getInstance() -> setTrack(track); 
+					State::getInstance() -> setClip(clip); 
+					ressources_panel = true;
+				}
 				ImGui::PopID ();
 			}
 			
@@ -627,11 +631,10 @@ void SequencerTitle ()
 	ImGui::Text("#   ##  ## ##  ## # #  ## ## # #");
 }
 
-void SequencerScreen (bool* main_switch, Project* project) 
+void SequencerScreen (Project* project) 
 {
 	BeginScreen ();
-	bool clockOn = not(project -> getClock() -> getState());
-	mainMenu (clockOn, main_switch, project);
+	mainMenu (project);
 	ControlPanel (project, SequencerTitle);
 
 	// TODO : Afficher les pistes
@@ -650,7 +653,7 @@ void SequencerScreen (bool* main_switch, Project* project)
 //======================================================================
 
 
-void GUI_Main(bool* main_switch, Project* project)
+void GUI_Main(Project* project)
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -659,7 +662,7 @@ void GUI_Main(bool* main_switch, Project* project)
 		switch ( event.type )
 		{
 			case SDL_QUIT:
-				*main_switch = false;
+				State::getInstance() -> halt();
 				break;
 				
 			case SDL_KEYDOWN:
@@ -710,15 +713,15 @@ void GUI_Main(bool* main_switch, Project* project)
 	switch ( details.type )
 	{
 		case Screen::RESSOURCES:
-			ProjectScreen (main_switch, project);
+			ProjectScreen (project);
 			break;
 			
 		case Screen::CONSOLE:
-			ConsoleScreen (main_switch, project);
+			ConsoleScreen (project);
 			break;
 		
 		case Screen::SEQUENCER:
-			SequencerScreen (main_switch, project);
+			SequencerScreen (project);
 			break;
 		
 		default:

@@ -79,12 +79,16 @@ void Project::updateRessources ()
 
 void Project::addAudioTrack ( std::string s )
 {
-	tracks_.push_back ( audio_ -> addTrack (s) );
+	Track * track = audio_ -> addTrack (s);
+	tracks_.push_back (track);
+	State::getInstance() -> setTrack(track);
 }
 
 void Project::addMidiTrack ( std::string s )
 {
-	tracks_.push_back ( midi_ -> addTrack (s) );
+	Track * track = midi_ -> addTrack (s);
+	tracks_.push_back (track);
+	State::getInstance() -> setTrack(track);
 }
 
 void Project::deleteTrack (unsigned int i)

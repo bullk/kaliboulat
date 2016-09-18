@@ -3,7 +3,7 @@
 ---------------
 ## MAINTENANT
 
-Z* entrées (canaux Audio | MIDI | OSC |..., sequenceur, horloge)
+* entrées (canaux Audio | MIDI | OSC |..., sequenceur, horloge)
 * finir l'implémentation des Launch / Stop / Loop pour AudioClip
   et l'adapter pour MidiClip
 

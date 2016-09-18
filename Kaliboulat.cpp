@@ -146,6 +146,8 @@ void audioClose (RtAudio * dac)
 int main( int argc, char* args[] )
 {
 	cout << "\n----- engine init -----" << endl;
+	State * state;
+	state = State::getInstance ();
 	Waiter * waiter;
 	waiter = Waiter::getInstance ();
 
@@ -231,9 +233,8 @@ int main( int argc, char* args[] )
 	
 	cout << "\n----- starting main loop -----" << endl;
 	unsigned int midi_ticks = 0;
-	bool main_switch = true;
 	
-	while (main_switch)
+	while ( state -> isOn () )
 	{
 		// Clock update
 		if ( project -> getClock () -> getState () ) 
@@ -252,7 +253,7 @@ int main( int argc, char* args[] )
 		
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (&main_switch, project);
+			GUI_Main (project);
 		#endif
 
 	}
