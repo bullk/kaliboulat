@@ -7,7 +7,6 @@
 class Clip
 {
 public:	
-	enum ClipType { AUDIO, MIDI, OSC, COM };
 	enum ClipState { HALTED, ARMED, PLAYING, RECORDING };
 	enum LaunchStyle { BAR, BEAT, FREE, RESYNC };
 	enum LoopStyle { ONESHOT, MANY, FOREVER };
@@ -29,7 +28,7 @@ public:
 	//virtual int getAngle (void) = 0;
    
 protected:
-	ClipType m_type;
+	DataType m_type;
 	ClipState state_;
 	std::string path_;
 	std::string name_;

@@ -97,10 +97,10 @@ void Project::deleteTrack (unsigned int i)
 	tracks_.erase (tracks_.begin() + i);
 	switch ( track -> getType () )
 	{
-	case Track::AUDIO:
+	case AUDIO:
 		audio_ -> deleteTrack ((AudioTrack *)track);
 		break;
-	case Track::MIDI:
+	case MIDI:
 		midi_ -> deleteTrack ((MidiTrack *)track);
 		break;
 	default:

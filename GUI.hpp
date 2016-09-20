@@ -19,11 +19,15 @@
 
 struct Screen
 {
-	enum Type { TITLE, RESSOURCES, CONSOLE, SEQUENCER };
-	enum Context { NONE, PROJECT, AUDIOCLIP, MIDICLIP }; 
+	enum Type { TITLE, PROJECT, CONSOLE, SEQUENCER };
+	enum Context { NONE, RESSOURCES, AUDIOCLIP, MIDICLIP }; 
 	Type type;
 	Context context;
 	unsigned int audioclip, midiclip;
+	std::string dragged_audio_file;
+	Clip * selected_clip;
+	Track * selected_track;
+	
 };
 
 class GUI

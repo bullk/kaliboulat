@@ -9,6 +9,7 @@
 AudioTrack::AudioTrack (std::string s) : Track (s)
 {
 	type_ = AUDIO;
+	type_str_ = "Audio";
 	clipset_ = new std::vector<AudioClip *>;
 	volume_ = 1.0f;
 	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
@@ -21,7 +22,7 @@ AudioTrack::AudioTrack (std::string s) : Track (s)
 
 AudioTrack::~AudioTrack ()
 {
-    //delete each audio file object (and corresponding buffer, etc.)
+	std::cout << "~AudioTrack()" << std::endl;
 	if ( clipset_ != NULL )
 		for (unsigned int i=0; i < clipset_ -> size(); i++)
 			delete clipset_ -> at (i);
@@ -32,9 +33,9 @@ AudioTrack::~AudioTrack ()
 // Add a clip
 //------------
 
-void AudioTrack::addClip (std::string path)
+void AudioTrack::addClip (AudioClip * clip)
 {
-	clipset_ -> push_back (new AudioClip(path));
+	clipset_ -> push_back (clip);
 }
 
 void AudioTrack::deleteClip (unsigned int i)
@@ -57,9 +58,9 @@ stk::StkFloat AudioTrack::tick()
 	sample = 0;
 	for ( unsigned int j = 0; j < clipset_ -> size (); j++ )
 	{
-		AudioClip * daClip = clipset_ -> at (j);
-		if ( daClip -> isPlaying () )
-			sample += daClip -> tick () * *(daClip -> getVolume ());
+		AudioClip * clip = clipset_ -> at (j);
+		if ( clip -> isPlaying () )
+			sample += clip -> tick () * *(clip -> getVolume ());
 	}
 	return sample;
 }

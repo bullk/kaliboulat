@@ -6,10 +6,12 @@ using namespace std;
 SDL_GLContext glcontext;
 SDL_Window * window = NULL;
 ImVec4 clear_color;
-Screen details = { Screen::CONSOLE, Screen::PROJECT, 0, 0 };
+Screen details = { Screen::CONSOLE, Screen::RESSOURCES, 0, 0, "", NULL, NULL };
 
 int width1, width2, width3, width4, width5;
+
 bool ressources_panel = true;
+bool action_drag_clip = false;
 
 int GUI_Init ()
 {
@@ -67,12 +69,17 @@ void BeginScreen ()
 	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
 	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 5.0f);
 	
-	width1 = (int)ImGui::GetIO().DisplaySize.x / 6;
-	width2 = (int)ImGui::GetIO().DisplaySize.x / 3;
-	width3 = (int)ImGui::GetIO().DisplaySize.x / 2;
-	width4 = 2 * (int)ImGui::GetIO().DisplaySize.x / 3;
-	width5 = 5 * (int)ImGui::GetIO().DisplaySize.x / 6;
-
+	//width1 = (int)ImGui::GetIO().DisplaySize.x / 6;
+	//width2 = (int)ImGui::GetIO().DisplaySize.x / 3;
+	//width3 = (int)ImGui::GetIO().DisplaySize.x / 2;
+	//width4 = 2 * (int)ImGui::GetIO().DisplaySize.x / 3;
+	//width5 = 5 * (int)ImGui::GetIO().DisplaySize.x / 6;
+	int w = (int) ImGui::GetWindowContentRegionWidth();
+	width1 = w / 6;
+	width2 = w / 3;
+	width3 = w / 2;
+	width4 = 2 * w / 3;
+	width5 = 5 * w / 6;
 }
 
 void EndScreen ()
@@ -297,12 +304,11 @@ void displayAudioClipDetails (AudioClip * clip)
 
 int displayAudioClipSet (Project* project, int selected)
 {
-		vector<std::string> * list = NULL;
-		list = project -> getAudioFiles ();
-		int res = selected;
-		for (unsigned int i=0; i < list -> size(); i++ )
-			if ( ImGui::Selectable(list -> at(i).c_str(), int(i)==selected) ) res = i;
-		return res;
+	vector<std::string> * list = project -> getAudioFiles ();
+	int res = selected;
+	for (unsigned int i=0; i < list -> size(); i++ )
+		if ( ImGui::Selectable(list -> at(i).c_str(), int(i)==selected) ) res = i;
+	return res;
 }
 	
 void displayMidiClipSet (Project* project)
@@ -322,25 +328,99 @@ void displayMidiClipSet (Project* project)
 	}
 }
 
+bool ChooseButton () 
+{
+	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.4f, 0.4f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+	bool res = ImGui::Button("CHOOSE");
+	ImGui::PopStyleColor(3);
+	return res;
+}
+
+bool HearButton ()
+{
+	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(4/7.0f, 0.4f, 0.4f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(4/7.0f, 0.6f, 0.6f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(4/7.0f, 0.8f, 0.8f));
+	bool res = ImGui::Button("HEAR");
+	ImGui::PopStyleColor(3);
+	return res;
+}
+
+static void DragClipOverlay (std::string, bool* p_open)
+{
+    ImGui::SetNextWindowPos (ImVec2(ImGui::GetIO().MousePos.x + 5, ImGui::GetIO().MousePos.y + 5));
+    if (!ImGui::Begin("Drag Clip Overlay", p_open, ImVec2(0,0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings))
+    {
+        ImGui::End();
+        return;
+    }
+    ImGui::Text("%s", details.dragged_audio_file.c_str());
+    ImGui::End();
+}
+
 void RessourcesPanel (Project* project)
 {
-	ImGui::BeginChild ("Ressources", ImVec2(0,0), true);
-	if (ImGui::Button ("Files")) details.context = Screen::PROJECT;
-	ImGui::SameLine();
-	if ( project -> getAudio () -> getClipSet() -> size() )
-		if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP;
-	ImGui::SameLine();
-	if ( project -> getMIDI () -> getClipSet() -> size() )
-		if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
-	ImGui::Separator();
+	ImGui::BeginChild ("Ressources", ImVec2(width1,0), true);
+	//ImGui::SameLine();
+	//if ( project -> getAudio () -> getClipSet() -> size() )
+		//if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP;
+	//ImGui::SameLine();
+	//if ( project -> getMIDI () -> getClipSet() -> size() )
+		//if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
 	
 	switch (details.context)
 	{
-		case Screen::PROJECT:
+		case Screen::RESSOURCES:
+		{
+			//State * state = State::getInstance();
+			//if (ImGui::Button ("Files")) details.context = Screen::RESSOURCES;
+			//ImGui::Separator();
 			ImGui::SetNextTreeNodeOpen(true);
 			if (ImGui::CollapsingHeader("Audio Files"))
-				displayAudioClipSet (project, -1);
-			displayMidiClipSet (project);
+			{
+				//AudioTrack * track = (AudioTrack *) state -> getTrack();
+				vector<std::string> * list = project -> getAudioFiles ();
+				//for ( unsigned int i=0; i < list -> size(); i++ )
+				//{
+					//ImGui::PushID(i);
+					//if ( ChooseButton () ) {
+						//std::string path = project -> getAudioDir() + "/" + project -> getAudioFiles() -> at(i).c_str();
+						//std::cout << "adding Audioclip " << path << " to Track " << track -> getName () << endl;
+						//AudioClip * clip = new AudioClip (path);
+						//track -> addClip (clip);
+						//std::cout << "Track has " << track -> nClips() << " clips" << endl;
+					//}
+					//ImGui::SameLine ();
+					//HearButton ();
+					//ImGui::SameLine ();
+					//ImGui::Text ("%s", list -> at(i).c_str());
+					//ImGui::PopID ();
+				//}
+				// DRAGGABLE CLIP
+				for ( unsigned int i=0; i < list -> size(); i++ )
+				{
+					//ImGui::PushID(i);
+					ImGui::Selectable (list -> at(i).c_str());
+					if ( ImGui::IsItemActive() )
+					{
+						if ( ImGui::IsMouseDragging() )
+						{
+							action_drag_clip = true;
+							details.dragged_audio_file = list -> at(i);
+						}
+						else
+						{
+							action_drag_clip = false;
+							details.dragged_audio_file = "";
+						}
+					}
+					//ImGui::PopID();
+				}
+			}
+			//displayMidiClipSet (project);
+		}
 			break;
 		case Screen::AUDIOCLIP:
 			displayAudioClipDetails (project -> getAudio () -> getClipSet() -> at(details.audioclip));
@@ -490,42 +570,49 @@ void ConsoleScreen (Project* project)
 	mainMenu (project);
 	ControlPanel (project, ConsoleTitle);
 	
-	int w = ressources_panel * width4;
+	if ( ressources_panel )
+	{
+		RessourcesPanel (project);
+		ImGui::SameLine ();
+	}
+	int w = ressources_panel * width5;
 	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-	static int add_a_clip = -1;
+	//static int add_a_clip = -1;
+	Track * asking_track = NULL;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{ // Tracks
+		
+		//switch ( track -> getType () )
+		//{
+		//case AUDIO:
+			//break;
+		//case MIDI:
+			//break;
+		//default:
+			//break;
+		//}
+		
 		Track * track = project -> getTrack(i);
-		ImColor child_bg = ImColor::HSV(0.0f, 1.0f, 1.0f, 1.0f);
-		std::string logo = "";
+		std::string type_str = " " + track -> getTypeStr () + " ";
+		float value = 0.2f;
+		if ( details.selected_track == track ) value = 0.4f;
+		ImColor track_bg = ImColor::HSV(track -> getHue (), 0.5f, value, 1.00f);
+		char child_id[32];
+		sprintf(child_id, "Track%03d", i*5731);
 		
-		switch ( track -> getType () )
-		{
-		case Track::AUDIO:
-			child_bg = ImColor::HSV(track -> getHue (), 0.4f, 0.2f, 1.00f);
-			logo = " Audio "; 
-			break;
-		case Track::MIDI:
-			child_bg = ImColor::HSV(track -> getHue (), 0.4f, 0.2f, 1.00f);
-			logo = " MIDI ";
-			break;
-		default:
-			break;
-		}
-		
-		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
-		//ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-		ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, child_bg);
 		if ( i > 0 ) ImGui::SameLine ();
-		char buf[32];
-		sprintf(buf, "Track%03d", i*5731);
-		ImGui::BeginChild (buf, ImVec2(150, 0), true);
 
+		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
+		ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, track_bg);
+		ImGui::BeginChild (child_id, ImVec2(150, 0), true);
+		//if ( action_drag_clip and ImGui::IsMouseHoveringWindow () ) asking_track = track;
+		if ( ImGui::IsMouseHoveringWindow () ) asking_track = track;
+		 
 		if ( ImGui::Button("X") ) project -> deleteTrack (i);
 		else
 		{ // Display Track
 			ImGui::SameLine (); ImGui::Text("%02d", i+1);
-			ImGui::SameLine (); ImGui::Text("%s", logo.c_str());
+			ImGui::SameLine (); ImGui::Text("%s", type_str.c_str());
 			ImGui::SameLine ();
 			if ( i == 0 ) 
 				ImGui::Button(" ");
@@ -562,28 +649,54 @@ void ConsoleScreen (Project* project)
 				ImGui::SameLine (); 
 				if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
 				{
-					State::getInstance() -> setTrack(track); 
-					State::getInstance() -> setClip(clip); 
+					State::getInstance() -> setTrack (track); 
+					State::getInstance() -> setClip (clip); 
 					ressources_panel = true;
 				}
 				ImGui::PopID ();
 			}
 			
 			// Empty slot
-			ImGui::PushID (i);
-			ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.0f, 1.00f));
-			ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.3f, 1.00f));
-			ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.6f, 1.00f));
-			if ( ImGui::Button("Add a clip", ImVec2(-1.0f, 0.0f)) ) add_a_clip = i;
-			ImGui::PopStyleColor (3);
-			
-			ImGui::PopID ();
+			//ImGui::PushID (i);
+			//ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.0f, 1.00f));
+			//ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.3f, 1.00f));
+			//ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.6f, 1.00f));
+			//if ( ImGui::Button("Add a clip", ImVec2(-1.0f, 0.0f)) )
+			//{
+				//details.context = Screen::RESSOURCES;
+				//ressources_panel = true;
+				//State::getInstance() -> setTrack (track);
+			//}
+			//ImGui::PopStyleColor (3);
+			//
+			//ImGui::PopID ();
 		}
 		
 		ImGui::EndChild ();
 		ImGui::PopStyleColor ();
 		ImGui::PopStyleVar ();
 	}
+	if ( details.selected_track != asking_track ) details.selected_track = asking_track;
+	if ( ImGui::IsMouseReleased(0) )
+	{
+		cout << "mouse released" << endl;
+		if ( action_drag_clip )
+		{
+			cout << "releasing clip" << endl;
+			if ( details.selected_track )
+			{
+				std::string path = project -> getAudioDir() + "/" + details.dragged_audio_file.c_str();
+				std::cout << "adding Audioclip " << path << " to Track " << details.selected_track -> getName () << endl;
+				AudioClip * clip = new AudioClip (path);
+				details.selected_track -> addClip (clip);
+				std::cout << "Track has " << details.selected_track -> nClips() << " clips" << endl;
+			}
+			details.dragged_audio_file = "";
+			action_drag_clip = false;
+		}
+	}
+	if ( action_drag_clip ) DragClipOverlay (details.dragged_audio_file, &action_drag_clip);
+	/* MODAL POPUP "Add a clip"
 	if ( add_a_clip != -1 ) ImGui::OpenPopup ("Add audio clip");
 	if ( ImGui::BeginPopupModal ("Add audio clip", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
 	{
@@ -600,7 +713,7 @@ void ConsoleScreen (Project* project)
 		}
 		else if ( ImGui::Button ("OK", ImVec2(80,0)) ) 
 		{
-			project -> getTrack(add_a_clip) -> addClip ( project->getAudioDir() + "/" + project -> getAudioFiles() -> at(selected_clip).c_str() );
+			project -> getTrack(add_a_clip) -> addClip ( new AudioClip ( project -> getAudioDir() + "/" + project -> getAudioFiles() -> at(selected_clip).c_str() ) );
 			ImGui::CloseCurrentPopup ();
 			add_a_clip = -1;
 			selected_clip = -1;
@@ -613,14 +726,10 @@ void ConsoleScreen (Project* project)
 			selected_clip = -1;
 		}
 		ImGui::EndPopup ();
-	}
+	} 
+	*/
 	ImGui::EndChild ();
 	
-	if ( ressources_panel )
-	{
-		ImGui::SameLine ();
-		RessourcesPanel (project);
-	}
 	EndScreen ();
 }
 
@@ -637,16 +746,16 @@ void SequencerScreen (Project* project)
 	mainMenu (project);
 	ControlPanel (project, SequencerTitle);
 
+	if ( ressources_panel )
+	{
+		RessourcesPanel (project);
+		ImGui::SameLine ();
+	}
 	// TODO : Afficher les pistes
-	int w = ressources_panel * width4;
+	int w = ressources_panel * width5;
 	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	ImGui::EndChild ();
 	
-	if ( ressources_panel )
-	{
-		ImGui::SameLine ();
-		RessourcesPanel (project);
-	}
 	EndScreen ();
 }
 
@@ -669,7 +778,7 @@ void GUI_Main(Project* project)
 				switch ( event.key.keysym.scancode )
 				{
 					case SDL_SCANCODE_F1:
-						details.type = Screen::RESSOURCES;
+						details.type = Screen::PROJECT;
 						break;
 					case SDL_SCANCODE_F2:
 						details.type = Screen::CONSOLE;

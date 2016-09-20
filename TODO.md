@@ -16,6 +16,10 @@
 	* Enregistrer
 * Clip Warp
 	
+### C/C++
+
+* fonctions 'static'
+
 ### Architecture / Moteur
 
 * Playlist / TrackList

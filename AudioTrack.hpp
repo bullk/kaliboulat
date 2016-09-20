@@ -1,6 +1,7 @@
 #ifndef INC_AUDIOTRACK_H
 #define INC_AUDIOTRACK_H
 
+//#include <iostream> // cout, endl
 #include <string>
 #include <vector>
 #include <RtAudio.h>
@@ -17,7 +18,7 @@ public:
 	// Destructor 
 	~AudioTrack ();
 
-    void addClip (std::string path);
+    void addClip (AudioClip * clip);
     void deleteClip (unsigned int i);
     inline AudioClip * getClip (unsigned int i) { return clipset_ -> at(i); }
     inline unsigned int nClips () { return clipset_ -> size(); }

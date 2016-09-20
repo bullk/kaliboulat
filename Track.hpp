@@ -8,20 +8,19 @@ class Track
 {
 	
 public:
-	enum TrackType { AUDIO, MIDI, OSC, COM };
-	
 	// Constructor 
 	Track (std::string s);
 	// Destructor 
 	virtual ~Track ();
 
-	inline TrackType getType () { return type_; }
+	inline DataType getType () { return type_; }
+	inline std::string getTypeStr () { return type_str_; }
 	inline std::string getName () { return name_; }
 	inline void setName (std::string s) { name_ = s; }
 	inline void setState (bool b) { state_ = b; }
 	inline void muteSwitch () { state_ = not(state_); }
 	inline bool isPlaying () { return state_; }
-    virtual void addClip (std::string path) = 0;
+    virtual void addClip (Clip * clip) {};
     virtual void deleteClip (unsigned int i) = 0;
     virtual Clip * getClip (unsigned int i) = 0;
     virtual unsigned int nClips () = 0;
@@ -31,7 +30,8 @@ public:
 	inline void setHue (float f) { hue_ = f; }
     
 protected:
-	TrackType type_;
+	DataType type_;
+	std::string type_str_;
 	std::string name_;
 	bool state_;
 	float hue_ = 0.0f;
