@@ -10,7 +10,7 @@ ALSALIBS = -lasound -lpthread
 JACKLIBS = -ljack
 EXT_OBJS = imgui.o imgui_draw.o imgui_demo.o imgui_impl_sdl.o
 GUI_OBJS = GUI.o
-MAIN_OBJS = Engine.o Clock.o Clip.o Scheduled.o Track.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioClip.o AudioTrack.o Project.o Modules.o State.o Kaliboulat.o
+MAIN_OBJS = Engine.o Clock.o Clip.o Scheduled.o Track.o midi.o MidiClip.o MidiTrack.o MidiFile.o AudioClip.o AudioTrack.o Project.o Modules.o State.o Listener.o Kaliboulat.o
 OBJS = $(EXT_OBJS) $(GUI_OBJS) $(MAIN_OBJS) 
 
 SUFFIXES = .cpp .o 
@@ -30,10 +30,11 @@ AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp
 Clip.o: Clip.hpp Engine.hpp
 Clock.o: Clock.hpp
 Engine.o: Engine.hpp Engine.cpp
-GUI.o: GUI.hpp Clock.hpp Modules.hpp MidiTrack.hpp Project.hpp MidiFile.hpp
+GUI.o: GUI.hpp Project.hpp Listener.hpp
 GUI.o: imgui/imgui.h imgui/imgui_impl_sdl.h
+Listener.o: Listener.hpp AudioClip.hpp
 midi.o: midi.hpp Scheduled.hpp
-MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp MidiFile.hpp MidiTrack.hpp
+MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp
 MidiFile.o: MidiFile.hpp MidiTrack.hpp
 MidiTrack.o: MidiTrack.hpp MidiClip.hpp Track.hpp
 Modules.o: Modules.hpp AudioTrack.hpp MidiTrack.hpp
@@ -47,16 +48,3 @@ Track.o: Track.hpp Clip.hpp
 	
 clean:
 	rm $(MAIN_OBJS) $(GUI_OBJS)
-
-#AudioTrack
-#Clip
-#Clock
-#GUI
-#midi
-#MidiClip
-#MidiFile
-#MidiTrack
-#Modules
-#Project
-#Scheduled
-#Track

@@ -95,7 +95,7 @@ void Project::deleteTrack (unsigned int i)
 {
 	Track * track = tracks_[i];
 	tracks_.erase (tracks_.begin() + i);
-	switch ( track -> getType () )
+	switch ( track -> dataType () )
 	{
 	case AUDIO:
 		audio_ -> deleteTrack ((AudioTrack *)track);

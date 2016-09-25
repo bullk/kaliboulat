@@ -6,7 +6,7 @@
 
 MidiTrack::MidiTrack (std::string s) : Track (s)
 {
-	type_ = MIDI;
+	data_type_ = MIDI;
 	type_str_ = "MIDI";
 	clipset_ = new std::vector<MidiClip *>;
 	hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
@@ -32,6 +32,11 @@ MidiTrack::~MidiTrack ()
 //------------
 // Add a clip
 //------------
+
+void MidiTrack::addClip (Clip * clip)
+{
+	addClip ( (MidiClip *) clip );
+}
 
 void MidiTrack::addClip(MidiClip * daClip)
 {

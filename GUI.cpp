@@ -1,4 +1,5 @@
-//#include <typeinfo>
+#include <typeinfo>
+#include <unistd.h> // sleep
 #include "GUI.hpp"
 
 using namespace std;
@@ -363,46 +364,22 @@ static void DragClipOverlay (std::string, bool* p_open)
 void RessourcesPanel (Project* project)
 {
 	ImGui::BeginChild ("Ressources", ImVec2(width1,0), true);
-	//ImGui::SameLine();
-	//if ( project -> getAudio () -> getClipSet() -> size() )
-		//if (ImGui::Button ("Audio Clip")) details.context = Screen::AUDIOCLIP;
-	//ImGui::SameLine();
-	//if ( project -> getMIDI () -> getClipSet() -> size() )
-		//if (ImGui::Button ("MIDI Clip")) details.context = Screen::MIDICLIP;
 	
 	switch (details.context)
 	{
 		case Screen::RESSOURCES:
-		{
-			//State * state = State::getInstance();
-			//if (ImGui::Button ("Files")) details.context = Screen::RESSOURCES;
-			//ImGui::Separator();
 			ImGui::SetNextTreeNodeOpen(true);
 			if (ImGui::CollapsingHeader("Audio Files"))
 			{
-				//AudioTrack * track = (AudioTrack *) state -> getTrack();
 				vector<std::string> * list = project -> getAudioFiles ();
-				//for ( unsigned int i=0; i < list -> size(); i++ )
-				//{
-					//ImGui::PushID(i);
-					//if ( ChooseButton () ) {
-						//std::string path = project -> getAudioDir() + "/" + project -> getAudioFiles() -> at(i).c_str();
-						//std::cout << "adding Audioclip " << path << " to Track " << track -> getName () << endl;
-						//AudioClip * clip = new AudioClip (path);
-						//track -> addClip (clip);
-						//std::cout << "Track has " << track -> nClips() << " clips" << endl;
-					//}
-					//ImGui::SameLine ();
-					//HearButton ();
-					//ImGui::SameLine ();
-					//ImGui::Text ("%s", list -> at(i).c_str());
-					//ImGui::PopID ();
-				//}
-				// DRAGGABLE CLIP
 				for ( unsigned int i=0; i < list -> size(); i++ )
 				{
-					//ImGui::PushID(i);
-					ImGui::Selectable (list -> at(i).c_str());
+					if ( ImGui::Selectable (list -> at(i).c_str()) )
+					{
+						cout << "selecting " << list -> at(i).c_str() << endl;
+						Listener::openFile (project -> getAudioDir() + "/" + list -> at(i));
+					}
+					
 					if ( ImGui::IsItemActive() )
 					{
 						if ( ImGui::IsMouseDragging() )
@@ -416,17 +393,9 @@ void RessourcesPanel (Project* project)
 							details.dragged_audio_file = "";
 						}
 					}
-					//ImGui::PopID();
 				}
 			}
 			//displayMidiClipSet (project);
-		}
-			break;
-		case Screen::AUDIOCLIP:
-			displayAudioClipDetails (project -> getAudio () -> getClipSet() -> at(details.audioclip));
-			break;
-		case Screen::MIDICLIP:
-			displayMidiClipDetails (project -> getMIDI () -> getClipSet() -> at(details.midiclip));
 			break;
 		default:
 			break;
@@ -577,7 +546,6 @@ void ConsoleScreen (Project* project)
 	}
 	int w = ressources_panel * width5;
 	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-	//static int add_a_clip = -1;
 	Track * asking_track = NULL;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{ // Tracks
@@ -605,6 +573,7 @@ void ConsoleScreen (Project* project)
 		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
 		ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, track_bg);
 		ImGui::BeginChild (child_id, ImVec2(150, 0), true);
+		
 		//if ( action_drag_clip and ImGui::IsMouseHoveringWindow () ) asking_track = track;
 		if ( ImGui::IsMouseHoveringWindow () ) asking_track = track;
 		 
@@ -655,21 +624,6 @@ void ConsoleScreen (Project* project)
 				}
 				ImGui::PopID ();
 			}
-			
-			// Empty slot
-			//ImGui::PushID (i);
-			//ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.0f, 1.00f));
-			//ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.3f, 1.00f));
-			//ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.6f, 1.00f));
-			//if ( ImGui::Button("Add a clip", ImVec2(-1.0f, 0.0f)) )
-			//{
-				//details.context = Screen::RESSOURCES;
-				//ressources_panel = true;
-				//State::getInstance() -> setTrack (track);
-			//}
-			//ImGui::PopStyleColor (3);
-			//
-			//ImGui::PopID ();
 		}
 		
 		ImGui::EndChild ();
@@ -686,7 +640,8 @@ void ConsoleScreen (Project* project)
 			if ( details.selected_track )
 			{
 				std::string path = project -> getAudioDir() + "/" + details.dragged_audio_file.c_str();
-				std::cout << "adding Audioclip " << path << " to Track " << details.selected_track -> getName () << endl;
+				const std::type_info &t=typeid(*details.selected_track);
+				std::cout << "adding Audioclip " << path << " to " << t.name() << " " << details.selected_track -> getName () << endl;
 				AudioClip * clip = new AudioClip (path);
 				details.selected_track -> addClip (clip);
 				std::cout << "Track has " << details.selected_track -> nClips() << " clips" << endl;
@@ -696,38 +651,7 @@ void ConsoleScreen (Project* project)
 		}
 	}
 	if ( action_drag_clip ) DragClipOverlay (details.dragged_audio_file, &action_drag_clip);
-	/* MODAL POPUP "Add a clip"
-	if ( add_a_clip != -1 ) ImGui::OpenPopup ("Add audio clip");
-	if ( ImGui::BeginPopupModal ("Add audio clip", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
-	{
-		static int selected_clip = -1;
-		selected_clip = displayAudioClipSet (project, selected_clip);
-		//ImGui::Text("%d", selected_clip);
-		if ( selected_clip == -1 ) 
-		{
-			ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(0.0f, 0.0f, 0.4f));
-			ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0.0f, 0.0f, 0.4f));
-			ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0.0f, 0.0f, 0.4f));
-			ImGui::Button ("OK", ImVec2(80,0));
-			ImGui::PopStyleColor (3);
-		}
-		else if ( ImGui::Button ("OK", ImVec2(80,0)) ) 
-		{
-			project -> getTrack(add_a_clip) -> addClip ( new AudioClip ( project -> getAudioDir() + "/" + project -> getAudioFiles() -> at(selected_clip).c_str() ) );
-			ImGui::CloseCurrentPopup ();
-			add_a_clip = -1;
-			selected_clip = -1;
-		}
-		ImGui::SameLine ();
-		if ( ImGui::Button ("Cancel", ImVec2(80,0)) ) 
-		{
-			ImGui::CloseCurrentPopup ();
-			add_a_clip = -1;
-			selected_clip = -1;
-		}
-		ImGui::EndPopup ();
-	} 
-	*/
+
 	ImGui::EndChild ();
 	
 	EndScreen ();

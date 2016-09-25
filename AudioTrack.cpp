@@ -8,7 +8,7 @@
 
 AudioTrack::AudioTrack (std::string s) : Track (s)
 {
-	type_ = AUDIO;
+	data_type_ = AUDIO;
 	type_str_ = "Audio";
 	clipset_ = new std::vector<AudioClip *>;
 	volume_ = 1.0f;
@@ -22,7 +22,7 @@ AudioTrack::AudioTrack (std::string s) : Track (s)
 
 AudioTrack::~AudioTrack ()
 {
-	std::cout << "~AudioTrack()" << std::endl;
+	std::cout << "AudioTrack::~AudioTrack()" << std::endl;
 	if ( clipset_ != NULL )
 		for (unsigned int i=0; i < clipset_ -> size(); i++)
 			delete clipset_ -> at (i);
@@ -33,8 +33,14 @@ AudioTrack::~AudioTrack ()
 // Add a clip
 //------------
 
+void AudioTrack::addClip (Clip * clip)
+{
+	addClip ( (AudioClip *) clip );
+}
+
 void AudioTrack::addClip (AudioClip * clip)
 {
+	std::cout << "AudioTrack::addClip" << std::endl;
 	clipset_ -> push_back (clip);
 }
 

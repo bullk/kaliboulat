@@ -7,7 +7,7 @@
 
 MidiClip::MidiClip (std::string name = "No name") : Clip()
 {
-	m_type = MIDI;
+	data_type_ = MIDI;
 	//path_ = path;
 	//int p = path_.rfind("/") + 1;
 	//name_ = path_.substr(p, path_.length()-p);

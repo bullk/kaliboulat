@@ -18,6 +18,7 @@ public:
 	// Destructor 
 	~AudioTrack ();
 
+    void addClip (Clip * clip);
     void addClip (AudioClip * clip);
     void deleteClip (unsigned int i);
     inline AudioClip * getClip (unsigned int i) { return clipset_ -> at(i); }

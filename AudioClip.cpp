@@ -7,7 +7,7 @@
 
 AudioClip::AudioClip(std::string path) : Clip(), FileWvIn(path)
 {
-	m_type = AUDIO;
+	data_type_ = AUDIO;
 	openFile(path);
 	path_ = path;
 	int p = path_.rfind("/") + 1;

@@ -1,6 +1,6 @@
 #define WITH_GUI
 
-#include <unistd.h>
+#include <unistd.h> // sleep
 
 #include <stdio.h>
 #include <string>
@@ -16,6 +16,7 @@
 #include "MidiFile.hpp"
 #include "Project.hpp"
 #include "Modules.hpp"
+#include "Listener.hpp"
 
 #ifdef WITH_GUI
 #include "GUI.hpp"
@@ -95,6 +96,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 			if ( daClip -> isPlaying () )
 				*samples += daClip -> tick () * *(daClip -> getVolume ());
 		}
+		*samples += Listener::getInstance() -> tick();
 		samples++;
 	}
 	return 0;
@@ -150,6 +152,8 @@ int main( int argc, char* args[] )
 	State * state = State::getInstance ();
 	cout << "creating Waiter" << endl;
 	Waiter * waiter = Waiter::getInstance ();
+	cout << "creating Listener" << endl;
+	Listener * listener = Listener::getInstance ();
 
 	cout << endl << "----- project init -----" << endl;
 	// INIT PROJECT
@@ -270,7 +274,9 @@ int main( int argc, char* args[] )
 	delete midiout;
 	delete dac;
 	//delete diApp;
+	listener -> kill ();
 	waiter -> kill ();
+	state -> kill ();
 	
 	return 0; /* ISO C requires main to return int. */
 

@@ -14,6 +14,7 @@ public:
 	// Destructor 
 	~MidiTrack ();
 
+    void addClip (Clip * clip);
 	void addClip (MidiClip * clip);
     void deleteClip (unsigned int i);
     inline MidiClip * getClip (unsigned int i) { return clipset_ -> at(i); }

@@ -13,6 +13,7 @@ public:
 	
 	Clip ();
 	virtual ~Clip ();
+	inline DataType dataType () { return data_type_; }
 	inline ClipState getState () { return state_; }
 	inline bool isPlaying () { return (state_ == PLAYING); }
 	void arm ();
@@ -28,7 +29,7 @@ public:
 	//virtual int getAngle (void) = 0;
    
 protected:
-	DataType m_type;
+	DataType data_type_;
 	ClipState state_;
 	std::string path_;
 	std::string name_;
