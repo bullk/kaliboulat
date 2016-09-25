@@ -14,6 +14,7 @@
 #include "Clock.hpp"
 #include "Modules.hpp"
 #include "State.hpp"
+#include "AudioFile.hpp"
 
 
 //void SplitFilename (const std::string& str)
@@ -43,7 +44,7 @@ public:
 	void swapTracks (unsigned int i, unsigned int j);
 	inline unsigned int nTracks () { return tracks_.size (); }
 	inline Track * getTrack (unsigned int i) { return tracks_[i]; }
-	inline std::vector<std::string> * getAudioFiles () { return audiofiles_; }
+	inline std::vector<AudioFile *> * getAudioFiles () { return audiofiles_; }
 	inline std::vector<std::string> * getMIDIFiles () { return midifiles_; }
 	inline bool ctrlPressed () { return ctrl_; }
 	inline void ctrlDown () { ctrl_ = true; }
@@ -57,7 +58,7 @@ protected:
 	AudioModule * audio_;
 	MidiModule * midi_;
 	std::vector<Track *> tracks_;
-	std::vector<std::string> * audiofiles_;
+	std::vector<AudioFile *> * audiofiles_;
 	std::vector<std::string> * midifiles_;
 	bool ctrl_;
 };

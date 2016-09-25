@@ -1,6 +1,5 @@
-#include "Project.hpp"
 #include <algorithm>
-
+#include "Project.hpp"
 
 Project::Project (std::string str)
 {
@@ -11,7 +10,7 @@ Project::Project (std::string str)
 	clock_ = new Clock ();
 	audio_ = new AudioModule ();
 	midi_ = new MidiModule ();
-	audiofiles_ = new std::vector<std::string>;
+	audiofiles_ = new std::vector<AudioFile *>;
 	midifiles_ = new std::vector<std::string>;
 	updateRessources ();
 	ctrl_ = false;
@@ -19,13 +18,19 @@ Project::Project (std::string str)
 
 Project::~Project () {
 	//if ( tracks_ != NULL )
-		//for (unsigned int i=0; i < tracks_ -> size(); i++)
-			//delete tracks_ -> at (i);
+		for (unsigned int i=0; i < tracks_.size(); i++)
+			delete tracks_[i];
+	if ( audiofiles_ != NULL )
+		for (unsigned int i=0; i < audiofiles_ -> size(); i++)
+			delete audiofiles_ -> at (i);
+	delete audiofiles_;
+	delete midifiles_;
 	delete audio_;
 	delete midi_;
 	delete clock_;
 }
 
+//TODO : factoriser
 void Project::updateRessources ()
 {
 	struct dirent* daFile = NULL;
@@ -45,7 +50,7 @@ void Project::updateRessources ()
 			std::size_t found = str.find_last_of(".");
 			if ( (str.substr(found+1) == "wav") or (str.substr(found+1) == "WAV") )
 			{
-				audiofiles_ -> push_back(str);
+				audiofiles_ -> push_back(new AudioFile(getAudioDir() + "/" +str));
 				std::cout << "Audio ressource : " << str << std::endl;
 			}
 		}

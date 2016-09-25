@@ -7,7 +7,7 @@ using namespace std;
 SDL_GLContext glcontext;
 SDL_Window * window = NULL;
 ImVec4 clear_color;
-Screen details = { Screen::CONSOLE, Screen::RESSOURCES, 0, 0, "", NULL, NULL };
+Screen details = { Screen::CONSOLE, Screen::RESSOURCES, 0, 0, NULL, NULL, NULL };
 
 int width1, width2, width3, width4, width5;
 
@@ -305,10 +305,10 @@ void displayAudioClipDetails (AudioClip * clip)
 
 int displayAudioClipSet (Project* project, int selected)
 {
-	vector<std::string> * list = project -> getAudioFiles ();
+	vector<AudioFile *> * list = project -> getAudioFiles ();
 	int res = selected;
 	for (unsigned int i=0; i < list -> size(); i++ )
-		if ( ImGui::Selectable(list -> at(i).c_str(), int(i)==selected) ) res = i;
+		if ( ImGui::Selectable(list -> at(i) -> getName().c_str(), int(i)==selected) ) res = i;
 	return res;
 }
 	
@@ -349,7 +349,7 @@ bool HearButton ()
 	return res;
 }
 
-static void DragClipOverlay (std::string, bool* p_open)
+static void DragClipOverlay (bool* p_open)
 {
     ImGui::SetNextWindowPos (ImVec2(ImGui::GetIO().MousePos.x + 5, ImGui::GetIO().MousePos.y + 5));
     if (!ImGui::Begin("Drag Clip Overlay", p_open, ImVec2(0,0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings))
@@ -357,7 +357,7 @@ static void DragClipOverlay (std::string, bool* p_open)
         ImGui::End();
         return;
     }
-    ImGui::Text("%s", details.dragged_audio_file.c_str());
+    ImGui::Text("%s", details.dragged_audio_file -> getName().c_str());
     ImGui::End();
 }
 
@@ -368,16 +368,18 @@ void RessourcesPanel (Project* project)
 	switch (details.context)
 	{
 		case Screen::RESSOURCES:
+			ImGui::Checkbox("LISTENER", Listener::getOnOffP());
 			ImGui::SetNextTreeNodeOpen(true);
 			if (ImGui::CollapsingHeader("Audio Files"))
 			{
-				vector<std::string> * list = project -> getAudioFiles ();
+				vector<AudioFile *> * list = project -> getAudioFiles ();
 				for ( unsigned int i=0; i < list -> size(); i++ )
 				{
-					if ( ImGui::Selectable (list -> at(i).c_str()) )
+					AudioFile * file = list -> at(i);
+					if ( ImGui::Selectable (file -> getName().c_str()) )
 					{
-						cout << "selecting " << list -> at(i).c_str() << endl;
-						Listener::openFile (project -> getAudioDir() + "/" + list -> at(i));
+						cout << "selecting " << file -> getName().c_str() << endl;
+						Listener::openFile (file -> getPath());
 					}
 					
 					if ( ImGui::IsItemActive() )
@@ -390,7 +392,7 @@ void RessourcesPanel (Project* project)
 						else
 						{
 							action_drag_clip = false;
-							details.dragged_audio_file = "";
+							details.dragged_audio_file = NULL;
 						}
 					}
 				}
@@ -562,9 +564,17 @@ void ConsoleScreen (Project* project)
 		
 		Track * track = project -> getTrack(i);
 		std::string type_str = " " + track -> getTypeStr () + " ";
-		float value = 0.2f;
-		if ( details.selected_track == track ) value = 0.4f;
-		ImColor track_bg = ImColor::HSV(track -> getHue (), 0.5f, value, 1.00f);
+		float saturation = 0.4f;
+		float value = 0.1f;
+		float alpha = 1.00f;
+		if ( details.selected_track == track )
+		{
+			saturation = 0.8f;
+			value = 0.2f;
+		}
+		else if ( details.dragged_audio_file )
+			if ( details.dragged_audio_file->dataType() != track->dataType() ) alpha = 0.2f;
+		ImColor track_bg = ImColor::HSV(track -> getHue (), saturation, value, alpha);
 		char child_id[32];
 		sprintf(child_id, "Track%03d", i*5731);
 		
@@ -574,8 +584,8 @@ void ConsoleScreen (Project* project)
 		ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, track_bg);
 		ImGui::BeginChild (child_id, ImVec2(150, 0), true);
 		
-		//if ( action_drag_clip and ImGui::IsMouseHoveringWindow () ) asking_track = track;
-		if ( ImGui::IsMouseHoveringWindow () ) asking_track = track;
+		if ( action_drag_clip and ImGui::IsMouseHoveringWindow () ) asking_track = track;
+		//if ( ImGui::IsMouseHoveringWindow () ) asking_track = track;
 		 
 		if ( ImGui::Button("X") ) project -> deleteTrack (i);
 		else
@@ -583,16 +593,12 @@ void ConsoleScreen (Project* project)
 			ImGui::SameLine (); ImGui::Text("%02d", i+1);
 			ImGui::SameLine (); ImGui::Text("%s", type_str.c_str());
 			ImGui::SameLine ();
-			if ( i == 0 ) 
-				ImGui::Button(" ");
-			else
-				if ( ImGui::Button("<") ) project -> swapTracks (i, i-1);
+			if ( i == 0 ) ImGui::Button(" ");
+			else if ( ImGui::Button("<") ) project -> swapTracks (i, i-1);
 
 			ImGui::SameLine ();
-			if ( i == project->nTracks()-1 ) 
-				ImGui::Button(" ");
-			else
-				if ( ImGui::Button(">") ) project -> swapTracks (i, i+1);
+			if ( i == project->nTracks()-1 ) ImGui::Button(" ");
+			else if ( ImGui::Button(">") ) project -> swapTracks (i, i+1);
 			
 			ImGui::Text ( "%s", track -> getName().c_str() );
 			if ( ImGui::BeginPopupContextItem ("rename track") )
@@ -614,6 +620,9 @@ void ConsoleScreen (Project* project)
 			{
 				Clip * clip = track -> getClip(j);
 				ImGui::PushID (j);
+				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(track -> getHue (), 0.4f, 0.4f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(track -> getHue (), 0.4f, 0.4f));
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(track -> getHue (), 0.4f, 0.4f));
 				if ( ImGui::Button(">") ) clip -> arm() ; 
 				ImGui::SameLine (); 
 				if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
@@ -622,6 +631,7 @@ void ConsoleScreen (Project* project)
 					State::getInstance() -> setClip (clip); 
 					ressources_panel = true;
 				}
+				ImGui::PopStyleColor(3);
 				ImGui::PopID ();
 			}
 		}
@@ -637,20 +647,20 @@ void ConsoleScreen (Project* project)
 		if ( action_drag_clip )
 		{
 			cout << "releasing clip" << endl;
-			if ( details.selected_track )
-			{
-				std::string path = project -> getAudioDir() + "/" + details.dragged_audio_file.c_str();
+			if ( details.selected_track and details.dragged_audio_file->dataType() == details.selected_track->dataType() )
+			{	
+				std::string path = project -> getAudioDir() + "/" + details.dragged_audio_file -> getName().c_str();
 				const std::type_info &t=typeid(*details.selected_track);
 				std::cout << "adding Audioclip " << path << " to " << t.name() << " " << details.selected_track -> getName () << endl;
 				AudioClip * clip = new AudioClip (path);
 				details.selected_track -> addClip (clip);
 				std::cout << "Track has " << details.selected_track -> nClips() << " clips" << endl;
 			}
-			details.dragged_audio_file = "";
+			details.dragged_audio_file = NULL;
 			action_drag_clip = false;
 		}
 	}
-	if ( action_drag_clip ) DragClipOverlay (details.dragged_audio_file, &action_drag_clip);
+	if ( action_drag_clip ) DragClipOverlay (&action_drag_clip);
 
 	ImGui::EndChild ();
 	
