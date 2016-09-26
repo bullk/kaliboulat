@@ -24,11 +24,11 @@ void Clip::arm ()
 	{
 		case BAR:
 			state_ = ARMED;
-			std::cout << "clip armed" << std::endl;
 			Waiter::getInstance () -> addBar (new Command<Clip*, void(Clip::*)()>(this, &Clip::play));
 			break;
 		case BEAT:
 			state_ = ARMED;
+			Waiter::getInstance () -> addBeat (new Command<Clip*, void(Clip::*)()>(this, &Clip::play));
 			break;
 		case FREE:
 			play ();
