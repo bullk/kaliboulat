@@ -9,7 +9,8 @@ SDL_Window * window = NULL;
 ImVec4 clear_color;
 Screen details = { Screen::CONSOLE, Screen::RESSOURCES, 0, 0, NULL, NULL, NULL };
 
-int width1, width2, width3, width4, width5;
+unsigned int width1, width2, width3, width4, width5;
+unsigned int control_panel_columns;
 
 bool ressources_panel = true;
 bool action_drag_clip = false;
@@ -188,7 +189,8 @@ void ControlPanel (Project * project, void (*title_func)())
 {
 	ImGui::BeginChild ("Master Controls", ImVec2(0, 64), true);
 
-	ImGui::Columns (8);
+	control_panel_columns = (int) ImGui::GetWindowContentRegionWidth() / 230;
+	ImGui::Columns (control_panel_columns);
 	title_func ();
 	ImGui::NextColumn ();
 	
@@ -364,6 +366,11 @@ static void DragClipOverlay (bool* p_open)
 void RessourcesPanel (Project* project)
 {
 	ImGui::BeginChild ("Ressources", ImVec2(width1,0), true);
+	if ( ImGui::Button("Files") ) details.context = Screen::RESSOURCES;
+	ImGui::SameLine();
+	if ( ImGui::Button("Audio") ) details.context = Screen::AUDIOCLIP;
+	ImGui::SameLine();
+	if ( ImGui::Button("MIDI") ) details.context = Screen::MIDICLIP;
 	
 	switch (details.context)
 	{
@@ -398,6 +405,17 @@ void RessourcesPanel (Project* project)
 				}
 			}
 			//displayMidiClipSet (project);
+			break;
+		case Screen::AUDIOCLIP:
+		if ( State::getInstance() -> getClip() )
+		{
+			AudioClip * clip = (AudioClip *)State::getInstance() -> getClip();
+			ImGui::Text("%s", clip -> getName().c_str());
+			ImGui::Text("%s", clip -> getPath().c_str());
+			
+		}
+			break;
+		case Screen::MIDICLIP:
 			break;
 		default:
 			break;
@@ -547,6 +565,7 @@ void ConsoleClip (Clip * clip, int id, float hue)
 	{
 		State::getInstance() -> setClip (clip); 
 		ressources_panel = true;
+		details.context = Screen::AUDIOCLIP;
 	}
 	ImGui::PopStyleColor(3);
 	ImGui::PopID ();
