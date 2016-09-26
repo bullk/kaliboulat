@@ -17,12 +17,10 @@ Project::Project (std::string str)
 }
 
 Project::~Project () {
-	//if ( tracks_ != NULL )
-		for (unsigned int i=0; i < tracks_.size(); i++)
-			delete tracks_[i];
-	if ( audiofiles_ != NULL )
-		for (unsigned int i=0; i < audiofiles_ -> size(); i++)
-			delete audiofiles_ -> at (i);
+	while (tracks_.size())
+		deleteTrack(0);
+	for (unsigned int i=0; i < audiofiles_ -> size(); i++)
+		delete audiofiles_ -> at (i);
 	delete audiofiles_;
 	delete midifiles_;
 	delete audio_;
