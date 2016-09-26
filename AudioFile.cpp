@@ -1,5 +1,6 @@
 #include "AudioFile.hpp"
 
+
 RessourceFile::RessourceFile (DataType dt, std::string path) : data_type_(dt), path_(path)
 {
 	int p = path_.rfind("/") + 1;

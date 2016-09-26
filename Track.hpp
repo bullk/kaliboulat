@@ -26,7 +26,7 @@ public:
     virtual Clip * getClip (unsigned int i) = 0;
     virtual unsigned int nClips () = 0;
     virtual void stopAll () = 0;
-	inline float * getHueP () { return &hue_; }
+	//inline float * getHueP () { return &hue_; }
 	inline float getHue () { return hue_; }
 	inline void setHue (float f) { hue_ = f; }
     

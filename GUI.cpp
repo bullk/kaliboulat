@@ -68,7 +68,7 @@ void BeginScreen ()
 	
 	ImGui::Begin("main window", NULL, flags);
 	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 5.0f);
+	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
 	
 	//width1 = (int)ImGui::GetIO().DisplaySize.x / 6;
 	//width2 = (int)ImGui::GetIO().DisplaySize.x / 3;
@@ -535,7 +535,24 @@ void ConsoleTitle ()
 	ImGui::Text("   ##  #  # # #    #  ## ##");
 }
 
-void ConsoleScreen (Project* project) 
+void ConsoleClip (Clip * clip, int id, float hue)
+{
+	ImGui::PushID (id);
+	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(hue, 0.4f, 0.4f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(hue, 0.4f, 0.4f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(hue, 0.4f, 0.4f));
+	if ( ImGui::Button(">") ) clip -> arm() ; 
+	ImGui::SameLine ();
+	if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
+	{
+		State::getInstance() -> setClip (clip); 
+		ressources_panel = true;
+	}
+	ImGui::PopStyleColor(3);
+	ImGui::PopID ();
+}
+
+void ConsoleScreen (Project * project) 
 {	
 	BeginScreen ();
 	mainMenu (project);
@@ -547,7 +564,9 @@ void ConsoleScreen (Project* project)
 		ImGui::SameLine ();
 	}
 	int w = ressources_panel * width5;
+	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(2, 2));
 	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 	Track * asking_track = NULL;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{ // Tracks
@@ -580,12 +599,16 @@ void ConsoleScreen (Project* project)
 		
 		if ( i > 0 ) ImGui::SameLine ();
 
-		ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
+		ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
 		ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, track_bg);
 		ImGui::BeginChild (child_id, ImVec2(150, 0), true);
+		ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(8, 8));
 		
-		if ( action_drag_clip and ImGui::IsMouseHoveringWindow () ) asking_track = track;
-		//if ( ImGui::IsMouseHoveringWindow () ) asking_track = track;
+		if ( ImGui::IsMouseHoveringWindow () )
+		{
+			if ( action_drag_clip ) asking_track = track;
+			else if ( ImGui::IsMouseClicked(0) ) asking_track = track;
+		}
 		 
 		if ( ImGui::Button("X") ) project -> deleteTrack (i);
 		else
@@ -607,62 +630,42 @@ void ConsoleScreen (Project* project)
 				sprintf (buf, "%s", track -> getName().c_str());
 				if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 				{
-					track -> setName(buf);
+					track -> setName (buf);
 					ImGui::CloseCurrentPopup ();
 				}
 				ImGui::EndPopup ();
 			}
-			
-			//ImGui::SliderFloat ("Color", project->getTrack(i)->getHueP(), 0.0f, 1.0f);
+
+			ImGui::Spacing ();
 			ImGui::Separator ();
 			// Clips
-			for ( unsigned int j=0; j < track -> nClips(); j++)
-			{
-				Clip * clip = track -> getClip(j);
-				ImGui::PushID (j);
-				ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(track -> getHue (), 0.4f, 0.4f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(track -> getHue (), 0.4f, 0.4f));
-				ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(track -> getHue (), 0.4f, 0.4f));
-				if ( ImGui::Button(">") ) clip -> arm() ; 
-				ImGui::SameLine (); 
-				if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
-				{
-					State::getInstance() -> setTrack (track); 
-					State::getInstance() -> setClip (clip); 
-					ressources_panel = true;
-				}
-				ImGui::PopStyleColor(3);
-				ImGui::PopID ();
-			}
+			for ( unsigned int j=0; j < track -> nClips(); j++ )
+				ConsoleClip (track->getClip(j), j, track->getHue());
 		}
 		
+		ImGui::PopStyleVar ();
 		ImGui::EndChild ();
 		ImGui::PopStyleColor ();
 		ImGui::PopStyleVar ();
 	}
-	if ( details.selected_track != asking_track ) details.selected_track = asking_track;
-	if ( ImGui::IsMouseReleased(0) )
+	
+	if ( asking_track and details.selected_track != asking_track ) details.selected_track = asking_track;
+
+	if ( action_drag_clip )
 	{
-		cout << "mouse released" << endl;
-		if ( action_drag_clip )
+		if ( ImGui::IsMouseReleased(0) )
 		{
-			cout << "releasing clip" << endl;
 			if ( details.selected_track and details.dragged_audio_file->dataType() == details.selected_track->dataType() )
-			{	
-				std::string path = project -> getAudioDir() + "/" + details.dragged_audio_file -> getName().c_str();
-				const std::type_info &t=typeid(*details.selected_track);
-				std::cout << "adding Audioclip " << path << " to " << t.name() << " " << details.selected_track -> getName () << endl;
-				AudioClip * clip = new AudioClip (path);
-				details.selected_track -> addClip (clip);
-				std::cout << "Track has " << details.selected_track -> nClips() << " clips" << endl;
-			}
+				details.selected_track -> addClip (new AudioClip (details.dragged_audio_file -> getPath()));
 			details.dragged_audio_file = NULL;
 			action_drag_clip = false;
 		}
+		else DragClipOverlay (&action_drag_clip);
 	}
-	if ( action_drag_clip ) DragClipOverlay (&action_drag_clip);
-
+	
+	ImGui::PopStyleVar ();
 	ImGui::EndChild ();
+	ImGui::PopStyleVar ();
 	
 	EndScreen ();
 }
