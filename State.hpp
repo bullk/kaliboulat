@@ -11,17 +11,17 @@ class State
 		// Destructor
 		~State ();
 		bool onoff_;
-		Track * track_;
-		Clip * clip_;
+		static Track * track_;
+		static Clip * clip_;
 		static State * singleton_;
 
 	public:
 		inline bool isOn () { return onoff_; }
 		inline void halt () { onoff_ = false; }
-		inline Track * getTrack () { return track_; }
-		inline void setTrack (Track * track) { track_ = track; }
-		inline Clip * getClip () { return clip_; }
-		inline void setClip (Clip * clip) { clip_ = clip; }
+		static inline Track * getTrack () { return track_; }
+		static inline void setTrack (Track * track) { track_ = track; }
+		static inline Clip * getClip () { return clip_; }
+		static inline void setClip (Clip * clip) { clip_ = clip; }
 		
 		// Singleton
 		static State *getInstance ()

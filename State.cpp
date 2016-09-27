@@ -1,14 +1,13 @@
 #include "State.hpp"
 
 // Initialisation du singleton à NULL
-State *State::singleton_ = NULL;
+State * State::singleton_ = NULL;
+Track *	State::track_ = NULL;
+Clip * State::clip_ = NULL;
 
 // Constructor
-State::State ()
+State::State () : onoff_(true)
 {
-	onoff_ = true;
-	track_ = NULL;
-	clip_ = NULL;
 }
 
 // Destructor

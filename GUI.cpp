@@ -7,7 +7,8 @@ using namespace std;
 SDL_GLContext glcontext;
 SDL_Window * window = NULL;
 ImVec4 clear_color;
-Screen details = { Screen::CONSOLE, Screen::RESSOURCES, 0, 0, NULL, NULL, NULL };
+//Screen details = { Screen::CONSOLE, Screen::RESSOURCES, 0, 0, NULL, NULL, NULL };
+Screen details = { Screen::CONSOLE, Screen::RESSOURCES, NULL };
 
 unsigned int width1, width2, width3, width4, width5;
 unsigned int control_panel_columns;
@@ -437,7 +438,7 @@ void ProjectScreen (Project* project)
 	BeginScreen ();
 	mainMenu (project);
 	ControlPanel (project, ProjectTitle);
-	
+/*	
 	// MAIN BOARD
 	ImGui::BeginChild("Clips", ImVec2(0, 0), true);
 	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
@@ -542,7 +543,7 @@ void ProjectScreen (Project* project)
 	
 	ImGui::PopStyleVar ();
 	ImGui::EndChild ();
-
+*/
 	EndScreen();
 }
 
@@ -605,7 +606,7 @@ void ConsoleScreen (Project * project)
 		float saturation = 0.4f;
 		float value = 0.1f;
 		float alpha = 1.00f;
-		if ( details.selected_track == track )
+		if ( State::getTrack() == track )
 		{
 			saturation = 0.8f;
 			value = 0.2f;
@@ -668,14 +669,14 @@ void ConsoleScreen (Project * project)
 		ImGui::PopStyleVar ();
 	}
 	
-	if ( asking_track and details.selected_track != asking_track ) details.selected_track = asking_track;
+	if ( asking_track and asking_track != State::getTrack() ) State::setTrack(asking_track);
 
 	if ( action_drag_clip )
 	{
 		if ( ImGui::IsMouseReleased(0) )
 		{
-			if ( details.selected_track and details.dragged_audio_file->dataType() == details.selected_track->dataType() )
-				details.selected_track -> addClip (new AudioClip (details.dragged_audio_file -> getPath()));
+			if ( State::getTrack() and details.dragged_audio_file->dataType() == State::getTrack()->dataType() )
+				State::getTrack() -> addClip (new AudioClip (details.dragged_audio_file -> getPath()));
 			details.dragged_audio_file = NULL;
 			action_drag_clip = false;
 		}

@@ -22,10 +22,10 @@ class Listener
 		//inline void setAudioFile (stk::FileWvIn * file) { audiofile_ = file; }
 		stk::StkFloat tick (unsigned int channel = 0);
 
-		static bool isOn () { return onoff_; }
-		static void setOn () { onoff_ = true; }
-		static void setOff () { onoff_ = false; }
-		static bool * getOnOffP () { return &onoff_; }
+		static inline bool isOn () { return onoff_; }
+		static inline void setOn () { onoff_ = true; }
+		static inline void setOff () { onoff_ = false; }
+		static inline bool * getOnOffP () { return &onoff_; }
 		static void openFile (std::string filename) { audiofile_ -> openFile (filename, false, true); }
 		static void closeFile () { if ( audiofile_->isOpen() ) audiofile_->closeFile (); }
 		

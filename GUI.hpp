@@ -20,10 +20,10 @@ struct Screen
 	enum Context { NONE, RESSOURCES, AUDIOCLIP, MIDICLIP }; 
 	Type type;
 	Context context;
-	unsigned int audioclip, midiclip;
+	//unsigned int audioclip, midiclip;
 	AudioFile * dragged_audio_file;
-	Clip * selected_clip;
-	Track * selected_track;
+	//Clip * selected_clip;
+	//Track * selected_track;
 	
 };
 
