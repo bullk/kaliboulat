@@ -15,6 +15,7 @@
 #include "Modules.hpp"
 #include "State.hpp"
 #include "AudioFile.hpp"
+#include "MidiFile.hpp"
 
 
 //void SplitFilename (const std::string& str)
@@ -45,7 +46,7 @@ public:
 	inline unsigned int nTracks () { return tracks_.size (); }
 	inline Track * getTrack (unsigned int i) { return tracks_[i]; }
 	inline std::vector<AudioFile *> * getAudioFiles () { return audiofiles_; }
-	inline std::vector<std::string> * getMIDIFiles () { return midifiles_; }
+	inline std::vector<MidiFile *> * getMIDIFiles () { return midifiles_; }
 	inline bool ctrlPressed () { return ctrl_; }
 	inline void ctrlDown () { ctrl_ = true; }
 	inline void ctrlUp () { ctrl_ = false; }
@@ -59,7 +60,7 @@ protected:
 	MidiModule * midi_;
 	std::vector<Track *> tracks_;
 	std::vector<AudioFile *> * audiofiles_;
-	std::vector<std::string> * midifiles_;
+	std::vector<MidiFile *> * midifiles_;
 	bool ctrl_;
 };
 

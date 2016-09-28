@@ -21,7 +21,8 @@ struct Screen
 	Type type;
 	Context context;
 	//unsigned int audioclip, midiclip;
-	AudioFile * dragged_audio_file;
+	//AudioFile * dragged_audio_file;
+	RessourceFile * dragged_file;
 	//Clip * selected_clip;
 	//Track * selected_track;
 	

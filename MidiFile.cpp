@@ -5,11 +5,8 @@
 // Constructor 
 //-------------
 
-MidiFile::MidiFile (std::string path) : MidiFileIn (path)
+MidiFile::MidiFile (std::string path) : MidiFileIn (path), RessourceFile(MIDI, path)
 {
-	path_ = path;
-	int p = path_.rfind("/") + 1;
-	name_ = path_.substr(p, path_.length()-p);
 	length_ = 0;
 	time_ = 0;
 }

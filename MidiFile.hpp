@@ -5,7 +5,7 @@
 #include "MidiTrack.hpp"
 
 
-class MidiFile : public stk::MidiFileIn
+class MidiFile : public stk::MidiFileIn, public RessourceFile
 {
 public:
 	MidiFile (std::string path);
@@ -17,7 +17,6 @@ public:
 	//void tick (RtMidiOut *);
 	
 protected:
-	std::string path_, name_;
 	long unsigned int length_, time_;
 	//std::vector<long unsigned int> track_indexes_;
 };

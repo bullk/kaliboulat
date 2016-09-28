@@ -306,29 +306,63 @@ void displayAudioClipDetails (AudioClip * clip)
 	//ImGui::Text("size %d", IM_ARRAYSIZE(clip -> getGUIData()));
 }
 
-int displayAudioClipSet (Project* project, int selected)
+void displayAudioFiles (Project* project)
 {
-	vector<AudioFile *> * list = project -> getAudioFiles ();
-	int res = selected;
-	for (unsigned int i=0; i < list -> size(); i++ )
-		if ( ImGui::Selectable(list -> at(i) -> getName().c_str(), int(i)==selected) ) res = i;
-	return res;
+	ImGui::Spacing();
+	static bool audio_tree_open = true;
+	ImGui::SetNextTreeNodeOpen(audio_tree_open);
+	if (ImGui::CollapsingHeader("Audio Files"))
+	{
+		vector<AudioFile *> * list = project -> getAudioFiles ();
+		for ( unsigned int i=0; i < list -> size(); i++ )
+		{
+			AudioFile * file = list -> at(i);
+			if ( ImGui::Selectable (file -> getName().c_str()) )
+			{
+				cout << "selecting " << file -> getName().c_str() << endl;
+				Listener::openFile (file -> getPath());
+			}
+			
+			if ( ImGui::IsItemActive() )
+			{
+				if ( ImGui::IsMouseDragging() )
+				{
+					action_drag_clip = true;
+					details.dragged_file = list -> at(i);
+				}
+				else
+				{
+					action_drag_clip = false;
+					details.dragged_file = NULL;
+				}
+			}
+		}
+	}
 }
 	
-void displayMidiClipSet (Project* project)
+void displayMidiFiles (Project* project)
 {
-	vector<std::string> * list = NULL;
-	ImGui::SetNextTreeNodeOpen(true);
+	vector<MidiFile *> * list = NULL;
+	ImGui::Spacing();
+	static bool midi_tree_open = true;
+	ImGui::SetNextTreeNodeOpen(midi_tree_open);
 	if (ImGui::CollapsingHeader("MIDI Files"))
 	{
 		list = project -> getMIDIFiles ();
 		for ( unsigned int i=0; i < list -> size(); i++ )
-			if ( ImGui::Selectable(list -> at(i).c_str()) )
+		{
+			if ( ImGui::TreeNode(list -> at(i) -> getName().c_str()) )
 			{
+				ImGui::Text("type %d", list -> at(i) -> getFileFormat());
+				ImGui::Text("%d tracks", list -> at(i) -> getNumberOfTracks());
+				ImGui::Text("division : %d (ticks per beat)", list -> at(i) -> getDivision());
+				ImGui::TreePop();
 				//MidiFile * midifile = new MidiFile ( project->getMIDIDir() + "/" + list -> at(i).c_str() );
 				//midifile -> parse (miditrack);
 				//delete midifile;
 			}
+		}
+		ImGui::Columns(1);
 	}
 }
 
@@ -360,7 +394,7 @@ static void DragClipOverlay (bool* p_open)
         ImGui::End();
         return;
     }
-    ImGui::Text("%s", details.dragged_audio_file -> getName().c_str());
+    ImGui::Text("%s", details.dragged_file -> getName().c_str());
     ImGui::End();
 }
 
@@ -372,40 +406,15 @@ void RessourcesPanel (Project* project)
 	if ( ImGui::Button("Audio") ) details.context = Screen::AUDIOCLIP;
 	ImGui::SameLine();
 	if ( ImGui::Button("MIDI") ) details.context = Screen::MIDICLIP;
+	ImGui::Separator();
 	
 	switch (details.context)
 	{
 		case Screen::RESSOURCES:
+			ImGui::Spacing();
 			ImGui::Checkbox("LISTENER", Listener::getOnOffP());
-			ImGui::SetNextTreeNodeOpen(true);
-			if (ImGui::CollapsingHeader("Audio Files"))
-			{
-				vector<AudioFile *> * list = project -> getAudioFiles ();
-				for ( unsigned int i=0; i < list -> size(); i++ )
-				{
-					AudioFile * file = list -> at(i);
-					if ( ImGui::Selectable (file -> getName().c_str()) )
-					{
-						cout << "selecting " << file -> getName().c_str() << endl;
-						Listener::openFile (file -> getPath());
-					}
-					
-					if ( ImGui::IsItemActive() )
-					{
-						if ( ImGui::IsMouseDragging() )
-						{
-							action_drag_clip = true;
-							details.dragged_audio_file = list -> at(i);
-						}
-						else
-						{
-							action_drag_clip = false;
-							details.dragged_audio_file = NULL;
-						}
-					}
-				}
-			}
-			//displayMidiClipSet (project);
+			displayAudioFiles (project);
+			displayMidiFiles (project);
 			break;
 		case Screen::AUDIOCLIP:
 		if ( State::getInstance() -> getClip() )
@@ -611,8 +620,8 @@ void ConsoleScreen (Project * project)
 			saturation = 0.8f;
 			value = 0.2f;
 		}
-		else if ( details.dragged_audio_file )
-			if ( details.dragged_audio_file->dataType() != track->dataType() ) alpha = 0.2f;
+		else if ( details.dragged_file )
+			if ( details.dragged_file->dataType() != track->dataType() ) alpha = 0.2f;
 		ImColor track_bg = ImColor::HSV(track -> getHue (), saturation, value, alpha);
 		char child_id[32];
 		sprintf(child_id, "Track%03d", i*5731);
@@ -626,7 +635,10 @@ void ConsoleScreen (Project * project)
 		
 		if ( ImGui::IsMouseHoveringWindow () )
 		{
-			if ( action_drag_clip ) asking_track = track;
+			if ( action_drag_clip )
+			{
+				if ( details.dragged_file->dataType() == track->dataType() ) asking_track = track;
+			}
 			else if ( ImGui::IsMouseClicked(0) ) asking_track = track;
 		}
 		 
@@ -675,9 +687,9 @@ void ConsoleScreen (Project * project)
 	{
 		if ( ImGui::IsMouseReleased(0) )
 		{
-			if ( State::getTrack() and details.dragged_audio_file->dataType() == State::getTrack()->dataType() )
-				State::getTrack() -> addClip (new AudioClip (details.dragged_audio_file -> getPath()));
-			details.dragged_audio_file = NULL;
+			if ( State::getTrack() and details.dragged_file->dataType() == State::getTrack()->dataType() )
+				State::getTrack() -> addClip (new AudioClip (details.dragged_file -> getPath()));
+			details.dragged_file = NULL;
 			action_drag_clip = false;
 		}
 		else DragClipOverlay (&action_drag_clip);

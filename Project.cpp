@@ -11,7 +11,7 @@ Project::Project (std::string str)
 	audio_ = new AudioModule ();
 	midi_ = new MidiModule ();
 	audiofiles_ = new std::vector<AudioFile *>;
-	midifiles_ = new std::vector<std::string>;
+	midifiles_ = new std::vector<MidiFile *>;
 	updateRessources ();
 	ctrl_ = false;
 }
@@ -71,7 +71,7 @@ void Project::updateRessources ()
 			std::size_t found = str.find_last_of(".");
 			if ( (str.substr(found+1) == "mid") or (str.substr(found+1) == "MID") )
 			{
-				midifiles_ -> push_back(str);
+				midifiles_ -> push_back(new MidiFile(getMIDIDir() + "/" +str));
 				std::cout << "MIDI ressource : " << str << std::endl;
 			}
 		}

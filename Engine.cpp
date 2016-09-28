@@ -1,5 +1,16 @@
 #include "Engine.hpp"
 
+
+RessourceFile::RessourceFile (DataType dt, std::string path) : data_type_(dt), path_(path)
+{
+	int p = path_.rfind("/") + 1;
+	name_ = path_.substr(p, path_.length()-p);
+}
+
+RessourceFile::~RessourceFile ()
+{
+}
+
 // Initialisation du singleton à NULL
 Waiter *Waiter::singleton_ = NULL;
 

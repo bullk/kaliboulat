@@ -3,12 +3,13 @@
 ---------------
 ## MAINTENANT
 
-* entrées (canaux Audio | MIDI | OSC |..., sequenceur, horloge)
-* finir l'implémentation des Launch / Stop / Loop pour AudioClip
-  et l'adapter pour MidiClip
+### reimplementer l'insertion de Fichiers MIDI
+
 
 ### Fonctionnalités
 
+* finir l'implémentation des Launch / Stop / Loop pour AudioClip
+  et l'adapter pour MidiClip
 * Navigation / Import de fichiers
 * Gestion des projets
 	* Nouveau
@@ -28,6 +29,7 @@
 
 ### I/O
 
+* entrées (canaux Audio | MIDI | OSC |..., sequenceur, horloge)
 * MIDI THRU
 * Sortie Audio en double mono
 * Entrees / Sorties multiples
