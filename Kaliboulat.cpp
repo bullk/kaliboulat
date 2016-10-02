@@ -92,9 +92,9 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		std::vector<AudioClip *> * clipset = project -> getAudio () -> getClipSet ();
 		for ( unsigned int j = 0; j < clipset -> size (); j++ )
 		{
-			AudioClip * daClip = clipset -> at (j);
-			if ( daClip -> isPlaying () )
-				*samples += daClip -> tick () * *(daClip -> getVolume ());
+			AudioClip * clip = clipset -> at (j);
+			if ( clip -> isPlaying () )
+				*samples += clip -> tick () * *(clip -> getVolume ());
 		}
 		*samples += Listener::getInstance() -> tick();
 		samples++;

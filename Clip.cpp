@@ -5,7 +5,7 @@
 // Constructor 
 //-------------
 
-Clip::Clip () : state_(HALTED)
+Clip::Clip () : state_(HALTED), name_(""), path_("")
 {
 }
 

@@ -3,6 +3,7 @@
 
 #include <stk/FileWvIn.h>
 #include "AudioClip.hpp"
+#include "MidiClip.hpp"
 
 class Listener
 {

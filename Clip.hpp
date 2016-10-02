@@ -11,6 +11,16 @@ public:
 	enum LaunchStyle { BAR, BEAT, FREE, RESYNC };
 	enum LoopStyle { ONESHOT, MANY, FOREVER };
 	
+protected:
+	DataType data_type_;
+	ClipState state_;
+	std::string path_;
+	std::string name_;
+	LaunchStyle launchstyle_, stopstyle_;
+	LoopStyle loopstyle_;
+	//int angle_;
+	
+public:	
 	Clip ();
 	virtual ~Clip ();
 	inline DataType dataType () { return data_type_; }
@@ -28,15 +38,6 @@ public:
 	virtual unsigned long getLength() = 0;
 	//virtual int getAngle (void) = 0;
    
-protected:
-	DataType data_type_;
-	ClipState state_;
-	std::string path_;
-	std::string name_;
-	LaunchStyle launchstyle_, stopstyle_;
-	LoopStyle loopstyle_;
-	//int angle_;
-	
 };
 
 #endif
