@@ -3,8 +3,7 @@
 ---------------
 ## MAINTENANT
 
-### reimplementer l'insertion de Fichiers MIDI
-
+MIDI IN parsing
 
 ### Fonctionnalités
 
@@ -16,6 +15,7 @@
 	* Ouvrir
 	* Enregistrer
 * Clip Warp
+* ajout multi-clips (ex : fichier MIDI multitracks entier)
 	
 ### C/C++
 
@@ -23,6 +23,7 @@
 
 ### Architecture / Moteur
 
+* Logger
 * Playlist / TrackList
 * Bases de séquençage pour les clips
 * Baie de brassage ?
