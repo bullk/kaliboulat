@@ -22,6 +22,11 @@ Waiter::Waiter ()
 // Destructor
 Waiter::~Waiter ()
 {
+	//while ( !main_.empty() ) main_.pop();
+	//while ( !tick_.empty() ) tick_.pop();
+	//while ( !beat_.empty() ) beat_.pop();
+	//while ( !bar_.empty() ) bar_.pop();
+	//while ( !midilog_.empty() ) midilog_.pop_back();
 }
 		
 void Waiter::bar ()
@@ -58,4 +63,10 @@ void Waiter::main ()
 		main_.front() -> execute ();
 		main_.pop();
 	}
+}
+
+void Waiter::midiLog (MidiRawMessage * message)
+{
+	MidiRawMessage * m = new MidiRawMessage(*message);
+	midilog_.push_back (m);
 }
