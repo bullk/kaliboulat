@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <iomanip>
 
 #include <RtError.h>
 #include <RtAudio.h>
@@ -63,6 +64,11 @@ void midiPanic (RtMidiOut * midiout)
 		message[0] += i;
 		midiout -> sendMessage(&message);
 	}
+}
+
+void midiCallback (double timeStamp, vector< unsigned char > *message, void *userData)
+{
+	Waiter::getInstance() -> midiLog (message);
 }
 
 
@@ -194,7 +200,8 @@ int main( int argc, char* args[] )
 		error.printMessage ();
 		exit ( EXIT_FAILURE );
 	}
-	
+	midiin->setCallback (midiCallback);
+	midiin->ignoreTypes( false, true, true );
 	//unsigned int nPorts = midiout -> getPortCount (); // Check available ports.
 	//if ( nPorts == 0 )
 		//std::cout << "No ports available !" << std::endl;
@@ -266,16 +273,30 @@ int main( int argc, char* args[] )
 	#endif
 	
 	midiPanic (midiout);
-	
+
+	cout << "closing MidiOut port" << endl;
 	midiout -> closePort ();
+	cout << "closing MidiIn port" << endl;
+	midiin -> closePort ();
+	cout << "canceling MidiIn callback" << endl;
+	midiin -> cancelCallback ();
+	cout << "closing Audio ports" << endl;
 	audioClose (dac);
 
+	cout << "deleting project" << endl;
 	delete project;
+	cout << "deleting RtMidiIn" << endl;
+	delete midiin;
+	cout << "deleting RtMidiOut" << endl;
 	delete midiout;
+	cout << "deleting RtAudio" << endl;
 	delete dac;
 	//delete diApp;
+	cout << "killing Listener" << endl;
 	listener -> kill ();
+	cout << "killing Waiter" << endl;
 	waiter -> kill ();
+	cout << "killing State" << endl;
 	state -> kill ();
 	
 	return 0; /* ISO C requires main to return int. */

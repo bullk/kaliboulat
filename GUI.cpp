@@ -474,112 +474,20 @@ void ProjectScreen (Project* project)
 	BeginScreen ();
 	mainMenu (project);
 	ControlPanel (project, ProjectTitle);
-/*	
-	// MAIN BOARD
-	ImGui::BeginChild("Clips", ImVec2(0, 0), true);
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 0.0f);
-
-	// Audio Clips
-	for ( unsigned int i = 0; i < project -> getAudio () -> getClipSet() -> size(); i++ )
+	ImGui::BeginChild ("MIDI input log", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	std::vector<MidiRawMessage *> * midilog = Waiter::getInstance()->getMidiLog();
+	for ( unsigned int i=0; i<midilog->size(); i++ )
 	{
-		AudioClip * clip = project -> getAudio () -> getClipSet() -> at(i);
-		bool lock = false;
-		float progress = 0.0f;
-		ImGui::PushID(i);
-		if ( ui.audioclip == i ) 
-		{ 
-			ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImColor::HSV(3/7.0f, 0.4f, 0.4f));
-			lock = true;
-		}
-		ImGui::BeginChild(i, ImVec2(0, 30)); 
-		if ( ImGui::IsMouseHoveringWindow () )
+		MidiRawMessage * m = midilog -> at(i);
+		ImGui::Text("MIDI IN : ");
+		for ( std::vector<unsigned char>::iterator c=m->begin(); c != m->end(); c++ )
 		{
-			if ( ImGui::IsMouseClicked (0) )
-			{
-				ui.context = Screen::AUDIOCLIP;
-				ui.audioclip = i;
-			}
-			else if ( ImGui::IsMouseClicked (1) ) 
-			{
-				ui.context = Screen::AUDIOCLIP;
-				ui.audioclip = i;
-				ImGui::OpenPopup("popup-clip");
-			}
+			ImGui::SameLine();
+			ImGui::Text("%02x ", *c);
 		}
-		clipPlayButton ( clip );
-		ImGui::SameLine(); // Progress bar
-		progress = clip -> getTime() / clip -> getLength();
-		ImGui::ProgressBar(progress, ImVec2(100, 0.f),""); 
-		ImGui::SameLine(); ImGui::Text("%s", clip -> getName().c_str());
-
-		if ( ImGui::BeginPopup("popup-clip") )
-		{
-			if ( ImGui::Selectable("delete this clip") )
-			{
-				//ui.audioclip = 0;
-				ui.context = Screen::NONE;
-				project -> getAudio () -> deleteClip (i);
-			}
-			ImGui::EndPopup ();
-		}
-
-		ImGui::EndChild ();
-		if ( lock ) ImGui::PopStyleColor ();
-		ImGui::PopID ();
 	}
-	
-	// MIDI Clips
-	for ( unsigned int i = 0; i < project -> getMIDI () -> getClipSet() -> size(); i++ )
-	{
-		MidiClip * clip = project -> getMIDI () -> getClipSet() -> at(i);
-		bool lock = false;
-		float progress = 0.0f;
-		ImGui::PushID(4096 + i);
-		if ( ui.midiclip == i ) 
-		{ 
-			ImGui::PushStyleColor(ImGuiCol_ChildWindowBg, ImColor::HSV(6/7.0f, 0.4f, 0.4f));
-			lock = true;
-		}
-		ImGui::BeginChild(4096 + i, ImVec2(0, 30)); 
-		if ( ImGui::IsMouseHoveringWindow () )
-		{
-			if ( ImGui::IsMouseClicked (0) )
-			{
-				ui.context = Screen::MIDICLIP;
-				ui.midiclip = i;
-			}
-			else if ( ImGui::IsMouseClicked (1) ) 
-			{
-				ui.context = Screen::MIDICLIP;
-				ui.midiclip = i;
-				ImGui::OpenPopup("popup-midiclip");
-			}
-		}
-		clipPlayButton (clip);
-		ImGui::SameLine(); // Progress bar
-		progress = (float) clip -> getTime() / clip -> getLength();
-		ImGui::ProgressBar(progress, ImVec2(100, 0.f), "");
-		ImGui::SameLine(); ImGui::Text("%s", clip -> getName().c_str());
-		
-		if (ImGui::BeginPopup("popup-midiclip"))
-		{
-			if ( ImGui::Selectable("delete this clip") )
-			{
-				//ui.midiclip = 0;
-				ui.context = Screen::NONE;
-				project -> getMIDI () -> deleteClip (i);
-			}
-			ImGui::EndPopup();
-		}
-
-		ImGui::EndChild();
-		if ( lock ) ImGui::PopStyleColor();
-		ImGui::PopID();
-	}
-	
-	ImGui::PopStyleVar ();
 	ImGui::EndChild ();
-*/
+	
 	EndScreen();
 }
 
@@ -635,7 +543,7 @@ void ConsoleScreen (Project * project)
 		if ( i > 0 ) ImGui::SameLine ();
 		if ( action_drag_clip and ui.dragged_clip->dataType() != track->dataType() ) 
 		{
-			ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImColor::HSV(0.0f, 0.0f, 0.25f));
+			ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImColor::HSV(0.0f, 0.0f, 0.15f));
 			ImGui::BeginChild (child_id, ImVec2(150, 0), true);
 			ImGui::EndChild ();
 			ImGui::PopStyleColor ();
@@ -643,12 +551,12 @@ void ConsoleScreen (Project * project)
 		else
 		{
 			// background color
-			float saturation = 0.4f;
+			float saturation = 0.3f;
 			float value = 0.1f;
 			float alpha = 1.00f;
 			if ( State::getTrack() == track )
 			{
-				saturation = 0.8f;
+				saturation = 1.0f;
 				value = 0.2f;
 			}
 			ImColor color_bg = ImColor::HSV(track -> getHue (), saturation, value, alpha);
