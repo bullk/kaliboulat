@@ -16,6 +16,7 @@ unsigned int control_panel_columns;
 bool ressources_panel = true;
 bool action_drag_clip = false;
 
+
 int GUI_Init ()
 {
 	// Setup SDL
@@ -427,7 +428,7 @@ static void DragClipOverlay (bool* p_open)
 
 void RessourcesPanel (Project* project)
 {
-	ImGui::BeginChild ("Ressources", ImVec2(width1,0), true);
+	ImGui::BeginChild ("Ressources", ImVec2(width1-3,0), true);
 	if ( ImGui::Button("Files") ) ui.context = Screen::RESSOURCES;
 	ImGui::SameLine();
 	if ( ImGui::Button("Audio") ) ui.context = Screen::AUDIOCLIP;
@@ -475,16 +476,17 @@ void ProjectScreen (Project* project)
 	mainMenu (project);
 	ControlPanel (project, ProjectTitle);
 	ImGui::BeginChild ("MIDI input log", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-	std::vector<MidiRawMessage *> * midilog = Waiter::getInstance()->getMidiLog();
+	std::vector<MidiRaw *> * midilog = Waiter::getInstance()->getMidiLog();
 	for ( unsigned int i=0; i<midilog->size(); i++ )
 	{
-		MidiRawMessage * m = midilog -> at(i);
-		ImGui::Text("MIDI IN : ");
+		MidiRaw * m = midilog -> at(i);
+		ImGui::Text("MIDI IN :");
 		for ( std::vector<unsigned char>::iterator c=m->begin(); c != m->end(); c++ )
 		{
 			ImGui::SameLine();
-			ImGui::Text("%02x ", *c);
+			ImGui::Text("%02X", *c);
 		}
+		ImGui::SetScrollHere(1.0f);
 	}
 	ImGui::EndChild ();
 	
@@ -529,7 +531,7 @@ void ConsoleScreen (Project * project)
 	}
 	int w = ressources_panel * width5;
 	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(2, 2));
-	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::BeginChild ("Board", ImVec2(w-3, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 	// DISPLAYING TRACKS
 	Track * asking_track = NULL;
@@ -660,7 +662,7 @@ void SequencerScreen (Project* project)
 	}
 	// TODO : Afficher les pistes
 	int w = ressources_panel * width5;
-	ImGui::BeginChild ("Board", ImVec2(w, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::BeginChild ("Board", ImVec2(w-3, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	ImGui::EndChild ();
 	
 	EndScreen ();

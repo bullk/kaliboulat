@@ -5,7 +5,7 @@
 #include <queue>
 
 
-typedef std::vector<unsigned char> MidiRawMessage;
+typedef std::vector<unsigned char> MidiRaw;
 
 enum DataType { AUDIO, MIDI, OSC, COM };
 
@@ -56,7 +56,7 @@ class Waiter
 		// Destructor
 		~Waiter ();
 		std::queue<BaseCommand *> bar_, beat_, tick_, main_;
-		std::vector<MidiRawMessage *> midilog_;
+		std::vector<MidiRaw *> midilog_;
 		static Waiter * singleton_;
 		
 	public:
@@ -68,8 +68,8 @@ class Waiter
 		inline void addBeat (BaseCommand * command) { beat_.push (command); }
 		inline void addTick (BaseCommand * command) { tick_.push (command); }
 		inline void addMain (BaseCommand * command) { main_.push (command); }
-		void midiLog (MidiRawMessage * message);
-		inline std::vector<MidiRawMessage *> * getMidiLog () { return &midilog_; }
+		void midiLog (MidiRaw * message);
+		inline std::vector<MidiRaw *> * getMidiLog () { return &midilog_; }
 		
 		// Singleton
 		static Waiter *getInstance ()

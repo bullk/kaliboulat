@@ -68,6 +68,96 @@ void midiPanic (RtMidiOut * midiout)
 
 void midiCallback (double timeStamp, vector< unsigned char > *message, void *userData)
 {
+	unsigned int high_digit = message->at(0) >> 4;
+	unsigned int low_digit = message->at(0) & 0xF;
+	switch ( high_digit )
+	{
+		case 0x8: // note off
+			cout << "channel " << low_digit +1
+				<< " NOTE OFF " << (unsigned int)message->at(1)
+				<< endl;
+			break;
+		case 0x9: // note on
+			cout << "channel " << low_digit +1
+				<< " NOTE ON " << (unsigned int)message->at(1)
+				<< " velocity " << (unsigned int)message->at(2)
+				<< endl;
+			break;
+		case 0xA: // polyphonic after touch
+			cout << "channel " << low_digit +1
+				<< " polyphonic after touch note " << (unsigned int)message->at(1)
+				<< " pressure " << (unsigned int)message->at(2)
+				<< endl;
+			break;
+		case 0xB: // control change
+			cout << "channel " << low_digit +1
+				<< " controller " << (unsigned int)message->at(1)
+				<< " value " << (unsigned int)message->at(2)
+				<< endl;
+			break;
+		case 0xC: // program change
+			cout << "channel " << low_digit +1
+				<< " program change " << (unsigned int)message->at(1)
+				<< endl;
+			break;
+		case 0xD: // channel after touch
+			cout << "channel " << low_digit +1
+				<< " after touch " << (unsigned int)message->at(1)
+				<< endl;
+			break;
+		case 0xE: // pitch bend
+			cout << "channel " << low_digit +1
+				<< " pitch bend " << (unsigned int)message->at(2)
+				<< endl;
+			break;
+		case 0xF: // system message
+			switch ( low_digit )
+			{
+				case 0x0:
+					cout << "SYSEX" << endl;
+					break;
+				case 0x1:
+					cout << "MTC" << endl;
+					break;
+				case 0x2:
+					cout << "Song Position" << endl;
+					break;
+				case 0x3:
+					cout << "Song Select" << endl;
+					break;
+				case 0x6:
+					cout << "Tune request" << endl;
+					break;
+				case 0x8:
+					cout << "Timing clock" << endl;
+					break;
+				case 0x9:
+					cout << "Mesure end" << endl;
+					break;
+				case 0xA:
+					cout << "Start" << endl;
+					break;
+				case 0xB:
+					cout << "Continue" << endl;
+					break;
+				case 0xC:
+					cout << "Stop" << endl;
+					break;
+				case 0xE:
+					cout << "Active sensing" << endl;
+					break;
+				case 0xF:
+					cout << "System reset" << endl;
+					break;
+				default:
+					cout << "WARNING : unknown MIDI data" << endl;
+					break;
+			}
+			break;
+		default:
+			cout << "WARNING : unknown MIDI data" << endl;
+			break;
+	}
 	Waiter::getInstance() -> midiLog (message);
 }
 
