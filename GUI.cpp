@@ -476,7 +476,7 @@ void ProjectScreen (Project* project)
 	mainMenu (project);
 	ControlPanel (project, ProjectTitle);
 	ImGui::BeginChild ("MIDI input log", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-	std::vector<MidiRaw *> * midilog = Waiter::getInstance()->getMidiLog();
+	std::vector<MidiRaw *> * midilog = State::getInstance()->getMidiLog();
 	for ( unsigned int i=0; i<midilog->size(); i++ )
 	{
 		MidiRaw * m = midilog -> at(i);

@@ -158,7 +158,7 @@ void midiCallback (double timeStamp, vector< unsigned char > *message, void *use
 			cout << "WARNING : unknown MIDI data" << endl;
 			break;
 	}
-	Waiter::getInstance() -> midiLog (message);
+	State::getInstance() -> midiLog (message);
 }
 
 

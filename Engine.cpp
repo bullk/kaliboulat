@@ -65,8 +65,3 @@ void Waiter::main ()
 	}
 }
 
-void Waiter::midiLog (MidiRaw * message)
-{
-	MidiRaw * m = new MidiRaw(*message);
-	midilog_.push_back (m);
-}
