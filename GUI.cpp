@@ -476,18 +476,18 @@ void ProjectScreen (Project* project)
 	mainMenu (project);
 	ControlPanel (project, ProjectTitle);
 	ImGui::BeginChild ("MIDI input log", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-	std::vector<MidiRaw *> * midilog = State::getInstance()->getMidiLog();
-	for ( unsigned int i=0; i<midilog->size(); i++ )
-	{
-		MidiRaw * m = midilog -> at(i);
-		ImGui::Text("MIDI IN :");
-		for ( std::vector<unsigned char>::iterator c=m->begin(); c != m->end(); c++ )
-		{
-			ImGui::SameLine();
-			ImGui::Text("%02X", *c);
-		}
-		ImGui::SetScrollHere(1.0f);
-	}
+	//std::vector<MidiRaw *> * midilog = State::getInstance()->getMidiLog();
+	//for ( unsigned int i=0; i<midilog->size(); i++ )
+	//{
+		//MidiRaw * m = midilog -> at(i);
+		//ImGui::Text("MIDI IN :");
+		//for ( std::vector<unsigned char>::iterator c=m->begin(); c != m->end(); c++ )
+		//{
+			//ImGui::SameLine();
+			//ImGui::Text("%02X", *c);
+		//}
+		//ImGui::SetScrollHere(1.0f);
+	//}
 	ImGui::EndChild ();
 	
 	EndScreen();

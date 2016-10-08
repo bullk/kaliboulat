@@ -10,6 +10,9 @@
 #include <RtAudio.h>
 #include <RtMidi.h>
 
+#include "spdlog/spdlog.h"
+//#include "spdlog.h"
+
 #include "globals.h"
 #include "Clock.hpp"
 #include "AudioTrack.hpp"
@@ -158,7 +161,7 @@ void midiCallback (double timeStamp, vector< unsigned char > *message, void *use
 			cout << "WARNING : unknown MIDI data" << endl;
 			break;
 	}
-	State::getInstance() -> midiLog (message);
+	//State::getInstance() -> midiLog (message);
 }
 
 
@@ -243,15 +246,28 @@ void audioClose (RtAudio * dac)
 
 int main( int argc, char* args[] )
 {
-	cout << "----- engine init -----" << endl;
-	cout << "creating State" << endl;
+	try
+	{         
+		// Create basic file logger (not rotated)
+		// trace, debug, info, warn, error, critical
+		auto mainlog = spdlog::basic_logger_mt("main", "main.log");
+		mainlog->info("Kaliboulat version 0.1 pre-alpha");
+	}
+	catch (const spdlog::spdlog_ex& ex)
+	{
+		cout << "Log failed: " << ex.what() << endl;
+	}
+
+	auto mainlog= spdlog::get("main");	
+	mainlog->info("----- engine init -----");
+	mainlog->info("creating State");
 	State * state = State::getInstance ();
-	cout << "creating Waiter" << endl;
+	mainlog->info("creating Waiter");
 	Waiter * waiter = Waiter::getInstance ();
-	cout << "creating Listener" << endl;
+	mainlog->info("creating Listener");
 	Listener * listener = Listener::getInstance ();
 
-	cout << endl << "----- project init -----" << endl;
+	mainlog->info("----- project init -----");
 	// INIT PROJECT
 	Project * project = new Project("test");
 	
@@ -260,7 +276,7 @@ int main( int argc, char* args[] )
 	//project -> addMidiTrack ( "MidiTrack1" );
 	
 	
-	cout << endl << "----- audio init -----" << endl;
+	mainlog->info("----- audio init -----");
 	// AUDIO INIT
 	#ifdef __UNIX_JACK__
 		RtAudio * dac = new RtAudio (RtAudio::UNIX_JACK); // main audio output
@@ -270,17 +286,16 @@ int main( int argc, char* args[] )
 	audioInit (dac, project);
 
 	// MIDI INIT
-	cout << endl << "----- MIDI init -----" << endl;
-	cout << "creating RtMidiOut";
+	mainlog->info("----- MIDI init -----");
 	RtMidiOut * midiout = NULL;
 	RtMidiIn * midiin = NULL;
 	try { 
 	#ifdef __UNIX_JACK__
-		cout << " with JACK" << endl;
+		mainlog->info("creating RtMidiOut with JACK");
 		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDIOUT_MODULE_NAME);
 		midiin = new RtMidiIn (RtMidi::UNIX_JACK, MIDIIN_MODULE_NAME);
 	#else
-		cout << " without JACK !!!" << endl;
+		mainlog->info("creating RtMidiOut without JACK !!!");
 		midiout = new RtMidiOut (MIDI_MODULE_NAME);
 		midiin = new RtMidiIn (MIDI_MODULE_NAME);
 	#endif
@@ -301,7 +316,7 @@ int main( int argc, char* args[] )
 			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
 		//midiout -> openPort (); // Open first available port.
 	//}
-	cout << "opening virtual MIDI out port" << endl;
+	mainlog->info("opening virtual MIDI out port");
 	try { 
 		midiout -> openVirtualPort ();
 	}
@@ -311,7 +326,7 @@ int main( int argc, char* args[] )
 		exit( EXIT_FAILURE );
 	}
 	
-	cout << "opening virtual MIDI in port" << endl;
+	mainlog->info("opening virtual MIDI in port");
 	try { 
 		midiin -> openVirtualPort ();
 	}
@@ -321,10 +336,10 @@ int main( int argc, char* args[] )
 		exit( EXIT_FAILURE );
 	}
 	
-	//cout << "...MIDI module" << endl;
+	//mainlog->info("...MIDI module");
 	//midiInit ();
 
-	cout << endl << "----- GUI init -----" << endl;
+	mainlog->info("----- GUI init -----");
 	// GUI INIT
 	#ifdef WITH_GUI
 		if ( GUI_Init () != 0 )	return -1;
@@ -332,7 +347,7 @@ int main( int argc, char* args[] )
 	
 	// MAIN LOOP
 	
-	cout << endl << "----- starting main loop -----" << endl;
+	mainlog->info("----- starting main loop -----");
 	unsigned int midi_ticks = 0;
 	
 	while ( state -> isOn () )
@@ -364,29 +379,29 @@ int main( int argc, char* args[] )
 	
 	midiPanic (midiout);
 
-	cout << "closing MidiOut port" << endl;
+	mainlog->info("closing MidiOut port");
 	midiout -> closePort ();
-	cout << "closing MidiIn port" << endl;
+	mainlog->info("closing MidiIn port");
 	midiin -> closePort ();
-	cout << "canceling MidiIn callback" << endl;
+	mainlog->info("canceling MidiIn callback");
 	midiin -> cancelCallback ();
-	cout << "closing Audio ports" << endl;
+	mainlog->info("closing Audio ports");
 	audioClose (dac);
 
-	cout << "deleting project" << endl;
+	mainlog->info("deleting project");
 	delete project;
-	cout << "deleting RtMidiIn" << endl;
+	mainlog->info("deleting RtMidiIn");
 	delete midiin;
-	cout << "deleting RtMidiOut" << endl;
+	mainlog->info("deleting RtMidiOut");
 	delete midiout;
-	cout << "deleting RtAudio" << endl;
+	mainlog->info("deleting RtAudio");
 	delete dac;
 	//delete diApp;
-	cout << "killing Listener" << endl;
+	mainlog->info("killing Listener");
 	listener -> kill ();
-	cout << "killing Waiter" << endl;
+	mainlog->info("killing Waiter");
 	waiter -> kill ();
-	cout << "killing State" << endl;
+	mainlog->info("killing State");
 	state -> kill ();
 	
 	return 0; /* ISO C requires main to return int. */

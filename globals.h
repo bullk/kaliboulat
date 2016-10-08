@@ -14,4 +14,6 @@
 
 //const int GLOBAL_SAMPLE_RATE = 44100;
 
+typedef std::vector<unsigned char> MidiRaw;
+
 #endif

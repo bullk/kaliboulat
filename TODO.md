@@ -3,7 +3,8 @@
 ---------------
 ## MAINTENANT
 
-MIDI IN parsing
+MIDI IN parsing a finir
+revoir les logs MIDI
 
 ### Fonctionnalités
 

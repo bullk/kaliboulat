@@ -3,9 +3,6 @@
 
 #include "Track.hpp"
 
-typedef std::vector<unsigned char> MidiRaw;
-//typedef std::vector<char> MidiRaw;
-
 class State
 {
 	private:
@@ -16,7 +13,6 @@ class State
 		bool onoff_;
 		static Track * track_;
 		static Clip * clip_;
-		std::vector<MidiRaw *> midilog_;
 		static State * singleton_;
 
 	public:
@@ -26,8 +22,6 @@ class State
 		static inline void setTrack (Track * track) { track_ = track; }
 		static inline Clip * getClip () { return clip_; }
 		static inline void setClip (Clip * clip) { clip_ = clip; }
-		void midiLog (MidiRaw * message);
-		inline std::vector<MidiRaw *> * getMidiLog () { return &midilog_; }
 		
 		// Singleton
 		static State *getInstance ()

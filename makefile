@@ -1,10 +1,10 @@
 CC = g++
-CFLAGS = -Wall -Os -D__LITTLE_ENDIAN__ 
+CFLAGS = -Wall -Os -D__LITTLE_ENDIAN__ -I.
 CFLAGS += -std=c++0x
 #CFLAGS += -std=c++11
 JACKFLAGS = -D__UNIX_JACK__
 ALSAFLAGS = -D__LINUX_ALSA__ -D__LINUX_ALSASEQ__
-LDFLAGS = `sdl2-config --cflags` -I/usr/include/stk 
+LDFLAGS = `sdl2-config --cflags` -I/usr/include/stk
 LDLIBS = `sdl2-config --libs` -lGL -lstk -lrtaudio -lrtmidi
 ALSALIBS = -lasound -lpthread
 JACKLIBS = -ljack
@@ -20,10 +20,10 @@ new: Kaliboulat-rtmidi2.0.1
 old: Kaliboulat-rtmidi1.0.15
 
 Kaliboulat-rtmidi2.0.1: $(OBJS) globals.h
-	$(CC) $(CFLAGS) $(JACKFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) $(JACKLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(JACKFLAGS) -o $@ $(OBJS) $(LDLIBS) $(JACKLIBS)
 
 Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
-	$(CC) $(CFLAGS) $(ALSAFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(ALSAFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
 	
 AudioClip.o: AudioClip.hpp
 AudioFile.o: AudioFile.hpp Engine.hpp
