@@ -25,7 +25,7 @@ struct Screen
 	RessourceFile * dragged_file;
 	Clip * dragged_clip;
 	//Clip * selected_clip;
-	//Track * selected_track;
+	//std::shared_ptr<Track> selected_track;
 	
 };
 
@@ -39,7 +39,7 @@ class GUI
 
 int GUI_Init();
 void GUI_Close();
-void GUI_Main(Project * project);
+void GUI_Main(std::shared_ptr<Project> project);
 
 
 #endif

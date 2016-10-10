@@ -13,7 +13,7 @@
 #define AUDIO_OUTPUTS 1
 
 //const int GLOBAL_SAMPLE_RATE = 44100;
-
-typedef std::vector<unsigned char> MidiRaw;
+#include <memory>
+#include "spdlog/spdlog.h"
 
 #endif

@@ -1,5 +1,9 @@
 #include <algorithm>
+
+#include "spdlog/spdlog.h"
+
 #include "Project.hpp"
+#include "State.hpp"
 
 Project::Project (std::string str)
 {
@@ -31,13 +35,14 @@ Project::~Project () {
 //TODO : factoriser
 void Project::updateRessources ()
 {
+	auto mainlog= spdlog::get("main");	
 	struct dirent* daFile = NULL;
 	
 	//std::string path = dir_ + "/Audio";
 	DIR * audiodir = opendir (getAudioDir().c_str());
 	if (audiodir == NULL)
 	{
-		printf("Erreur à l'ouverture du dossier '%s'\n", getAudioDir().c_str());
+		mainlog->error("Impossible d'ouvrir le dossier {}", getAudioDir().c_str());
 		exit(1);
 	}
 	
@@ -49,7 +54,7 @@ void Project::updateRessources ()
 			if ( (str.substr(found+1) == "wav") or (str.substr(found+1) == "WAV") )
 			{
 				audiofiles_ -> push_back(new AudioFile(getAudioDir() + "/" +str));
-				std::cout << "Audio ressource : " << str << std::endl;
+				mainlog->info("Audio ressource : {}", str);
 			}
 		}
 	
@@ -59,7 +64,7 @@ void Project::updateRessources ()
 	DIR * mididir = opendir (getMIDIDir().c_str());
 	if (mididir == NULL)
 	{
-		printf("Erreur à l'ouverture du dossier '%s'\n", getMIDIDir().c_str());
+		mainlog->error("Impossible d'ouvrir le dossier {}", getMIDIDir().c_str());
 		exit(1);
 	}
 	
@@ -72,7 +77,7 @@ void Project::updateRessources ()
 			if ( (str.substr(found+1) == "mid") or (str.substr(found+1) == "MID") )
 			{
 				midifiles_ -> push_back(new MidiFile(getMIDIDir() + "/" +str));
-				std::cout << "MIDI ressource : " << str << std::endl;
+				mainlog->info("MIDI ressource : {}", str);
 			}
 		}
 	
@@ -82,29 +87,32 @@ void Project::updateRessources ()
 
 void Project::addAudioTrack ( std::string s )
 {
-	Track * track = audio_ -> addTrack (s);
+	std::shared_ptr<Track> track = audio_ -> addTrack (s);
+	//std::shared_ptr<Track> track = new AudioTrack(s);
 	tracks_.push_back (track);
 	State::getInstance() -> setTrack(track);
 }
 
 void Project::addMidiTrack ( std::string s )
 {
-	Track * track = midi_ -> addTrack (s);
+	std::shared_ptr<Track> track = midi_ -> addTrack (s);
+	//std::shared_ptr<Track> track = new MidiTrack(s);
 	tracks_.push_back (track);
 	State::getInstance() -> setTrack(track);
 }
 
 void Project::deleteTrack (unsigned int i)
 {
-	Track * track = tracks_[i];
+	std::shared_ptr<Track> track = tracks_[i];
 	tracks_.erase (tracks_.begin() + i);
 	switch ( track -> dataType () )
 	{
 	case AUDIO:
-		audio_ -> deleteTrack ((AudioTrack *)track);
+		audio_ -> deleteTrack (std::static_pointer_cast<AudioTrack>(track));
+		//audio_ -> deleteTrack (track);
 		break;
 	case MIDI:
-		midi_ -> deleteTrack ((MidiTrack *)track);
+		midi_ -> deleteTrack (std::static_pointer_cast<MidiTrack>(track));
 		break;
 	default:
 		break;
@@ -116,3 +124,4 @@ void Project::swapTracks ( unsigned int i, unsigned int j )
 	//std::iter_swap (tracks_->begin()+i, tracks_->begin()+j);
 	std::swap ( tracks_[i], tracks_[j] );
 }
+

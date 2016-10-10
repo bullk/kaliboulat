@@ -13,7 +13,6 @@
 #include "globals.h"
 #include "Clock.hpp"
 #include "Modules.hpp"
-#include "State.hpp"
 #include "AudioFile.hpp"
 #include "MidiFile.hpp"
 
@@ -34,6 +33,7 @@ public:
 	void updateRessources ();
 	//void importAll ();
 	inline std::string getName () { return name_; }
+	inline std::string getFile () { return file_; }
 	inline Clock * getClock () { return clock_; }
 	inline AudioModule * getAudio () { return audio_; }
 	inline MidiModule * getMIDI () { return midi_; }
@@ -44,12 +44,18 @@ public:
 	void deleteTrack (unsigned int i);
 	void swapTracks (unsigned int i, unsigned int j);
 	inline unsigned int nTracks () { return tracks_.size (); }
-	inline Track * getTrack (unsigned int i) { return tracks_[i]; }
+	inline std::shared_ptr<Track> getTrack (unsigned int i) { return tracks_[i]; }
 	inline std::vector<AudioFile *> * getAudioFiles () { return audiofiles_; }
 	inline std::vector<MidiFile *> * getMIDIFiles () { return midifiles_; }
 	inline bool ctrlPressed () { return ctrl_; }
 	inline void ctrlDown () { ctrl_ = true; }
 	inline void ctrlUp () { ctrl_ = false; }
+	
+	template<class Archive>
+	void serialize(Archive & archive)
+	{
+		archive (name_, tracks_);
+	}
 	
 protected:
 	std::string name_;
@@ -58,7 +64,7 @@ protected:
 	Clock * clock_;
 	AudioModule * audio_;
 	MidiModule * midi_;
-	std::vector<Track *> tracks_;
+	std::vector<std::shared_ptr<Track>> tracks_;
 	std::vector<AudioFile *> * audiofiles_;
 	std::vector<MidiFile *> * midifiles_;
 	bool ctrl_;

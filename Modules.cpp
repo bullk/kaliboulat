@@ -7,8 +7,8 @@
 
 AudioModule::AudioModule ()
 {
-	trackset_ = new std::vector<AudioTrack *>;
-	clipset_ = new std::vector<AudioClip *>;
+	trackset_ = new std::vector<std::shared_ptr<AudioTrack>>;
+	//clipset_ = new std::vector<AudioClip *>;
 }
 
 
@@ -18,52 +18,49 @@ AudioModule::AudioModule ()
 
 AudioModule::~AudioModule ()
 {
-    //delete each audio file object (and corresponding buffer, etc.)
-	if ( clipset_ != NULL )
-		for (unsigned int i=0; i < clipset_ -> size(); i++)
-			delete clipset_ -> at (i);
+	//if ( clipset_ != NULL )
+		//for (unsigned int i=0; i < clipset_ -> size(); i++)
+			//delete clipset_ -> at (i);
     //delete each track
 	if ( trackset_ != NULL )
 		for (unsigned int i=0; i < trackset_ -> size(); i++)
-			delete trackset_ -> at (i);
+			deleteTrack (i);
 }
 
 //==================
 
-AudioTrack * AudioModule::addTrack (std::string s)
+std::shared_ptr<AudioTrack> AudioModule::addTrack (std::string s)
 {
-	AudioTrack * track = new AudioTrack (s);
+	std::shared_ptr<AudioTrack> track(new AudioTrack(s));
 	trackset_ -> push_back (track);
-	//std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
 	return track;
 }
 
 void AudioModule::deleteTrack (unsigned int i)
 {
-	AudioTrack * track = trackset_ -> at(i);
+	//std::shared_ptr<AudioTrack> track = trackset_ -> at(i);
 	trackset_ -> erase (trackset_ -> begin() + i);
-	//std::cout << "Audio Module has " << trackset_ -> size () << " tracks." << std::endl;
-	delete track;
+	//delete track;
 }
 
-void AudioModule::deleteTrack (AudioTrack * t)
+void AudioModule::deleteTrack (std::shared_ptr<AudioTrack> t)
 {
 	unsigned int i=0;
 	while ( trackset_ -> at(i) != t ) i++;
 	deleteTrack (i);
 }
 
-void AudioModule::addClip (std::string path)
-{
-	clipset_ -> push_back (new AudioClip(path));
-}
-
-void AudioModule::deleteClip (unsigned int i)
-{
-	AudioClip * clip = clipset_ -> at(i);
-	clipset_ -> erase (clipset_ -> begin() + i);
-	delete clip;
-}
+//void AudioModule::addClip (std::string path)
+//{
+	//clipset_ -> push_back (new AudioClip(path));
+//}
+//
+//void AudioModule::deleteClip (unsigned int i)
+//{
+	//AudioClip * clip = clipset_ -> at(i);
+	//clipset_ -> erase (clipset_ -> begin() + i);
+	//delete clip;
+//}
 
 
 //======================================================================
@@ -74,8 +71,8 @@ void AudioModule::deleteClip (unsigned int i)
 
 MidiModule::MidiModule ()
 {
-	trackset_ = new std::vector<MidiTrack *>;
-	clipset_ = new std::vector<MidiClip *>;
+	trackset_ = new std::vector<std::shared_ptr<MidiTrack>>;
+	//clipset_ = new std::vector<MidiClip *>;
 }
 
 
@@ -85,21 +82,20 @@ MidiModule::MidiModule ()
 
 MidiModule::~MidiModule ()
 {
-    //delete each audio file object (and corresponding buffer, etc.)
-	if ( clipset_ != NULL )
-		for (unsigned int i=0; i < clipset_ -> size(); i++)
-			delete clipset_ -> at (i);
+	//if ( clipset_ != NULL )
+		//for (unsigned int i=0; i < clipset_ -> size(); i++)
+			//delete clipset_ -> at (i);
     //delete each track
 	if ( trackset_ != NULL )
 		for (unsigned int i=0; i < trackset_ -> size(); i++)
-			delete trackset_ -> at (i);
+			deleteTrack (i);
 }
 
 //======================================================================
 
-MidiTrack * MidiModule::addTrack (std::string s)
+std::shared_ptr<MidiTrack> MidiModule::addTrack (std::string s)
 {
-	MidiTrack * track = new MidiTrack (s);
+	std::shared_ptr<MidiTrack> track(new MidiTrack(s));
 	trackset_ -> push_back (track);
 	//std::cout << "Midi Module has " << trackset_ -> size () << " tracks." << std::endl;
 	return track;
@@ -107,30 +103,30 @@ MidiTrack * MidiModule::addTrack (std::string s)
 
 void MidiModule::deleteTrack (unsigned int i)
 {
-	MidiTrack * track = trackset_ -> at(i);
+	//std::shared_ptr<MidiTrack> track = trackset_ -> at(i);
 	trackset_ -> erase (trackset_ -> begin() + i);
 	//std::cout << "Midi Module has " << trackset_ -> size () << " tracks." << std::endl;
-	delete track;
+	//delete track;
 }
 
-void MidiModule::deleteTrack (MidiTrack * t)
+void MidiModule::deleteTrack (std::shared_ptr<MidiTrack> t)
 {
 	unsigned int i=0;
 	while ( trackset_ -> at(i) != t ) i++;
 	deleteTrack (i);
 }
 
-void MidiModule::addClip (std::string path)
-{
-	clipset_ -> push_back (new MidiClip(path));
-}
-
-void MidiModule::deleteClip (unsigned int i)
-{
-	MidiClip * clip = clipset_ -> at(i);
-	clipset_ -> erase (clipset_ -> begin() + i);
-	delete clip;
-}
+//void MidiModule::addClip (std::string path)
+//{
+	//clipset_ -> push_back (new MidiClip(path));
+//}
+//
+//void MidiModule::deleteClip (unsigned int i)
+//{
+	//MidiClip * clip = clipset_ -> at(i);
+	//clipset_ -> erase (clipset_ -> begin() + i);
+	//delete clip;
+//}
 
 void MidiModule::tick (RtMidiOut * midiout)
 {

@@ -1,6 +1,7 @@
 #include <typeinfo>
 #include <unistd.h> // sleep
 #include "GUI.hpp"
+#include "State.hpp"
 
 using namespace std;
 
@@ -93,8 +94,9 @@ void EndScreen ()
 	ImGui::End();
 }
 
-void mainMenu (Project * project)
+void mainMenu ()
 {
+	std::shared_ptr<Project> project = State::getProject();
 	static bool about_open = false;
 	static bool new_audio_track = false;
 	static bool new_midi_track = false;
@@ -106,7 +108,8 @@ void mainMenu (Project * project)
 		{
 			if (ImGui::MenuItem("New", "Ctrl+N", false, menu_mask)) {}
 			if (ImGui::MenuItem("Open", "Ctrl+O", false, menu_mask)) {}
-			if (ImGui::MenuItem("Save", "Ctrl+S", false, menu_mask)) {}
+			if (ImGui::MenuItem("Save", "Ctrl+S", false, menu_mask))
+				Waiter::getInstance()->saveProject();
 			if (ImGui::MenuItem("Save As..", NULL, false, menu_mask)) {}
 			ImGui::Separator();
 			if (ImGui::MenuItem("Options")) {}
@@ -186,7 +189,7 @@ void mainMenu (Project * project)
 	}	
 }
 
-void ControlPanel (Project * project, void (*title_func)())
+void ControlPanel (std::shared_ptr<Project> project, void (*title_func)())
 // TODO : factoriser le panneau de commande (boutons, horloges...)
 {
 	ImGui::BeginChild ("Master Controls", ImVec2(0, 64), true);
@@ -307,7 +310,7 @@ void displayAudioClipDetails (AudioClip * clip)
 	//ImGui::Text("size %d", IM_ARRAYSIZE(clip -> getGUIData()));
 }
 
-void displayAudioFiles (Project* project)
+void displayAudioFiles (std::shared_ptr<Project> project)
 {
 	ImGui::Spacing();
 	static bool audio_tree_open = true;
@@ -343,7 +346,7 @@ void displayAudioFiles (Project* project)
 	}
 }
 	
-void displayMidiFiles (Project* project)
+void displayMidiFiles (std::shared_ptr<Project> project)
 {
 	vector<MidiFile *> * list = project -> getMIDIFiles ();
 	static bool midi_tree_open = true;
@@ -426,7 +429,7 @@ static void DragClipOverlay (bool* p_open)
     ImGui::End();
 }
 
-void RessourcesPanel (Project* project)
+void RessourcesPanel (std::shared_ptr<Project> project)
 {
 	ImGui::BeginChild ("Ressources", ImVec2(width1-3,0), true);
 	if ( ImGui::Button("Files") ) ui.context = Screen::RESSOURCES;
@@ -470,10 +473,10 @@ void ProjectTitle ()
 	ImGui::Text("  #   # #  #  #   ##  ##  #");
 }
 
-void ProjectScreen (Project* project)
+void ProjectScreen (std::shared_ptr<Project> project)
 {
 	BeginScreen ();
-	mainMenu (project);
+	mainMenu ();
 	ControlPanel (project, ProjectTitle);
 	ImGui::BeginChild ("MIDI input log", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	//std::vector<MidiRaw *> * midilog = State::getInstance()->getMidiLog();
@@ -518,10 +521,10 @@ void ConsoleClip (Clip * clip, int id, float hue)
 	ImGui::PopID ();
 }
 
-void ConsoleScreen (Project * project) 
+void ConsoleScreen (std::shared_ptr<Project> project) 
 {	
 	BeginScreen ();
-	mainMenu (project);
+	mainMenu ();
 	ControlPanel (project, ConsoleTitle);
 	
 	if ( ressources_panel )
@@ -534,10 +537,10 @@ void ConsoleScreen (Project * project)
 	ImGui::BeginChild ("Board", ImVec2(w-3, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 	// DISPLAYING TRACKS
-	Track * asking_track = NULL;
+	std::shared_ptr<Track> asking_track = NULL;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
 	{
-		Track * track = project -> getTrack(i);
+		std::shared_ptr<Track> track = project -> getTrack(i);
 		// track name/id
 		char child_id[32];
 		sprintf(child_id, "Track%03d", i);
@@ -649,10 +652,10 @@ void SequencerTitle ()
 	ImGui::Text("#   ##  ## ##  ## # #  ## ## # #");
 }
 
-void SequencerScreen (Project* project) 
+void SequencerScreen (std::shared_ptr<Project> project) 
 {
 	BeginScreen ();
-	mainMenu (project);
+	mainMenu ();
 	ControlPanel (project, SequencerTitle);
 
 	if ( ressources_panel )
@@ -671,7 +674,7 @@ void SequencerScreen (Project* project)
 //======================================================================
 
 
-void GUI_Main(Project* project)
+void GUI_Main(std::shared_ptr<Project> project)
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))

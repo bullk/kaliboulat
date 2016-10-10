@@ -1,5 +1,10 @@
-#include "Engine.hpp"
+#include <fstream>
+#include "cereal/types/memory.hpp"
+#include "cereal/types/vector.hpp"
+#include "cereal/archives/xml.hpp"
 
+#include "Engine.hpp"
+#include "State.hpp"
 
 RessourceFile::RessourceFile (DataType dt, std::string path) : data_type_(dt), path_(path)
 {
@@ -63,5 +68,13 @@ void Waiter::main ()
 		main_.front() -> execute ();
 		main_.pop();
 	}
+}
+
+void Waiter::saveProject ()
+{
+    std::ofstream os(State::getProject()->getFile());
+    cereal::XMLOutputArchive archive(os);
+    //State::getProject()->serialize(archive); 
+    archive(State::getProject()); 
 }
 

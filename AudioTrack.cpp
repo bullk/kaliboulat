@@ -1,17 +1,21 @@
 #include "AudioTrack.hpp"
-#include <stdlib.h>
+//#include <stdlib.h>
+#include "spdlog/spdlog.h"
 
 
 //-------------
-// Constructor 
+// Constructor
 //-------------
 
-AudioTrack::AudioTrack (std::string s) : Track (s)
+AudioTrack::AudioTrack () : Track (AUDIO, "Audio", "AudioTrack"), volume_(1.0f)
 {
-	data_type_ = AUDIO;
-	type_str_ = "Audio";
 	clipset_ = new std::vector<AudioClip *>;
-	volume_ = 1.0f;
+	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
+}
+
+AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f)
+{
+	clipset_ = new std::vector<AudioClip *>;
 	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
 }
 
@@ -22,10 +26,12 @@ AudioTrack::AudioTrack (std::string s) : Track (s)
 
 AudioTrack::~AudioTrack ()
 {
-	std::cout << "AudioTrack::~AudioTrack()" << std::endl;
+	spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
 	if ( clipset_ != NULL )
 		for (unsigned int i=0; i < clipset_ -> size(); i++)
 			delete clipset_ -> at (i);
+    delete clipset_;
+    clipset_ = NULL;
 }
 
 
@@ -57,7 +63,7 @@ void AudioTrack::stopAll ()
 		clipset_ -> at(i) -> stop();
 }
 		
-stk::StkFloat AudioTrack::tick()
+stk::StkFloat AudioTrack::tick() const
 {
 	register stk::StkFloat sample;
 
@@ -71,4 +77,4 @@ stk::StkFloat AudioTrack::tick()
 	return sample;
 }
 
-		
+

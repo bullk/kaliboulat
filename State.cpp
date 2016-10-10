@@ -2,7 +2,8 @@
 
 // Initialisation du singleton à NULL
 State * State::singleton_ = NULL;
-Track *	State::track_ = NULL;
+std::shared_ptr<Project> State::project_ = NULL;
+std::shared_ptr<Track> State::track_ = NULL;
 Clip * State::clip_ = NULL;
 
 // Constructor

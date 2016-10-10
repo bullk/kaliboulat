@@ -1,13 +1,18 @@
 #include "MidiTrack.hpp"
+#include "spdlog/spdlog.h"
 
 //-------------
 // Constructor 
 //-------------
 
-MidiTrack::MidiTrack (std::string s) : Track (s)
+//MidiTrack::MidiTrack () : Track (MIDI, "MIDI", "MidiTrack")
+//{
+	//clipset_ = new std::vector<MidiClip *>;
+	//hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
+//}
+
+MidiTrack::MidiTrack (std::string s) : Track (MIDI, "MIDI", s)
 {
-	data_type_ = MIDI;
-	type_str_ = "MIDI";
 	clipset_ = new std::vector<MidiClip *>;
 	hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
 }
@@ -19,13 +24,13 @@ MidiTrack::MidiTrack (std::string s) : Track (s)
 
 MidiTrack::~MidiTrack ()
 {
-    //delete each audio file object (and corresponding buffer, etc.)
+	spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
     if (clipset_ != NULL){
         for (unsigned int i = 0; i < clipset_->size (); i++)
-        {
             delete clipset_->at(i);
-        }
     }
+    delete clipset_;
+    clipset_ = NULL;
 }
 
 

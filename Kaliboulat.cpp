@@ -10,15 +10,10 @@
 #include <RtAudio.h>
 #include <RtMidi.h>
 
-#include "spdlog/spdlog.h"
-//#include "spdlog.h"
-
 #include "globals.h"
 #include "Clock.hpp"
-#include "AudioTrack.hpp"
-#include "MidiTrack.hpp"
 #include "MidiFile.hpp"
-#include "Project.hpp"
+#include "State.hpp"
 #include "Modules.hpp"
 #include "Listener.hpp"
 
@@ -32,13 +27,13 @@ using namespace std;
 
 // MIDI
 
-void midiInit (MidiTrack * miditrack_p);
-void midiPanic (MidiTrack * miditrack_p);
+void midiInit (std::shared_ptr<MidiTrack> miditrack_p);
+void midiPanic (std::shared_ptr<MidiTrack> miditrack_p);
 
 
 // Audio
 
-void audioInit (RtAudio * dac, AudioTrack * audiotrack_p);
+void audioInit (RtAudio * dac, std::shared_ptr<Project> project);
 void audioClose (RtAudio * dac);
 
 //----------------------------------------------------------------------
@@ -172,29 +167,29 @@ void midiCallback (double timeStamp, vector< unsigned char > *message, void *use
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer )
 {
-	Project * project = (Project *) dataPointer;
+	AudioModule * audio_module = (AudioModule *) dataPointer;
 	register StkFloat * samples = (StkFloat *) outputBuffer;
 	
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
-		if ( project -> getClock () -> isStarted () ) 
+		if ( State::getProject() -> getClock() -> isStarted() ) 
 		{
-			std::vector<AudioTrack *> * trackset = project -> getAudio () -> getTrackSet ();
+			std::vector<std::shared_ptr<AudioTrack>> * trackset = audio_module -> getTrackSet ();
 			for ( unsigned int j = 0; j < trackset -> size (); j++ )
 			{
-				AudioTrack * daTrack = trackset -> at (j);
+				std::shared_ptr<AudioTrack> daTrack = trackset -> at (j);
 				if ( daTrack -> isPlaying () )
 					*samples += daTrack -> tick () * *(daTrack -> getVolume ());
 			}
 		}
-		std::vector<AudioClip *> * clipset = project -> getAudio () -> getClipSet ();
-		for ( unsigned int j = 0; j < clipset -> size (); j++ )
-		{
-			AudioClip * clip = clipset -> at (j);
-			if ( clip -> isPlaying () )
-				*samples += clip -> tick () * *(clip -> getVolume ());
-		}
+		//std::vector<AudioClip *> * clipset = project -> getAudio () -> getClipSet ();
+		//for ( unsigned int j = 0; j < clipset -> size (); j++ )
+		//{
+			//AudioClip * clip = clipset -> at (j);
+			//if ( clip -> isPlaying () )
+				//*samples += clip -> tick () * *(clip -> getVolume ());
+		//}
 		*samples += Listener::getInstance() -> tick();
 		samples++;
 	}
@@ -202,7 +197,7 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 
-void audioInit (RtAudio * dac, Project * project)
+void audioInit (RtAudio * dac, std::shared_ptr<Project> project)
 {
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
@@ -223,7 +218,7 @@ void audioInit (RtAudio * dac, Project * project)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)project, &options ); }
+	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)project->getAudio(), &options ); }
 	catch ( RtError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
@@ -269,12 +264,8 @@ int main( int argc, char* args[] )
 
 	mainlog->info("----- project init -----");
 	// INIT PROJECT
-	Project * project = new Project("test");
-	
-	//project -> addAudioTrack ( "AudioTrack1" );
-	//project -> addAudioTrack ( "AudioTrack2" );
-	//project -> addMidiTrack ( "MidiTrack1" );
-	
+	std::shared_ptr<Project> project(new Project("test"));
+	State::setProject (project);
 	
 	mainlog->info("----- audio init -----");
 	// AUDIO INIT
@@ -388,8 +379,8 @@ int main( int argc, char* args[] )
 	mainlog->info("closing Audio ports");
 	audioClose (dac);
 
-	mainlog->info("deleting project");
-	delete project;
+	//mainlog->info("deleting project");
+	//delete project;
 	mainlog->info("deleting RtMidiIn");
 	delete midiin;
 	mainlog->info("deleting RtMidiOut");

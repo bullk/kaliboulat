@@ -10,26 +10,26 @@ class Track
 	
 public:
 	// Constructor 
-	Track (std::string s);
+	Track (DataType dt, std::string ts, std::string s);
 	// Destructor 
 	virtual ~Track ();
 
-	inline DataType dataType () { return data_type_; }
-	inline std::string getTypeStr () { return type_str_; }
-	inline std::string getName () { return name_; }
+	inline DataType dataType () const { return data_type_; }
+	inline std::string getTypeStr () const { return type_str_; }
+	inline std::string getName () const { return name_; }
 	inline void setName (std::string s) { name_ = s; }
 	inline void setState (bool b) { state_ = b; }
 	inline void muteSwitch () { state_ = not(state_); }
-	inline bool isPlaying () { return state_; }
+	inline bool isPlaying () const { return state_; }
     virtual void addClip (Clip * clip) = 0;
     virtual void deleteClip (unsigned int i) = 0;
-    virtual Clip * getClip (unsigned int i) = 0;
-    virtual unsigned int nClips () = 0;
+    virtual Clip * getClip (unsigned int i) const = 0;
+    virtual unsigned int nClips () const = 0;
     virtual void stopAll () = 0;
-	//inline float * getHueP () { return &hue_; }
-	inline float getHue () { return hue_; }
+	//inline float * getHueP () const { return &hue_; }
+	inline float getHue () const { return hue_; }
 	inline void setHue (float f) { hue_ = f; }
-    
+	
 protected:
 	DataType data_type_;
 	std::string type_str_;

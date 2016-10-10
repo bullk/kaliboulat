@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cereal>
+	<value0>
+		<ptr_wrapper>
+			<id>2147483649</id>
+			<data>
+				<value0>test</value0>
+				<value1 size="dynamic">
+					<value0>
+						<polymorphic_id>2147483649</polymorphic_id>
+						<polymorphic_name>AudioTrack</polymorphic_name>
+						<ptr_wrapper>
+							<id>2147483650</id>
+							<data>
+								<data_type_>0</data_type_>
+								<type_str_>Audio</type_str_>
+								<name_>AudioTrack</name_>
+								<hue_>0.20000000298023224</hue_>
+								<volume_>1</volume_>
+							</data>
+						</ptr_wrapper>
+					</value0>
+					<value1>
+						<polymorphic_id>1</polymorphic_id>
+						<ptr_wrapper>
+							<id>2147483651</id>
+							<data>
+								<data_type_>0</data_type_>
+								<type_str_>Audio</type_str_>
+								<name_>AudioTrack</name_>
+								<hue_>0.17000000178813934</hue_>
+								<volume_>1</volume_>
+							</data>
+						</ptr_wrapper>
+					</value1>
+					<value2>
+						<polymorphic_id>1</polymorphic_id>
+						<ptr_wrapper>
+							<id>2147483652</id>
+							<data>
+								<data_type_>0</data_type_>
+								<type_str_>Audio</type_str_>
+								<name_>AudioTrack</name_>
+								<hue_>0.28999999165534973</hue_>
+								<volume_>1</volume_>
+							</data>
+						</ptr_wrapper>
+					</value2>
+				</value1>
+			</data>
+		</ptr_wrapper>
+	</value0>
+</cereal>
+
