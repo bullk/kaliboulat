@@ -5,11 +5,11 @@
 // Constructor 
 //-------------
 
-//MidiTrack::MidiTrack () : Track (MIDI, "MIDI", "MidiTrack")
-//{
-	//clipset_ = new std::vector<MidiClip *>;
-	//hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
-//}
+MidiTrack::MidiTrack () : Track (MIDI, "MIDI", "MidiTrack")
+{
+	clipset_ = new std::vector<MidiClip *>;
+	hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
+}
 
 MidiTrack::MidiTrack (std::string s) : Track (MIDI, "MIDI", s)
 {

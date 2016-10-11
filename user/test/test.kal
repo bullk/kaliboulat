@@ -14,38 +14,25 @@
 							<data>
 								<data_type_>0</data_type_>
 								<type_str_>Audio</type_str_>
-								<name_>AudioTrack</name_>
+								<name_>Voix</name_>
 								<hue_>0.20000000298023224</hue_>
 								<volume_>1</volume_>
 							</data>
 						</ptr_wrapper>
 					</value0>
 					<value1>
-						<polymorphic_id>1</polymorphic_id>
+						<polymorphic_id>2147483650</polymorphic_id>
+						<polymorphic_name>MidiTrack</polymorphic_name>
 						<ptr_wrapper>
 							<id>2147483651</id>
 							<data>
-								<data_type_>0</data_type_>
-								<type_str_>Audio</type_str_>
-								<name_>AudioTrack</name_>
-								<hue_>0.17000000178813934</hue_>
-								<volume_>1</volume_>
+								<value0>1</value0>
+								<value1>MIDI</value1>
+								<value2>Drums</value2>
+								<value3>0.64999997615814209</value3>
 							</data>
 						</ptr_wrapper>
 					</value1>
-					<value2>
-						<polymorphic_id>1</polymorphic_id>
-						<ptr_wrapper>
-							<id>2147483652</id>
-							<data>
-								<data_type_>0</data_type_>
-								<type_str_>Audio</type_str_>
-								<name_>AudioTrack</name_>
-								<hue_>0.28999999165534973</hue_>
-								<volume_>1</volume_>
-							</data>
-						</ptr_wrapper>
-					</value2>
 				</value1>
 			</data>
 		</ptr_wrapper>

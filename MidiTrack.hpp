@@ -5,13 +5,16 @@
 #include "MidiClip.hpp"
 #include "Track.hpp"
 
+#include <cereal/archives/xml.hpp>
+#include <cereal/types/polymorphic.hpp>
+
 class MidiTrack : public Track
 {
 
 public:
 	// Constructor
-	//MidiTrack ();
-	MidiTrack (std::string s="MidiTrack");
+	MidiTrack ();
+	MidiTrack (std::string);
 	// Destructor 
 	~MidiTrack ();
 
@@ -29,7 +32,12 @@ public:
     template<class Archive>
 	void serialize(Archive & archive)
 	{
-		archive (data_type_, type_str_, name_, hue_);
+		archive (
+			CEREAL_NVP(data_type_),
+			CEREAL_NVP(type_str_),
+			CEREAL_NVP(name_),
+			CEREAL_NVP(hue_)
+		);
 	}
 	
 private:
@@ -37,5 +45,8 @@ private:
 	RtMidi * output_;
 
 };
+
+CEREAL_REGISTER_TYPE(MidiTrack)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Track, MidiTrack)
 
 #endif

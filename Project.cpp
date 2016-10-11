@@ -3,7 +3,9 @@
 #include "spdlog/spdlog.h"
 
 #include "Project.hpp"
+#include "Clock.hpp"
 #include "State.hpp"
+#include "Modules.hpp"
 
 Project::Project (std::string str)
 {

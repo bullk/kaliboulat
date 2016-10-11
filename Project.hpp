@@ -11,8 +11,6 @@
 #endif 
 
 #include "globals.h"
-#include "Clock.hpp"
-#include "Modules.hpp"
 #include "AudioFile.hpp"
 #include "MidiFile.hpp"
 
@@ -24,6 +22,10 @@
   //std::cout << " file: " << str.substr(found+1) << '\n';
 //}
 
+class Clock;
+class AudioModule;
+class MidiModule;
+
 class Project
 {
 
@@ -34,9 +36,9 @@ public:
 	//void importAll ();
 	inline std::string getName () { return name_; }
 	inline std::string getFile () { return file_; }
-	inline Clock * getClock () { return clock_; }
-	inline AudioModule * getAudio () { return audio_; }
-	inline MidiModule * getMIDI () { return midi_; }
+	Clock * getClock ();
+	AudioModule * getAudio ();
+	MidiModule * getMIDI ();
 	inline std::string getAudioDir () { return dir_ + "/Audio"; }
 	inline std::string getMIDIDir () { return dir_ + "/MIDI"; }
 	void addAudioTrack (std::string s);
@@ -54,7 +56,10 @@ public:
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
-		archive (name_, tracks_);
+		archive (
+			CEREAL_NVP(name_),
+			CEREAL_NVP(tracks_)
+		);
 	}
 	
 protected:
@@ -69,5 +74,10 @@ protected:
 	std::vector<MidiFile *> * midifiles_;
 	bool ctrl_;
 };
+
+inline Clock * Project::getClock () { return clock_; }
+inline AudioModule * Project::getAudio () { return audio_; }
+inline MidiModule * Project::getMIDI () { return midi_; }
+
 
 #endif

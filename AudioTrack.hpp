@@ -54,4 +54,5 @@ protected:
 
 CEREAL_REGISTER_TYPE(AudioTrack)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Track, AudioTrack)
+
 #endif

@@ -1,6 +1,7 @@
 #include <typeinfo>
 #include <unistd.h> // sleep
 #include "GUI.hpp"
+#include "Clock.hpp"
 #include "State.hpp"
 
 using namespace std;

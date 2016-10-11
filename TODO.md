@@ -3,6 +3,7 @@
 ---------------
 ## MAINTENANT
 
+Gestion automatique des dépendances du makefile
 Etudier la sérialisation pour la sauvegarde de projet et la gestion d'historique
 extraire de Project tout ce qui est relatif au type de données
 modulariser entièrement l'audio et le midi 

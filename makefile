@@ -39,7 +39,7 @@ MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp
 MidiFile.o: MidiFile.hpp MidiTrack.hpp
 MidiTrack.o: MidiTrack.hpp MidiClip.hpp Track.hpp
 Modules.o: Modules.hpp AudioTrack.hpp MidiTrack.hpp
-Project.o: Project.hpp globals.h Clock.hpp Modules.hpp
+Project.o: Project.hpp globals.h Clock.hpp State.hpp Modules.hpp
 Scheduled.o: Scheduled.hpp
 State.o: State.hpp Project.hpp
 Track.o: Track.hpp Clip.hpp
