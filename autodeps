@@ -1,0 +1,61 @@
+#!/bin/bash
+#dependencies for makefile
+
+i=0
+OLDFILE=makefile.000
+until [ ! -e "tmp/$OLDFILE" ]
+do
+	printf -v ext "%03d" $i
+	OLDFILE=makefile.$ext
+	(( i+=1 ))
+done
+echo "archiving makefile to $OLDFILE"
+cp makefile tmp/$OLDFILE
+
+TMPFILE=$(mktemp)
+
+echo "parsing makefile"
+deps_processed=0
+indeps=0
+cat "makefile" | while IFS=';' read line
+do
+	if [ "${line:0:9}" = "#AUTODEPS" ]
+	then
+		echo "$line" >> $TMPFILE
+		indeps=$((1-indeps))
+	else
+		if [ $indeps -eq 0 ]
+		then
+			echo "$line" >> $TMPFILE
+		else
+			if [ $deps_processed -eq 0 ]
+			then
+				echo "updating dependencies"
+				for SRC_FILE in *.cpp
+				do
+					BASENAME=${SRC_FILE%%.*}
+					echo -n "$BASENAME.o: " >> $TMPFILE
+
+					grep '^#include' $SRC_FILE | grep -v "<" | while read tag INCLUDE
+					do
+						echo -n "${INCLUDE:1: -1} " >> $TMPFILE
+					done
+
+					grep '^#include' $BASENAME.hpp | grep -v "<" | while read tag INCLUDE
+					do
+						echo -n "${INCLUDE:1: -1} " >> $TMPFILE
+					done
+					
+					echo >> $TMPFILE
+				done
+				deps_processed=1
+			fi
+		
+		fi
+	fi
+done
+
+cp $TMPFILE makefile
+rm $TMPFILE
+
+echo "done"

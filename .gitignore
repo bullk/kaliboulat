@@ -1,7 +1,11 @@
+tmp/
+doc/
+sdl_opengl_example/
+midifile/
+
 Kaliboulat*
 *.o
 *.log
+CMakeLists.txt
+
 #GUI.*
-sdl_opengl_example/
-midifile/
-doc
