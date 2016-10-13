@@ -1,4 +1,6 @@
 #include "MidiClip.hpp"
+#include <RtMidi.h>
+#include "midi.hpp"
 
 
 //-------------

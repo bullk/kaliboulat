@@ -81,15 +81,17 @@ void MidiFile::parse ()
 								}
 								default:
 									//std::cout << "unknown 0xFF event : ";
-									for (auto j = event->begin(); j != event->end(); ++j) std::cout << std::hex << (int)*j << ' ';
+									//for (auto j = event->begin(); j != event->end(); ++j)
+										//std::cout << std::hex << (int)*j << ' ';
 									break;
 							}
 							break;
 						default:
-							for (auto j = event->begin(); j != event->end(); ++j) std::cout << std::hex << (int)*j << ' ';
+							//for (auto j = event->begin(); j != event->end(); ++j)
+								//std::cout << std::hex << (int)*j << ' ';
 							clip -> appendEvent (abs_time, event);
 					}
-					std::cout << std::endl;
+					//std::cout << std::endl;
 					delta_time = getNextEvent (event, i);
 				}
 				//std::cout << "events parsing done" << std::endl;

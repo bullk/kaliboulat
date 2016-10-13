@@ -45,11 +45,8 @@ void AudioTrack::addClip (std::shared_ptr<Clip> clip)
 
 void AudioTrack::addClip (std::shared_ptr<AudioClip> clip)
 {
-	std::cout << "AudioTrack::addClip" << clipset_.size() << std::endl;
+	//std::cout << "AudioTrack::addClip" << clipset_.size() << std::endl;
 	clipset_.push_back (clip);
-	std::cout << "Clipset Types" << std::endl;
-	for ( unsigned int i=0; i < clipset_.size(); i++ )
-		std::cout << typeid(clipset_.at(i)).name() << std::endl;
 }
 
 void AudioTrack::deleteClip (unsigned int i)

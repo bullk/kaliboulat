@@ -4,11 +4,11 @@
 #include "MidiClip.hpp"
 #include "Track.hpp"
 
-#include <cereal/types/memory.hpp>
 #include <cereal/types/vector.hpp>
 //#include <cereal/archives/binary.hpp>
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/polymorphic.hpp>
+
 
 class MidiTrack : public Track
 {
@@ -28,8 +28,8 @@ public:
 	void tick (RtMidiOut *);
 	void stopAll ();
 	//inline std::vector<std::shared_ptr<MidiClip>> * getClipSet () { return clipset_; }
-	inline RtMidi * getOutput () const { return output_; }
-	inline void setOutput (RtMidi * o) { output_ = o; }
+	inline RtMidiOut * getOutput () const { return output_; }
+	inline void setOutput (RtMidiOut * o) { output_ = o; }
 	
     template<class Archive>
 	void serialize(Archive & archive)
@@ -45,7 +45,7 @@ public:
 	
 private:
 	std::vector<std::shared_ptr<MidiClip>> clipset_;
-	RtMidi * output_;
+	RtMidiOut * output_;
 
 };
 

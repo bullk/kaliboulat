@@ -1,5 +1,6 @@
 CC = g++
-CFLAGS = -Wall -Os -D__LITTLE_ENDIAN__ -I.
+#CFLAGS = -Wall -Os -D__LITTLE_ENDIAN__ -I.
+CFLAGS = -Wall -O1 -D__LITTLE_ENDIAN__ -I.
 CFLAGS += -std=c++0x
 #CFLAGS += -std=c++11
 JACKFLAGS = -D__UNIX_JACK__
@@ -37,7 +38,7 @@ AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp
 Clip.o: Clip.hpp globals.h Engine.hpp 
 Clock.o: Clock.hpp Engine.hpp 
 Engine.o: Engine.hpp State.hpp 
-GUI.o: GUI.hpp Clock.hpp State.hpp imgui/imgui.h imgui/imgui_impl_sdl.h Project.hpp Listener.hpp 
+GUI.o: GUI.hpp Clock.hpp State.hpp midi.hpp imgui/imgui.h imgui/imgui_impl_sdl.h Project.hpp Listener.hpp 
 Kaliboulat.o: globals.h Clock.hpp MidiFile.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp globals.h Clock.hpp AudioTrack.hpp MidiTrack.hpp MidiFile.hpp Project.hpp Modules.hpp GUI.hpp 
 Listener.o: Listener.hpp AudioClip.hpp MidiClip.hpp 
 MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp 

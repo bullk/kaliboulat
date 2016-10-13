@@ -1,8 +1,6 @@
 #ifndef INC_MIDICLIP_H
 #define INC_MIDICLIP_H
 
-#include <RtMidi.h>
-#include "midi.hpp"
 #include "Clip.hpp"
 
 #include <cereal/types/memory.hpp>
@@ -10,6 +8,8 @@
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/polymorphic.hpp>
 
+class RtMidiOut;
+class ScheduledMidiMessage;
 
 class MidiClip : public Clip
 {

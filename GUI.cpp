@@ -3,6 +3,7 @@
 #include "GUI.hpp"
 #include "Clock.hpp"
 #include "State.hpp"
+#include "midi.hpp"
 
 using namespace std;
 
@@ -324,7 +325,7 @@ void displayAudioFiles (std::shared_ptr<Project> project)
 			AudioFile * file = list -> at(i);
 			if ( ImGui::Selectable (file -> getName().c_str()) )
 			{
-				cout << "selecting " << file -> getName().c_str() << endl;
+				//cout << "selecting " << file -> getName().c_str() << endl;
 				Listener::openFile (file -> getPath());
 			}
 			

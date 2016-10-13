@@ -52,23 +52,6 @@
 											</data>
 										</ptr_wrapper>
 									</value1>
-									<value2>
-										<polymorphic_id>1073741824</polymorphic_id>
-										<ptr_wrapper>
-											<id>2147483653</id>
-											<data>
-												<data_type_>0</data_type_>
-												<path_>/home/jeandamme/src/kaliboulat/user/test/Audio/bar.wav</path_>
-												<name_>bar</name_>
-												<launchstyle_>0</launchstyle_>
-												<stopstyle_>2</stopstyle_>
-												<loopstyle_>0</loopstyle_>
-												<volume_>0.5</volume_>
-												<gui_rate_>1</gui_rate_>
-												<gui_pitch_>0</gui_pitch_>
-											</data>
-										</ptr_wrapper>
-									</value2>
 								</clipset_>
 							</data>
 						</ptr_wrapper>
@@ -77,7 +60,7 @@
 						<polymorphic_id>2147483650</polymorphic_id>
 						<polymorphic_name>MidiTrack</polymorphic_name>
 						<ptr_wrapper>
-							<id>2147483654</id>
+							<id>2147483653</id>
 							<data>
 								<data_type_>1</data_type_>
 								<type_str_>MIDI</type_str_>
@@ -87,7 +70,7 @@
 									<value0>
 										<polymorphic_id>1073741824</polymorphic_id>
 										<ptr_wrapper>
-											<id>2147483655</id>
+											<id>2147483654</id>
 											<data>
 												<data_type_>1</data_type_>
 												<path_></path_>
@@ -104,6 +87,68 @@
 							</data>
 						</ptr_wrapper>
 					</value1>
+					<value2>
+						<polymorphic_id>1</polymorphic_id>
+						<ptr_wrapper>
+							<id>2147483655</id>
+							<data>
+								<data_type_>0</data_type_>
+								<type_str_>Audio</type_str_>
+								<name_>AudioTrack</name_>
+								<hue_>0.12999999523162842</hue_>
+								<volume_>1</volume_>
+								<clipset_ size="dynamic">
+									<value0>
+										<polymorphic_id>1073741824</polymorphic_id>
+										<ptr_wrapper>
+											<id>2147483656</id>
+											<data>
+												<data_type_>0</data_type_>
+												<path_>/home/jeandamme/src/kaliboulat/user/test/Audio/hellosine.wav</path_>
+												<name_>hellosine</name_>
+												<launchstyle_>0</launchstyle_>
+												<stopstyle_>2</stopstyle_>
+												<loopstyle_>0</loopstyle_>
+												<volume_>0.5</volume_>
+												<gui_rate_>1</gui_rate_>
+												<gui_pitch_>0</gui_pitch_>
+											</data>
+										</ptr_wrapper>
+									</value0>
+									<value1>
+										<polymorphic_id>1073741824</polymorphic_id>
+										<ptr_wrapper>
+											<id>2147483657</id>
+											<data>
+												<data_type_>0</data_type_>
+												<path_>/home/jeandamme/src/kaliboulat/user/test/Audio/bar.wav</path_>
+												<name_>bar</name_>
+												<launchstyle_>0</launchstyle_>
+												<stopstyle_>2</stopstyle_>
+												<loopstyle_>0</loopstyle_>
+												<volume_>0.5</volume_>
+												<gui_rate_>1</gui_rate_>
+												<gui_pitch_>0</gui_pitch_>
+											</data>
+										</ptr_wrapper>
+									</value1>
+								</clipset_>
+							</data>
+						</ptr_wrapper>
+					</value2>
+					<value3>
+						<polymorphic_id>2</polymorphic_id>
+						<ptr_wrapper>
+							<id>2147483658</id>
+							<data>
+								<data_type_>1</data_type_>
+								<type_str_>MIDI</type_str_>
+								<name_>MidiTrack</name_>
+								<hue_>0.67000001668930054</hue_>
+								<clipset_ size="dynamic"/>
+							</data>
+						</ptr_wrapper>
+					</value3>
 				</tracks_>
 			</data>
 		</ptr_wrapper>

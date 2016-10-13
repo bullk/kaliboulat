@@ -19,7 +19,7 @@ public:
 	inline ClipState getState () { return state_; }
 	inline bool isPlaying () { return (state_ == PLAYING); }
 	void arm ();
-	inline void play () { std::cout << "clip started" << std::endl; state_ = PLAYING; }
+	inline void play () { state_ = PLAYING; }
 	inline void stop () { state_ = HALTED; }
 	inline virtual std::string getPath ()  { return path_; }
 	inline virtual std::string getName () { return name_; }
