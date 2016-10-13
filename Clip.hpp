@@ -2,6 +2,7 @@
 #define INC_CLIP_H
 
 #include <string>
+#include "globals.h"
 #include "Engine.hpp"
 
 class Clip
@@ -10,15 +11,6 @@ public:
 	enum ClipState { HALTED, ARMED, PLAYING, RECORDING };
 	enum LaunchStyle { BAR, BEAT, FREE, RESYNC };
 	enum LoopStyle { ONESHOT, MANY, FOREVER };
-	
-protected:
-	DataType data_type_;
-	ClipState state_;
-	std::string path_;
-	std::string name_;
-	LaunchStyle launchstyle_, stopstyle_;
-	LoopStyle loopstyle_;
-	//int angle_;
 	
 public:	
 	Clip ();
@@ -38,6 +30,15 @@ public:
 	virtual unsigned long getLength() = 0;
 	//virtual int getAngle (void) = 0;
    
+protected:
+	DataType data_type_;
+	ClipState state_;
+	std::string name_;
+	std::string path_;
+	LaunchStyle launchstyle_, stopstyle_;
+	LoopStyle loopstyle_;
+	//int angle_;
+	
 };
 
 #endif

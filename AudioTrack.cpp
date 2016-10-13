@@ -1,6 +1,6 @@
-#include "AudioTrack.hpp"
 //#include <stdlib.h>
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
+#include "AudioTrack.hpp"
 
 
 //-------------
@@ -9,13 +9,13 @@
 
 AudioTrack::AudioTrack () : Track (AUDIO, "Audio", "AudioTrack"), volume_(1.0f)
 {
-	clipset_ = new std::vector<AudioClip *>;
+	//clipset_ = new std::vector<std::shared_ptr<AudioClip>>;
 	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
 }
 
 AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f)
 {
-	clipset_ = new std::vector<AudioClip *>;
+	//clipset_ = new std::vector<std::shared_ptr<AudioClip>>;
 	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
 }
 
@@ -27,11 +27,10 @@ AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f
 AudioTrack::~AudioTrack ()
 {
 	spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
-	if ( clipset_ != NULL )
-		for (unsigned int i=0; i < clipset_ -> size(); i++)
-			delete clipset_ -> at (i);
-    delete clipset_;
-    clipset_ = NULL;
+	while (clipset_.size())
+		deleteClip(0);
+    //delete clipset_;
+    //clipset_ = NULL;
 }
 
 
@@ -39,28 +38,31 @@ AudioTrack::~AudioTrack ()
 // Add a clip
 //------------
 
-void AudioTrack::addClip (Clip * clip)
+void AudioTrack::addClip (std::shared_ptr<Clip> clip)
 {
-	addClip ( (AudioClip *) clip );
+	addClip ( std::static_pointer_cast<AudioClip>(clip)  );
 }
 
-void AudioTrack::addClip (AudioClip * clip)
+void AudioTrack::addClip (std::shared_ptr<AudioClip> clip)
 {
-	std::cout << "AudioTrack::addClip" << std::endl;
-	clipset_ -> push_back (clip);
+	std::cout << "AudioTrack::addClip" << clipset_.size() << std::endl;
+	clipset_.push_back (clip);
+	std::cout << "Clipset Types" << std::endl;
+	for ( unsigned int i=0; i < clipset_.size(); i++ )
+		std::cout << typeid(clipset_.at(i)).name() << std::endl;
 }
 
 void AudioTrack::deleteClip (unsigned int i)
 {
-	AudioClip * clip = clipset_ -> at(i);
-	clipset_ -> erase (clipset_ -> begin() + i);
-	delete clip;
+	std::shared_ptr<AudioClip> clip = clipset_.at(i);
+	clipset_.erase (clipset_.begin() + i);
+	//delete clip;
 }
 
 void AudioTrack::stopAll ()
 {
-	for ( unsigned int i=0; i < clipset_ -> size(); i++ )
-		clipset_ -> at(i) -> stop();
+	for ( unsigned int i=0; i < clipset_.size(); i++ )
+		clipset_.at(i) -> stop();
 }
 		
 stk::StkFloat AudioTrack::tick() const
@@ -68,9 +70,9 @@ stk::StkFloat AudioTrack::tick() const
 	register stk::StkFloat sample;
 
 	sample = 0;
-	for ( unsigned int j = 0; j < clipset_ -> size (); j++ )
+	for ( unsigned int j = 0; j < clipset_.size (); j++ )
 	{
-		AudioClip * clip = clipset_ -> at (j);
+		std::shared_ptr<AudioClip> clip = clipset_.at (j);
 		if ( clip -> isPlaying () )
 			sample += clip -> tick () * *(clip -> getVolume ());
 	}

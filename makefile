@@ -25,11 +25,16 @@ Kaliboulat-rtmidi2.0.1: $(OBJS) globals.h
 Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(ALSAFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
 
+#tests: MidiClip.o tests.o globals.h
+	#$(CC) $(CFLAGS) $(LDFLAGS) $(JACKFLAGS) -o $@ MidiClip.o tests.o $(LDLIBS) $(JACKLIBS)
+#
+#tests.o: MidiClip.hpp
+	
 #AUTODEPS
 AudioClip.o: AudioClip.hpp Clip.hpp 
 AudioFile.o: AudioFile.hpp Engine.hpp 
 AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp 
-Clip.o: Clip.hpp Engine.hpp 
+Clip.o: Clip.hpp globals.h Engine.hpp 
 Clock.o: Clock.hpp Engine.hpp 
 Engine.o: Engine.hpp State.hpp 
 GUI.o: GUI.hpp Clock.hpp State.hpp imgui/imgui.h imgui/imgui_impl_sdl.h Project.hpp Listener.hpp 
@@ -43,7 +48,7 @@ Modules.o: Modules.hpp globals.h AudioTrack.hpp MidiTrack.hpp
 Project.o: Project.hpp Clock.hpp State.hpp Modules.hpp globals.h AudioFile.hpp MidiFile.hpp 
 Scheduled.o: Scheduled.hpp 
 State.o: State.hpp Project.hpp 
-Track.o: Track.hpp Clip.hpp 
+Track.o: Track.hpp globals.h Clip.hpp 
 #AUTODEPS
 
 .cpp.o:

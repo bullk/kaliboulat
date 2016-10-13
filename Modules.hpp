@@ -45,12 +45,12 @@ public:
     inline std::vector<std::shared_ptr<AudioTrack>> * getTrackSet () { return trackset_; }
     //void addClip (std::string path);
     //void deleteClip (unsigned int i);
-    //inline std::vector<AudioClip *> * getClipSet () { return clipset_; }
+    //inline std::vector<std::shared_ptr<AudioClip>> * getClipSet () { return clipset_; }
     void stopAll ();
     
 protected:
 	std::vector<std::shared_ptr<AudioTrack>> * trackset_;
-	//std::vector<AudioClip *> * clipset_;
+	//std::vector<std::shared_ptr<AudioClip>> * clipset_;
 
 };
 
@@ -70,13 +70,13 @@ public:
     inline std::vector<std::shared_ptr<MidiTrack>> * getTrackSet () { return trackset_; }
     //void addClip (std::string path);
     //void deleteClip (unsigned int i);
-    //inline std::vector<MidiClip *> * getClipSet () { return clipset_; }
+    //inline std::vector<std::shared_ptr<MidiClip>> * getClipSet () { return clipset_; }
     void stopAll ();
     void tick (RtMidiOut * midiout);
     
 protected:
 	std::vector<std::shared_ptr<MidiTrack>> * trackset_;
-	//std::vector<MidiClip *> * clipset_;
+	//std::vector<std::shared_ptr<MidiClip>> * clipset_;
 
 };
 

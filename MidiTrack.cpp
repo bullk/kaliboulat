@@ -7,13 +7,13 @@
 
 MidiTrack::MidiTrack () : Track (MIDI, "MIDI", "MidiTrack")
 {
-	clipset_ = new std::vector<MidiClip *>;
+	//clipset_ = new std::vector<std::shared_ptr<MidiClip>>;
 	hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
 }
 
 MidiTrack::MidiTrack (std::string s) : Track (MIDI, "MIDI", s)
 {
-	clipset_ = new std::vector<MidiClip *>;
+	//clipset_ = new std::vector<std::shared_ptr<MidiClip>>;
 	hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
 }
 
@@ -25,12 +25,10 @@ MidiTrack::MidiTrack (std::string s) : Track (MIDI, "MIDI", s)
 MidiTrack::~MidiTrack ()
 {
 	spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
-    if (clipset_ != NULL){
-        for (unsigned int i = 0; i < clipset_->size (); i++)
-            delete clipset_->at(i);
-    }
-    delete clipset_;
-    clipset_ = NULL;
+	while (clipset_.size())
+		deleteClip(0);
+    //delete clipset_;
+    //clipset_ = NULL;
 }
 
 
@@ -38,33 +36,33 @@ MidiTrack::~MidiTrack ()
 // Add a clip
 //------------
 
-void MidiTrack::addClip (Clip * clip)
+void MidiTrack::addClip (std::shared_ptr<Clip> clip)
 {
-	addClip ( (MidiClip *) clip );
+	addClip ( std::static_pointer_cast<MidiClip>(clip) );
 }
 
-void MidiTrack::addClip(MidiClip * daClip)
+void MidiTrack::addClip(std::shared_ptr<MidiClip> daClip)
 {
-		clipset_->push_back (daClip);
+	clipset_.push_back (daClip);
 }
 
 void MidiTrack::deleteClip (unsigned int i)
 {
-	MidiClip * clip = clipset_ -> at(i);
-	clipset_ -> erase (clipset_ -> begin() + i);
-	delete clip;
+	std::shared_ptr<MidiClip> clip = clipset_.at(i);
+	clipset_.erase (clipset_.begin() + i);
+	//delete clip;
 }
 
 void MidiTrack::tick (RtMidiOut * midiout)
 {
-	for (unsigned int i = 0; i < clipset_->size (); i++)
-		if (clipset_->at(i)->getState () == Clip::PLAYING)
-			clipset_->at(i)->tick (midiout);
+	for (unsigned int i = 0; i < clipset_.size (); i++)
+		if (clipset_.at(i)->getState () == Clip::PLAYING)
+			clipset_.at(i)->tick (midiout);
 }
 
 void MidiTrack::stopAll ()
 {
-	for (unsigned int i = 0; i < clipset_->size(); i++)
-		clipset_ -> at(i) -> stop();
+	for (unsigned int i = 0; i < clipset_.size(); i++)
+		clipset_.at(i) -> stop();
 }
 		

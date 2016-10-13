@@ -13,7 +13,7 @@ public:
 	~MidiFile ();
 	void rewind ();
 	void parse ();
-	MidiClip * getTrack (unsigned int i);
+	std::shared_ptr<MidiClip> getTrack (unsigned int i);
 	inline unsigned int nClips () { return miditracks_ -> size(); }
 	//long unsigned int getLength ();
 	//long unsigned int getTime ();
@@ -21,7 +21,7 @@ public:
 	
 protected:
 	long unsigned int length_, time_;
-	std::vector<MidiClip *> * miditracks_;
+	std::vector<std::shared_ptr<MidiClip>> * miditracks_;
 	//std::vector<long unsigned int> track_indexes_;
 };
 

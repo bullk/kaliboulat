@@ -23,7 +23,7 @@ struct Screen
 	//unsigned int audioclip, midiclip;
 	//AudioFile * dragged_audio_file;
 	RessourceFile * dragged_file;
-	Clip * dragged_clip;
+	std::shared_ptr<Clip> dragged_clip;
 	//Clip * selected_clip;
 	//std::shared_ptr<Track> selected_track;
 	

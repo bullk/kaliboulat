@@ -1,15 +1,14 @@
 #ifndef INC_AUDIOCLIP_H
 #define INC_AUDIOCLIP_H
 
-#include <string>
 #include <stk/FileWvIn.h>
 #include <stk/PitShift.h>
 #include "Clip.hpp"
 
-/*		Classe AudioClip
- * 
- *
- */
+#include <cereal/types/memory.hpp>
+//#include <cereal/archives/binary.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/types/polymorphic.hpp>
 
 
 class AudioClip : public Clip, public stk::FileWvIn
@@ -29,6 +28,30 @@ public:
 	stk::StkFloat tick (unsigned int channel = 0);
 	//void setVolume (StkFloat);
 	//int getAngle (void);
+
+	template<class Archive>
+	void serialize(Archive & archive)
+	{
+		archive (
+			CEREAL_NVP(data_type_),
+			CEREAL_NVP(path_),
+			CEREAL_NVP(name_),
+			CEREAL_NVP(launchstyle_),
+			CEREAL_NVP(stopstyle_),
+			CEREAL_NVP(loopstyle_),
+			CEREAL_NVP(volume_),
+			CEREAL_NVP(gui_rate_),
+			CEREAL_NVP(gui_pitch_)
+		);
+	}
+	
+	template <class Archive>
+	static void load_and_construct( Archive & ar, cereal::construct<AudioClip> & construct )
+	{
+		std::string path;
+		ar( path );
+		construct( path );
+	}
 	
 protected:    
 	float volume_;
@@ -36,7 +59,24 @@ protected:
 	int gui_pitch_;
 	float gui_data_[];
 	stk::PitShift * pitshift_;
+	
 };
 
+//namespace cereal
+//{
+  //template <> struct LoadAndConstruct<AudioClip>
+  //{
+	//template <class Archive>
+	//static void load_and_construct( Archive & ar, cereal::construct<AudioClip> & construct )
+	//{
+		//std::string path;
+		//ar( path );
+		//construct( path );
+	//}
+  //};
+//}
+ 
+CEREAL_REGISTER_TYPE(AudioClip)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Clip, AudioClip)
 
 #endif

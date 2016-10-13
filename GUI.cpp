@@ -297,7 +297,7 @@ void displayMidiClipDetails (MidiClip * clip)
 	ImGui::Separator();
 }
 
-void displayAudioClipDetails (AudioClip * clip)
+void displayAudioClipDetails (std::shared_ptr<AudioClip> clip)
 {
 	ImGui::PushItemWidth(100);
 	ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
@@ -334,7 +334,7 @@ void displayAudioFiles (std::shared_ptr<Project> project)
 				{
 					action_drag_clip = true;
 					//ui.dragged_clip = list -> at(i);
-					ui.dragged_clip = new AudioClip (file -> getPath());
+					ui.dragged_clip = std::make_shared<AudioClip> (file -> getPath());
 				}
 				else
 				{
@@ -451,7 +451,8 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 		case Screen::AUDIOCLIP:
 		if ( State::getInstance() -> getClip() )
 		{
-			AudioClip * clip = (AudioClip *)State::getInstance() -> getClip();
+			
+			std::shared_ptr<AudioClip> clip = std::static_pointer_cast<AudioClip>(State::getInstance() -> getClip());
 			ImGui::Text("%s", clip -> getName().c_str());
 			ImGui::Text("%s", clip -> getPath().c_str());
 			
@@ -504,7 +505,7 @@ void ConsoleTitle ()
 	ImGui::Text("   ##  #  # # #    #  ## ##");
 }
 
-void ConsoleClip (Clip * clip, int id, float hue)
+void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue)
 {
 	ImGui::PushID (id);
 	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(hue, 0.4f, 0.4f));

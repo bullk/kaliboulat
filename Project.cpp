@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 #include "Project.hpp"
 #include "Clock.hpp"

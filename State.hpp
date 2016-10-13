@@ -14,7 +14,7 @@ class State
 		static State * singleton_;
 		static std::shared_ptr<Project> project_;
 		static std::shared_ptr<Track> track_;
-		static Clip * clip_;
+		static std::shared_ptr<Clip> clip_;
 
 	public:
 		inline bool isOn () { return onoff_; }
@@ -23,8 +23,8 @@ class State
 		static inline void setProject (std::shared_ptr<Project> project) { project_ = project; }
 		static inline std::shared_ptr<Track> getTrack () { return track_; }
 		static inline void setTrack (std::shared_ptr<Track> track) { track_ = track; }
-		static inline Clip * getClip () { return clip_; }
-		static inline void setClip (Clip * clip) { clip_ = clip; }
+		static inline std::shared_ptr<Clip> getClip () { return clip_; }
+		static inline void setClip (std::shared_ptr<Clip> clip) { clip_ = clip; }
 		
 		// Singleton
 		static State *getInstance ()

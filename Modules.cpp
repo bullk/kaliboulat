@@ -8,7 +8,7 @@
 AudioModule::AudioModule ()
 {
 	trackset_ = new std::vector<std::shared_ptr<AudioTrack>>;
-	//clipset_ = new std::vector<AudioClip *>;
+	//clipset_ = new std::vector<std::shared_ptr<AudioClip>>;
 }
 
 
@@ -57,7 +57,7 @@ void AudioModule::deleteTrack (std::shared_ptr<AudioTrack> t)
 //
 //void AudioModule::deleteClip (unsigned int i)
 //{
-	//AudioClip * clip = clipset_ -> at(i);
+	//std::shared_ptr<AudioClip> clip = clipset_ -> at(i);
 	//clipset_ -> erase (clipset_ -> begin() + i);
 	//delete clip;
 //}
@@ -72,7 +72,7 @@ void AudioModule::deleteTrack (std::shared_ptr<AudioTrack> t)
 MidiModule::MidiModule ()
 {
 	trackset_ = new std::vector<std::shared_ptr<MidiTrack>>;
-	//clipset_ = new std::vector<MidiClip *>;
+	//clipset_ = new std::vector<std::shared_ptr<MidiClip>>;
 }
 
 

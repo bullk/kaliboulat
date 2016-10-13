@@ -2,6 +2,7 @@
 #define INC_TRACK_H
 
 #include <string>
+#include "globals.h"
 #include "Clip.hpp"
 
 
@@ -21,9 +22,9 @@ public:
 	inline void setState (bool b) { state_ = b; }
 	inline void muteSwitch () { state_ = not(state_); }
 	inline bool isPlaying () const { return state_; }
-    virtual void addClip (Clip * clip) = 0;
+    virtual void addClip (std::shared_ptr<Clip> clip) = 0;
     virtual void deleteClip (unsigned int i) = 0;
-    virtual Clip * getClip (unsigned int i) const = 0;
+    virtual std::shared_ptr<Clip> getClip (unsigned int i) const = 0;
     virtual unsigned int nClips () const = 0;
     virtual void stopAll () = 0;
 	//inline float * getHueP () const { return &hue_; }

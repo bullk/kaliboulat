@@ -183,10 +183,10 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 					*samples += daTrack -> tick () * *(daTrack -> getVolume ());
 			}
 		}
-		//std::vector<AudioClip *> * clipset = project -> getAudio () -> getClipSet ();
+		//std::vector<std::shared_ptr<AudioClip>> * clipset = project -> getAudio () -> getClipSet ();
 		//for ( unsigned int j = 0; j < clipset -> size (); j++ )
 		//{
-			//AudioClip * clip = clipset -> at (j);
+			//std::shared_ptr<AudioClip> clip = clipset -> at (j);
 			//if ( clip -> isPlaying () )
 				//*samples += clip -> tick () * *(clip -> getVolume ());
 		//}
