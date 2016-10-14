@@ -8,4 +8,6 @@ Kaliboulat*
 *.log
 CMakeLists.txt
 
+user/
+
 #GUI.*

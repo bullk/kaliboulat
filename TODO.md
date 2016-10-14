@@ -3,22 +3,32 @@
 ---------------
 ## MAINTENANT
 
-Gestion automatique des dépendances du makefile
-Etudier la sérialisation pour la sauvegarde de projet et la gestion d'historique
-extraire de Project tout ce qui est relatif au type de données
-modulariser entièrement l'audio et le midi 
-MIDI IN parsing a finir
-revoir les logs MIDI
+* Rangement et nettoyage
+	* extraire de Project tout ce qui est relatif au type de données
+	* modulariser entièrement l'audio et le midi
+	* Passer les commandes par le Waiter
+	* Découper les fichier GUI
+	* réagencer le code source
+
+* MIDI 
+	* MIDI IN parsing a finir
+	* revoir les logs MIDI
+
+* Gestion des projets
+	* Nouveau
+	* Ouvrir
+	* Enregistrer (/sous)
+	* historique
+
+* Etudier et mettre en place
+	* Documentation
+	* Tests
 
 ### Fonctionnalités
 
 * finir l'implémentation des Launch / Stop / Loop pour AudioClip
   et l'adapter pour MidiClip
 * Navigation / Import de fichiers
-* Gestion des projets
-	* Nouveau
-	* Ouvrir
-	* Enregistrer
 * Clip Warp
 * ajout multi-clips (ex : fichier MIDI multitracks entier)
 	
