@@ -3,10 +3,15 @@
 
 #include <string>
 #include <vector>
+//#include <memory>
+#include <RtMidi.h>
 #include "Scheduled.hpp"
 
 typedef std::vector<unsigned char> MidiRaw;
 
+void midiInit ();
+void midiPanic (RtMidiOut * midiout);
+void midiCallback (double timeStamp, std::vector< unsigned char > *message, void *userData);
 
 // MIDI message types filtered by status byte, sorted by categories (events, channel mode, system common, realtime)
 // source : https://www.midi.org/specifications/item/table-1-summary-of-midi-message
