@@ -39,7 +39,7 @@ Clip.o: Clip.hpp globals.h Engine.hpp
 Clock.o: Clock.hpp Engine.hpp 
 Engine.o: Engine.hpp State.hpp 
 GUI.o: GUI.hpp Clock.hpp State.hpp midi.hpp imgui/imgui.h imgui/imgui_impl_sdl.h Project.hpp Listener.hpp 
-Kaliboulat.o: globals.h Clock.hpp MidiFile.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp globals.h Clock.hpp AudioTrack.hpp MidiTrack.hpp MidiFile.hpp Project.hpp Modules.hpp GUI.hpp 
+Kaliboulat.o: globals.h midi.hpp Clock.hpp MidiFile.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp globals.h Clock.hpp AudioTrack.hpp MidiTrack.hpp MidiFile.hpp Project.hpp Modules.hpp GUI.hpp 
 Listener.o: Listener.hpp AudioClip.hpp MidiClip.hpp 
 MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp 
 midi.o: midi.hpp Scheduled.hpp 

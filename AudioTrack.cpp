@@ -7,12 +7,6 @@
 // Constructor
 //-------------
 
-AudioTrack::AudioTrack () : Track (AUDIO, "Audio", "AudioTrack"), volume_(1.0f)
-{
-	//clipset_ = new std::vector<std::shared_ptr<AudioClip>>;
-	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
-}
-
 AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f)
 {
 	//clipset_ = new std::vector<std::shared_ptr<AudioClip>>;

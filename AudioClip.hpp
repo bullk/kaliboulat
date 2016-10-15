@@ -29,6 +29,14 @@ public:
 	//void setVolume (StkFloat);
 	//int getAngle (void);
 
+	template <class Archive>
+	static void load_and_construct( Archive & ar, cereal::construct<AudioClip> & construct )
+	{
+		std::string path;
+		ar( path );
+		construct( path );
+	}
+	
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
@@ -43,14 +51,6 @@ public:
 			CEREAL_NVP(gui_rate_),
 			CEREAL_NVP(gui_pitch_)
 		);
-	}
-	
-	template <class Archive>
-	static void load_and_construct( Archive & ar, cereal::construct<AudioClip> & construct )
-	{
-		std::string path;
-		ar( path );
-		construct( path );
 	}
 	
 protected:    

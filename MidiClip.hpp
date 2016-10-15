@@ -33,7 +33,7 @@ public:
 	template <class Archive>
 	static void load_and_construct( Archive & ar, cereal::construct<MidiClip> & construct )
 	{
-		std::string name = "testMidiClip";
+		std::string name;
 		ar( name );
 		construct( name );
 	}

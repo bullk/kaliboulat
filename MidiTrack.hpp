@@ -15,8 +15,7 @@ class MidiTrack : public Track
 
 public:
 	// Constructor
-	MidiTrack ();
-	MidiTrack (std::string);
+	MidiTrack (std::string name);
 	// Destructor 
 	~MidiTrack ();
 
@@ -30,6 +29,14 @@ public:
 	//inline std::vector<std::shared_ptr<MidiClip>> * getClipSet () { return clipset_; }
 	inline RtMidiOut * getOutput () const { return output_; }
 	inline void setOutput (RtMidiOut * o) { output_ = o; }
+	
+	template <class Archive>
+	static void load_and_construct( Archive & ar, cereal::construct<MidiTrack> & construct )
+	{
+		std::string name;
+		ar( name );
+		construct( name );
+	}
 	
     template<class Archive>
 	void serialize(Archive & archive)

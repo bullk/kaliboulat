@@ -8,7 +8,7 @@
 	* modulariser entièrement l'audio et le midi
 	* Passer les commandes par le Waiter
 	* Découper les fichier GUI
-	* réagencer le code source
+	* réagencer le code source dans des répertoires (core? audio midi...)
 
 * MIDI 
 	* MIDI IN parsing a finir

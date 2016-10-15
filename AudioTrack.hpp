@@ -19,7 +19,6 @@ class AudioTrack : public Track
 	
 public:
 	// Constructor 
-	AudioTrack ();
 	AudioTrack (std::string s);
 	// Destructor 
 	~AudioTrack ();
@@ -35,7 +34,15 @@ public:
 	inline float * getVolume () { return &volume_; }
 	stk::StkFloat tick () const;
 	
-    template<class Archive>
+	template <class Archive>
+	static void load_and_construct( Archive & ar, cereal::construct<AudioTrack> & construct )
+	{
+		std::string name;
+		ar( name );
+		construct( name );
+	}
+	
+     template<class Archive>
 	void serialize(Archive & archive)
 	{
 		archive (
