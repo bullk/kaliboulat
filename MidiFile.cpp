@@ -1,5 +1,7 @@
-#include <stdlib.h>
 #include "MidiFile.hpp"
+#include <stdlib.h>
+#include "MidiClip.hpp"
+
 
 //-------------
 // Constructor 

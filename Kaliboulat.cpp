@@ -7,11 +7,10 @@
 
 #include <RtError.h>
 #include <RtAudio.h>
+#include <RtMidi.h>
 
-#include "globals.h"
 #include "midi.hpp"
 #include "Clock.hpp"
-#include "MidiFile.hpp"
 #include "State.hpp"
 #include "Modules.hpp"
 #include "Listener.hpp"
@@ -136,7 +135,8 @@ int main( int argc, char* args[] )
 
 	mainlog->info("----- project init -----");
 	// INIT PROJECT
-	std::shared_ptr<Project> project(new Project("test"));
+	//std::shared_ptr<Project> project(new Project("test"));
+	std::shared_ptr<Project> project(new Project(".newproject"));
 	State::setProject (project);
 	
 	mainlog->info("----- audio init -----");

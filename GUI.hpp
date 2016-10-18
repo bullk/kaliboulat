@@ -7,12 +7,14 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
 
-#include "Project.hpp"
-#include "Listener.hpp"
+#include "globals.h"
 
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
+class RessourceFile;
+class Project;
+class Clip;
 
 struct Screen
 {

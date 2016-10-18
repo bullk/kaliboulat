@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <dirent.h>
 
 #include <spdlog/spdlog.h>
 
@@ -6,6 +7,9 @@
 #include "Clock.hpp"
 #include "State.hpp"
 #include "Modules.hpp"
+#include "AudioFile.hpp"
+#include "MidiFile.hpp"
+
 
 Project::Project (std::string str)
 {
@@ -19,7 +23,8 @@ Project::Project (std::string str)
 	audiofiles_ = new std::vector<AudioFile *>;
 	midifiles_ = new std::vector<MidiFile *>;
 	updateRessources ();
-	ctrl_ = false;
+	saved_ = false;
+	ctrl_ = false; // à passer dans State
 }
 
 Project::~Project () {

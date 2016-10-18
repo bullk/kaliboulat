@@ -1,10 +1,13 @@
 #ifndef INC_MIDIFILE_H
 #define INC_MIDIFILE_H
 
+#include <memory>
 #include <vector>
 #include <stk/MidiFileIn.h>
-#include "MidiTrack.hpp"
+#include "Engine.hpp"
 
+
+class MidiClip;
 
 class MidiFile : public stk::MidiFileIn, public RessourceFile
 {

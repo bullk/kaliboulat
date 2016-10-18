@@ -4,16 +4,15 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <dirent.h>
 
 #ifndef WIN32
     #include <sys/types.h>
 #endif 
 
 #include "globals.h"
-#include "AudioFile.hpp"
-#include "MidiFile.hpp"
+#include "Track.hpp"
 
+#include <cereal/archives/xml.hpp>
 
 //void SplitFilename (const std::string& str)
 //{
@@ -25,6 +24,8 @@
 class Clock;
 class AudioModule;
 class MidiModule;
+class AudioFile;
+class MidiFile;
 
 class Project
 {
@@ -72,7 +73,9 @@ protected:
 	std::vector<std::shared_ptr<Track>> tracks_;
 	std::vector<AudioFile *> * audiofiles_;
 	std::vector<MidiFile *> * midifiles_;
-	bool ctrl_;
+	bool saved_;
+	bool ctrl_; // à passer dans State
+	
 };
 
 inline Clock * Project::getClock () { return clock_; }

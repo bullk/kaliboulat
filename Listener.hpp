@@ -2,8 +2,6 @@
 #define INC_LISTENER_H
 
 #include <stk/FileWvIn.h>
-#include "AudioClip.hpp"
-#include "MidiClip.hpp"
 
 class Listener
 {

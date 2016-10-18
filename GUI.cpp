@@ -4,6 +4,11 @@
 #include "Clock.hpp"
 #include "State.hpp"
 #include "midi.hpp"
+#include "MidiFile.hpp"
+#include "MidiClip.hpp"
+#include "AudioFile.hpp"
+#include "AudioClip.hpp"
+#include "Listener.hpp"
 
 using namespace std;
 
@@ -100,6 +105,7 @@ void mainMenu ()
 {
 	std::shared_ptr<Project> project = State::getProject();
 	static bool about_open = false;
+	static bool new_project = false;
 	static bool new_audio_track = false;
 	static bool new_midi_track = false;
 	bool menu_mask = not(project -> getClock() -> getState());
@@ -108,7 +114,7 @@ void mainMenu ()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("New", "Ctrl+N", false, menu_mask)) {}
+			if (ImGui::MenuItem("New", "Ctrl+N", false, menu_mask)) new_project = true;
 			if (ImGui::MenuItem("Open", "Ctrl+O", false, menu_mask)) {}
 			if (ImGui::MenuItem("Save", "Ctrl+S", false, menu_mask))
 				Waiter::getInstance()->saveProject();
@@ -140,9 +146,29 @@ void mainMenu ()
 		ImGui::EndMenuBar();
 	}
 	
+	if (new_project) ImGui::OpenPopup("New Project");
 	if (new_audio_track) ImGui::OpenPopup("New Audio Track");
 	if (new_midi_track) ImGui::OpenPopup("New Midi Track");
 	if (about_open) ImGui::OpenPopup("About");
+	
+	if (ImGui::BeginPopupModal("New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		char buf[20];
+		sprintf (buf, "%s", "NewProject");
+		ImGui::SetKeyboardFocusHere ();
+		if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+		{
+			Waiter::getInstance() -> newProject(buf);
+			ImGui::CloseCurrentPopup ();
+			new_project = false;
+		}
+		//if (ImGui::Button("Close", ImVec2(200,0))) 
+		//{
+			//ImGui::CloseCurrentPopup();
+			//new_audio_track = false;
+		//}
+		ImGui::EndPopup();
+	}
 	
 	if (ImGui::BeginPopupModal("New Audio Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
@@ -259,7 +285,7 @@ void clipPlayButton (Clip * clip)
 	}
 }
 
-void displayMidiClipDetails (MidiClip * clip)
+void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 {
 	unsigned short beats_per_bar = 4;
 	ImGui::PushItemWidth(100);

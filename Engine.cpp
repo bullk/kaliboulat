@@ -70,6 +70,11 @@ void Waiter::main ()
 	}
 }
 
+void Waiter::newProject (char * name)
+{
+	//TODO : implémenter la création de projet
+}
+
 void Waiter::saveProject ()
 {
     std::ofstream os(State::getProject()->getFile());
