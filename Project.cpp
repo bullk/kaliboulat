@@ -44,13 +44,32 @@ void Project::updateRessources ()
 {
 	auto mainlog= spdlog::get("main");	
 	struct dirent* daFile = NULL;
+	int resmkdir;
+	
+	DIR * projectdir = opendir (dir_.c_str());
+	if (projectdir == NULL)
+	{
+		mainlog->error("Création du dossier {}", dir_.c_str());
+		resmkdir = mkdir (dir_.c_str(), S_IRWXU | S_IRWXG);
+		if ( resmkdir )
+		{
+			mainlog->error("Impossible de créer le dossier {}", dir_.c_str());
+			exit(1);
+		}
+	}
 	
 	//std::string path = dir_ + "/Audio";
 	DIR * audiodir = opendir (getAudioDir().c_str());
 	if (audiodir == NULL)
 	{
-		mainlog->error("Impossible d'ouvrir le dossier {}", getAudioDir().c_str());
-		exit(1);
+		mainlog->error("Création du dossier {}", getAudioDir().c_str());
+		resmkdir = mkdir (getAudioDir().c_str(), S_IRWXU | S_IRWXG);
+		if ( resmkdir )
+		{
+			mainlog->error("Impossible de créer le dossier {}", getAudioDir().c_str());
+			exit(1);
+		}
+		//mainlog->error("Impossible d'ouvrir le dossier {}", getAudioDir().c_str());
 	}
 	
 	while ((daFile = readdir(audiodir)) != NULL)
@@ -71,8 +90,14 @@ void Project::updateRessources ()
 	DIR * mididir = opendir (getMIDIDir().c_str());
 	if (mididir == NULL)
 	{
-		mainlog->error("Impossible d'ouvrir le dossier {}", getMIDIDir().c_str());
-		exit(1);
+		mainlog->error("Création du dossier {}", getMIDIDir().c_str());
+		resmkdir = mkdir (getMIDIDir().c_str(), S_IRWXU | S_IRWXG);
+		if ( resmkdir )
+		{
+			mainlog->error("Impossible de créer le dossier {}", getMIDIDir().c_str());
+			exit(1);
+		}
+		//mainlog->error("Impossible d'ouvrir le dossier {}", getMIDIDir().c_str());
 	}
 	
 	daFile = NULL;
