@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <iomanip>
 
-#include <RtError.h>
+//#include <RtError.h>
 #include <RtAudio.h>
 #include <RtMidi.h>
 
@@ -90,10 +90,10 @@ void audioInit (RtAudio * dac, std::shared_ptr<Project> project)
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
 	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)project->getAudio(), &options ); }
-	catch ( RtError &error ) { error.printMessage (); }
+	catch ( RtAudioError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
-	catch ( RtError &error ) { error.printMessage (); }
+	catch ( RtAudioError &error ) { error.printMessage (); }
 	//sleep ( 1 );	cout << "bonjour" << endl;
 	//cout << "bonjour" << endl;
 } 
@@ -101,10 +101,10 @@ void audioInit (RtAudio * dac, std::shared_ptr<Project> project)
 void audioClose (RtAudio * dac)
 {
 	try { dac->stopStream (); }
-	catch ( RtError &error ) { error.printMessage (); }
+	catch ( RtAudioError &error ) { error.printMessage (); }
 	
 	try { dac->closeStream (); }
-	catch ( RtError &error ) { error.printMessage (); }
+	catch ( RtAudioError &error ) { error.printMessage (); }
 }
 
 
@@ -163,7 +163,7 @@ int main( int argc, char* args[] )
 		midiin = new RtMidiIn (MIDI_MODULE_NAME);
 	#endif
 	}
-	catch ( RtError &error ) 
+	catch ( RtMidiError &error ) 
 	{
 		error.printMessage ();
 		exit ( EXIT_FAILURE );
@@ -183,7 +183,7 @@ int main( int argc, char* args[] )
 	try { 
 		midiout -> openVirtualPort ();
 	}
-	catch ( RtError &error ) 
+	catch ( RtMidiError &error ) 
 	{
 		error.printMessage();
 		exit( EXIT_FAILURE );
@@ -193,7 +193,7 @@ int main( int argc, char* args[] )
 	try { 
 		midiin -> openVirtualPort ();
 	}
-	catch ( RtError &error ) 
+	catch ( RtMidiError &error ) 
 	{
 		error.printMessage();
 		exit( EXIT_FAILURE );

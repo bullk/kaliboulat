@@ -6,7 +6,7 @@ CFLAGS += -std=c++0x
 JACKFLAGS = -D__UNIX_JACK__
 ALSAFLAGS = -D__LINUX_ALSA__ -D__LINUX_ALSASEQ__
 LDFLAGS = `sdl2-config --cflags` -I/usr/include/stk
-LDLIBS = `sdl2-config --libs` -lGL -lstk -lrtaudio -lrtmidi
+LDLIBS = `sdl2-config --libs` -lGL -lstk -lpthread -lrtaudio -lrtmidi
 ALSALIBS = -lasound -lpthread
 JACKLIBS = -ljack
 EXT_OBJS = imgui.o imgui_draw.o imgui_demo.o imgui_impl_sdl.o
@@ -56,4 +56,4 @@ Track.o: Track.hpp globals.h Clip.hpp
 	$(CC) $(CFLAGS) $(JACKFLAGS) -c $*.cpp
 
 clean:
-	rm $(MAIN_OBJS) $(GUI_OBJS)
+	rm $(MAIN_OBJS) $(GUI_OBJS) Kaliboulat.o
