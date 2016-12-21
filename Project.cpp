@@ -1,3 +1,4 @@
+#include <stdlib.h> //getenv
 #include <algorithm>
 #include <dirent.h>
 
@@ -10,11 +11,29 @@
 #include "AudioFile.hpp"
 #include "MidiFile.hpp"
 
+DIR * testandcreatedir (std::string s)
+{
+	auto mainlog= spdlog::get("main");	
+	int resmkdir;
+	DIR * dir = opendir (s.c_str());
+	if (dir == NULL)
+	{
+		mainlog->error("Création du dossier {}", s.c_str());
+		resmkdir = mkdir (s.c_str(), S_IRWXU | S_IRWXG);
+		if ( resmkdir )
+		{
+			mainlog->error("Impossible de créer le dossier {}", s.c_str());
+			exit(1);
+		}
+	}
+	return dir;
+}
 
 Project::Project (std::string str)
 {
 	name_ = str;
-	dir_ = USER_DIR;
+	dir_ = std::string(getenv ("HOME")) + "/Documents/Kaliboulat";
+	testandcreatedir (dir_);
 	dir_ += "/" + str;
 	file_ = dir_ + "/" + name_ + FILE_EXT;
 	clock_ = new Clock ();
@@ -44,34 +63,9 @@ void Project::updateRessources ()
 {
 	auto mainlog= spdlog::get("main");	
 	struct dirent* daFile = NULL;
-	int resmkdir;
-	
-	DIR * projectdir = opendir (dir_.c_str());
-	if (projectdir == NULL)
-	{
-		mainlog->error("Création du dossier {}", dir_.c_str());
-		resmkdir = mkdir (dir_.c_str(), S_IRWXU | S_IRWXG);
-		if ( resmkdir )
-		{
-			mainlog->error("Impossible de créer le dossier {}", dir_.c_str());
-			exit(1);
-		}
-	}
-	
-	//std::string path = dir_ + "/Audio";
-	DIR * audiodir = opendir (getAudioDir().c_str());
-	if (audiodir == NULL)
-	{
-		mainlog->error("Création du dossier {}", getAudioDir().c_str());
-		resmkdir = mkdir (getAudioDir().c_str(), S_IRWXU | S_IRWXG);
-		if ( resmkdir )
-		{
-			mainlog->error("Impossible de créer le dossier {}", getAudioDir().c_str());
-			exit(1);
-		}
-		//mainlog->error("Impossible d'ouvrir le dossier {}", getAudioDir().c_str());
-	}
-	
+	testandcreatedir (dir_);
+
+	DIR * audiodir = testandcreatedir (getAudioDir());
 	while ((daFile = readdir(audiodir)) != NULL)
 		if ( daFile -> d_type == DT_REG )
 		{
@@ -83,23 +77,9 @@ void Project::updateRessources ()
 				mainlog->info("Audio ressource : {}", str);
 			}
 		}
-	
 	closedir (audiodir);
 	
-	//path = dir_ + "/MIDI";
-	DIR * mididir = opendir (getMIDIDir().c_str());
-	if (mididir == NULL)
-	{
-		mainlog->error("Création du dossier {}", getMIDIDir().c_str());
-		resmkdir = mkdir (getMIDIDir().c_str(), S_IRWXU | S_IRWXG);
-		if ( resmkdir )
-		{
-			mainlog->error("Impossible de créer le dossier {}", getMIDIDir().c_str());
-			exit(1);
-		}
-		//mainlog->error("Impossible d'ouvrir le dossier {}", getMIDIDir().c_str());
-	}
-	
+	DIR * mididir = testandcreatedir (getMIDIDir());
 	daFile = NULL;
 	while ((daFile = readdir(mididir)) != NULL)
 		if ( daFile -> d_type == DT_REG )
@@ -112,7 +92,6 @@ void Project::updateRessources ()
 				mainlog->info("MIDI ressource : {}", str);
 			}
 		}
-	
 	closedir (mididir);
 	
 }
