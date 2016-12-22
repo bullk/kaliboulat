@@ -70,9 +70,12 @@ void Waiter::main ()
 	}
 }
 
-void Waiter::newProject (char * name)
+void Waiter::newProject (std::string name)
 {
-	//TODO : implémenter la création de projet
+	//sauvegarder le projet courant
+	saveProject ();
+	std::shared_ptr<Project> project (new Project (std::string(name)) );
+	State::setProject (project);
 }
 
 void Waiter::saveProject ()

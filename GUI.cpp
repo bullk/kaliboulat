@@ -156,9 +156,9 @@ void mainMenu ()
 		char buf[20];
 		sprintf (buf, "%s", "NewProject");
 		ImGui::SetKeyboardFocusHere ();
-		if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+		if ( ImGui::InputText ("project name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
-			Waiter::getInstance() -> newProject(buf);
+			Waiter::getInstance() -> newProject(std::string(buf));
 			ImGui::CloseCurrentPopup ();
 			new_project = false;
 		}
@@ -175,7 +175,7 @@ void mainMenu ()
 		char buf[20];
 		sprintf (buf, "%s", "AudioTrack");
 		ImGui::SetKeyboardFocusHere ();
-		if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+		if ( ImGui::InputText ("audio track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
 			project -> addAudioTrack (buf);
 			ImGui::CloseCurrentPopup ();
@@ -194,7 +194,7 @@ void mainMenu ()
 		char buf[20];
 		sprintf (buf, "%s", "MidiTrack");
 		ImGui::SetKeyboardFocusHere ();
-		if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+		if ( ImGui::InputText ("MIDI track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
 			project -> addMidiTrack (buf);
 			ImGui::CloseCurrentPopup ();

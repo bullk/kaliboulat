@@ -13,18 +13,19 @@
 
 DIR * testandcreatedir (std::string s)
 {
-	auto mainlog= spdlog::get("main");	
+	auto mainlog = spdlog::get("main");	
 	int resmkdir;
 	DIR * dir = opendir (s.c_str());
 	if (dir == NULL)
 	{
-		mainlog->error("Création du dossier {}", s.c_str());
+		mainlog->info("Création du dossier {}", s.c_str());
 		resmkdir = mkdir (s.c_str(), S_IRWXU | S_IRWXG);
 		if ( resmkdir )
 		{
 			mainlog->error("Impossible de créer le dossier {}", s.c_str());
 			exit(1);
 		}
+		else dir = opendir (s.c_str());
 	}
 	return dir;
 }
@@ -64,7 +65,7 @@ void Project::updateRessources ()
 	auto mainlog= spdlog::get("main");	
 	struct dirent* daFile = NULL;
 	testandcreatedir (dir_);
-
+	
 	DIR * audiodir = testandcreatedir (getAudioDir());
 	while ((daFile = readdir(audiodir)) != NULL)
 		if ( daFile -> d_type == DT_REG )

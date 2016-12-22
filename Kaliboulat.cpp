@@ -116,7 +116,8 @@ int main( int argc, char* args[] )
 	{         
 		// Create basic file logger (not rotated)
 		// trace, debug, info, warn, error, critical
-		auto mainlog = spdlog::basic_logger_mt("main", "main.log");
+		auto mainlog = spdlog::stdout_color_mt("main");
+		//auto mainlog = spdlog::basic_logger_mt("main", "main.log");
 		mainlog->info("Kaliboulat version 0.1 pre-alpha");
 	}
 	catch (const spdlog::spdlog_ex& ex)
@@ -251,6 +252,8 @@ int main( int argc, char* args[] )
 	mainlog->info("closing Audio ports");
 	audioClose (dac);
 
+	waiter->saveProject ();
+	//QUI SE CHARGE DE DETRUIRE LE PROJET ?
 	//mainlog->info("deleting project");
 	//delete project;
 	mainlog->info("deleting RtMidiIn");
