@@ -5,6 +5,11 @@
 #include <queue>
 
 
+inline std::string user_dir()
+{
+	return std::string(getenv ("HOME")) + "/Documents/Kaliboulat";
+}
+
 enum DataType { AUDIO, MIDI, OSC, COM };
 
 

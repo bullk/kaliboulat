@@ -106,16 +106,21 @@ void mainMenu ()
 	std::shared_ptr<Project> project = State::getProject();
 	static bool about_open = false;
 	static bool new_project = false;
+	static bool open_project = false;
 	static bool new_audio_track = false;
 	static bool new_midi_track = false;
 	bool menu_mask = not(project -> getClock() -> getState());
 	
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
+		if (ImGui::BeginMenu("Project"))
 		{
 			if (ImGui::MenuItem("New", "Ctrl+N", false, menu_mask)) new_project = true;
-			if (ImGui::MenuItem("Open", "Ctrl+O", false, menu_mask)) {}
+			if (ImGui::MenuItem("Open", "Ctrl+O", false, menu_mask))
+			{
+				State::scanProjects();
+				open_project = true;
+			}
 			if (ImGui::MenuItem("Save", "Ctrl+S", false, menu_mask))
 				Waiter::getInstance()->saveProject();
 			if (ImGui::MenuItem("Save As..", NULL, false, menu_mask)) {}
@@ -147,6 +152,7 @@ void mainMenu ()
 	}
 	
 	if (new_project) ImGui::OpenPopup("New Project");
+	if (open_project) ImGui::OpenPopup("Open Project");
 	if (new_audio_track) ImGui::OpenPopup("New Audio Track");
 	if (new_midi_track) ImGui::OpenPopup("New Midi Track");
 	if (about_open) ImGui::OpenPopup("About");
@@ -162,11 +168,30 @@ void mainMenu ()
 			ImGui::CloseCurrentPopup ();
 			new_project = false;
 		}
-		//if (ImGui::Button("Close", ImVec2(200,0))) 
-		//{
-			//ImGui::CloseCurrentPopup();
-			//new_audio_track = false;
-		//}
+		ImGui::EndPopup();
+	}
+	
+	if (ImGui::BeginPopupModal("Open Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+        ImGui::Text("Choose a project and open it or close this window\n");
+        ImGui::Separator();
+		static unsigned int selected = 0;
+		for (unsigned int i=0; i<State::getProjectList()->size(); i++)
+			if ( ImGui::Selectable(State::getProjectList()->at(i).c_str(), (i==selected)) )
+				selected = i;
+        ImGui::Separator();
+		ImGui::Columns(2, NULL, false);
+		if (ImGui::Button("Open", ImVec2(80,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			open_project = false;
+		}
+		ImGui::NextColumn();
+		if (ImGui::Button("Close", ImVec2(80,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			open_project = false;
+		}
 		ImGui::EndPopup();
 	}
 	
@@ -447,14 +472,14 @@ bool HearButton ()
 
 static void DragClipOverlay (bool* p_open)
 {
-    ImGui::SetNextWindowPos (ImVec2(ImGui::GetIO().MousePos.x + 5, ImGui::GetIO().MousePos.y + 5));
-    if (!ImGui::Begin("Drag Clip Overlay", p_open, ImVec2(0,0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings))
-    {
-        ImGui::End();
-        return;
-    }
-    ImGui::Text("%s", ui.dragged_clip -> getName().c_str());
-    ImGui::End();
+	ImGui::SetNextWindowPos (ImVec2(ImGui::GetIO().MousePos.x + 5, ImGui::GetIO().MousePos.y + 5));
+	if (!ImGui::Begin("Drag Clip Overlay", p_open, ImVec2(0,0), 0.3f, ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoMove|ImGuiWindowFlags_NoSavedSettings))
+	{
+		ImGui::End();
+		return;
+	}
+	ImGui::Text("%s", ui.dragged_clip -> getName().c_str());
+	ImGui::End();
 }
 
 void RessourcesPanel (std::shared_ptr<Project> project)

@@ -33,7 +33,7 @@ DIR * testandcreatedir (std::string s)
 Project::Project (std::string str)
 {
 	name_ = str;
-	dir_ = std::string(getenv ("HOME")) + "/Documents/Kaliboulat";
+	dir_ = user_dir ();
 	testandcreatedir (dir_);
 	dir_ += "/" + str;
 	file_ = dir_ + "/" + name_ + FILE_EXT;
