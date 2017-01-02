@@ -183,6 +183,7 @@ void mainMenu ()
 		ImGui::Columns(2, NULL, false);
 		if (ImGui::Button("Open", ImVec2(80,0))) 
 		{
+			Waiter::getInstance() -> newProject(State::getProjectList()->at(selected));
 			ImGui::CloseCurrentPopup();
 			open_project = false;
 		}

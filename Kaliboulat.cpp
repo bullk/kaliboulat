@@ -129,6 +129,8 @@ int main( int argc, char* args[] )
 	mainlog->info("----- engine init -----");
 	mainlog->info("creating State");
 	State * state = State::getInstance ();
+	State::scanAudioFiles ();
+	State::scanMidiFiles ();
 	mainlog->info("creating Waiter");
 	Waiter * waiter = Waiter::getInstance ();
 	mainlog->info("creating Listener");

@@ -3,10 +3,12 @@ doc/
 sdl_opengl_example/
 midifile/
 
-Kaliboulat*
+Kaliboulat
+Kaliboulat-rtmidi2.0.1
 *.o
 *.log
 CMakeLists.txt
+imgui.ini
 
 user/
 
