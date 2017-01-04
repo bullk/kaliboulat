@@ -109,6 +109,8 @@ void mainMenu ()
 	static bool open_project = false;
 	static bool new_audio_track = false;
 	static bool new_midi_track = false;
+	static bool import_audio_files = false;
+	static bool import_midi_files = false;
 	bool menu_mask = not(project -> getClock() -> getState());
 	
 	if (ImGui::BeginMenuBar())
@@ -131,8 +133,16 @@ void mainMenu ()
 		}
 		if (ImGui::BeginMenu("Import"))
 		{
-			if (ImGui::MenuItem("Audio File", NULL, false, menu_mask)) {}
-			if (ImGui::MenuItem("MIDI File", NULL, false, menu_mask)) {}
+			if (ImGui::MenuItem("Audio File", NULL, false, menu_mask))
+			{
+				//State::scanAudioFiles();
+				import_audio_files = true;
+			}
+			if (ImGui::MenuItem("MIDI File", NULL, false, menu_mask))
+			{
+				//State::scanMidiFiles();
+				import_midi_files = true;
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("New"))
@@ -153,8 +163,10 @@ void mainMenu ()
 	
 	if (new_project) ImGui::OpenPopup("New Project");
 	if (open_project) ImGui::OpenPopup("Open Project");
-	if (new_audio_track) ImGui::OpenPopup("New Audio Track");
-	if (new_midi_track) ImGui::OpenPopup("New Midi Track");
+	if (new_audio_track) ImGui::OpenPopup("New audio track");
+	if (new_midi_track) ImGui::OpenPopup("New MIDI track");
+	if (import_audio_files) ImGui::OpenPopup("Import audio files");
+	if (import_midi_files) ImGui::OpenPopup("Import MIDI files");
 	if (about_open) ImGui::OpenPopup("About");
 	
 	if (ImGui::BeginPopupModal("New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -173,7 +185,7 @@ void mainMenu ()
 	
 	if (ImGui::BeginPopupModal("Open Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-        ImGui::Text("Choose a project and open it or close this window\n");
+        ImGui::Text("Choose a project and open it\n or close this window\n");
         ImGui::Separator();
 		static unsigned int selected = 0;
 		for (unsigned int i=0; i<State::getProjectList()->size(); i++)
@@ -196,7 +208,56 @@ void mainMenu ()
 		ImGui::EndPopup();
 	}
 	
-	if (ImGui::BeginPopupModal("New Audio Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("Import audio files", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+        ImGui::Text("Select some files and confirm\n or close this window\n");
+        ImGui::Separator();
+		static std::vector<bool> selected (State::getAudioFiles()->size(), false);
+        ImGui::Text("%lu files found", State::getAudioFiles()->size());
+		ImGui::BeginChild("wav files", ImVec2(800,600), true);
+		for (unsigned int i=0; i<selected.size(); i++)
+			if ( ImGui::Selectable(State::getAudioFiles()->at(i).c_str(), selected[i]) )
+				selected[i] = !selected[i];
+		ImGui::EndChild();
+        ImGui::Separator();
+		ImGui::Columns(2, NULL, false);
+		if (ImGui::Button("Open", ImVec2(80,0))) 
+		{
+			for (unsigned int i=0; i<selected.size(); i++)
+				if ( selected[i] )
+					State::getProject()->getAudioFiles()->push_back( new AudioFile(State::getAudioFiles()->at(i)) );
+			ImGui::CloseCurrentPopup();
+			import_audio_files = false;
+		}
+		ImGui::NextColumn();
+		if (ImGui::Button("Close", ImVec2(80,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			import_audio_files = false;
+		}
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopupModal("Import MIDI files", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+        ImGui::Text("Select some files and confirm\n or close this window\n");
+        ImGui::Separator();
+		ImGui::Columns(2, NULL, false);
+		if (ImGui::Button("Open", ImVec2(80,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			import_midi_files = false;
+		}
+		ImGui::NextColumn();
+		if (ImGui::Button("Close", ImVec2(80,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			import_midi_files = false;
+		}
+		ImGui::EndPopup();
+	}
+	
+	if (ImGui::BeginPopupModal("New audio track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		char buf[20];
 		sprintf (buf, "%s", "AudioTrack");
@@ -215,7 +276,7 @@ void mainMenu ()
 		ImGui::EndPopup();
 	}
 	
-	if (ImGui::BeginPopupModal("New Midi Track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginPopupModal("New MIDI track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		char buf[20];
 		sprintf (buf, "%s", "MidiTrack");

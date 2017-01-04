@@ -130,7 +130,7 @@ int main( int argc, char* args[] )
 	mainlog->info("creating State");
 	State * state = State::getInstance ();
 	State::scanAudioFiles ();
-	State::scanMidiFiles ();
+	//State::scanMidiFiles ();
 	mainlog->info("creating Waiter");
 	Waiter * waiter = Waiter::getInstance ();
 	mainlog->info("creating Listener");

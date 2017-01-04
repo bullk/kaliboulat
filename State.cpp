@@ -4,6 +4,8 @@
 #include <fnmatch.h>
 #include <libgen.h>
 
+#include <spdlog/spdlog.h>
+
 // Initialisation du singleton à NULL
 State * State::singleton_ = NULL;
 std::shared_ptr<Project> State::project_ = NULL;
@@ -17,6 +19,8 @@ std::vector<std::string> * State::midifiles_ = NULL;
 State::State () : onoff_(true)
 {
 	projectlist_ = new std::vector<std::string>;
+	audiofiles_ = new std::vector<std::string>;
+	midifiles_ = new std::vector<std::string>;
 }
 
 // Destructor
@@ -45,11 +49,14 @@ int State::scanProjects ()
 
 int State::scanAudioFilesCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
-	char * localpath = strdup (user_dir().c_str());
+	//auto mainlog = spdlog::get("main");	
+	char * localpath = strdup (fpath);
     if (typeflag == FTW_F) {
 		if (fnmatch("*.wav", localpath, FNM_CASEFOLD) == 0) {
-			std::string str = std::string (basename(localpath));
-			audiofiles_ -> push_back(str.substr(0, str.length()-4));
+			audiofiles_ -> push_back(localpath);
+			//std::string str = std::string (basename(localpath));
+			//audiofiles_ -> push_back(str.substr(0, str.length()-4));
+			//mainlog->info("found {}", str.c_str());
 		}
     }
     return 0;
@@ -57,14 +64,14 @@ int State::scanAudioFilesCallback (const char *fpath, const struct stat *sb, int
 
 int State::scanAudioFiles ()
 {
-	projectlist_->clear();
-    ftw(user_dir().c_str(), scanAudioFilesCallback, 16);
+	audiofiles_->clear();
+    ftw(getenv("HOME"), scanAudioFilesCallback, 16);
     return 0;
 }
 
 int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
-	char * localpath = strdup (user_dir().c_str());
+	char * localpath = strdup (fpath);
     if (typeflag == FTW_F) {
 		if (fnmatch("*.mid", localpath, FNM_CASEFOLD) == 0) {
 			std::string str = std::string (basename(localpath));
@@ -76,8 +83,8 @@ int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int 
 
 int State::scanMidiFiles ()
 {
-	projectlist_->clear();
-    ftw(user_dir().c_str(), scanMidiFilesCallback, 16);
+	midifiles_->clear();
+    ftw(getenv("HOME"), scanMidiFilesCallback, 16);
     return 0;
 }
 
