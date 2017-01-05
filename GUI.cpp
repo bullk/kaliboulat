@@ -1,5 +1,8 @@
 #include <typeinfo>
-#include <unistd.h> // sleep
+//#include <unistd.h> // sleep
+#include <ftw.h>
+#include <fnmatch.h>
+
 #include "GUI.hpp"
 #include "Clock.hpp"
 #include "State.hpp"
@@ -100,6 +103,28 @@ void EndScreen ()
 	ImGui::PopStyleVar ();
 	ImGui::End();
 }
+
+int browseCallback (const char *fpath, const struct stat *sb, int typeflag)
+{
+	char * localpath = strdup (fpath);
+	switch (typeflag)
+	{
+		case FTW_D:
+			if (ImGui::TreeNode(fpath))
+			{
+				ImGui::TreePop();
+			}
+			break;
+		case FTW_F:
+			if (fnmatch("*.wav", localpath, FNM_CASEFOLD) == 0)
+			{
+				
+			}
+			break;
+	}
+	return 0;
+}
+//FTW_DEPTH
 
 void mainMenu ()
 {
@@ -212,20 +237,22 @@ void mainMenu ()
 	{
         ImGui::Text("Select some files and confirm\n or close this window\n");
         ImGui::Separator();
-		static std::vector<bool> selected (State::getAudioFiles()->size(), false);
-        ImGui::Text("%lu files found", State::getAudioFiles()->size());
-		ImGui::BeginChild("wav files", ImVec2(800,600), true);
-		for (unsigned int i=0; i<selected.size(); i++)
-			if ( ImGui::Selectable(State::getAudioFiles()->at(i).c_str(), selected[i]) )
-				selected[i] = !selected[i];
-		ImGui::EndChild();
+		ftw(getenv("HOME"), browseCallback, 16);
+        
+		//static std::vector<bool> selected (State::getAudioFiles()->size(), false);
+        //ImGui::Text("%lu files found", State::getAudioFiles()->size());
+		//ImGui::BeginChild("wav files", ImVec2(800,600), true);
+		//for (unsigned int i=0; i<selected.size(); i++)
+			//if ( ImGui::Selectable(State::getAudioFiles()->at(i).c_str(), selected[i]) )
+				//selected[i] = !selected[i];
+		//ImGui::EndChild();
         ImGui::Separator();
 		ImGui::Columns(2, NULL, false);
 		if (ImGui::Button("Open", ImVec2(80,0))) 
 		{
-			for (unsigned int i=0; i<selected.size(); i++)
-				if ( selected[i] )
-					State::getProject()->getAudioFiles()->push_back( new AudioFile(State::getAudioFiles()->at(i)) );
+			//for (unsigned int i=0; i<selected.size(); i++)
+				//if ( selected[i] )
+					//State::getProject()->getAudioFiles()->push_back( new AudioFile(State::getAudioFiles()->at(i)) );
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
 		}

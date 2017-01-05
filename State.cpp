@@ -31,60 +31,60 @@ State::~State ()
 int State::scanProjectsCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
 	char * localpath = strdup (fpath);
-    if (typeflag == FTW_F) {
+	if (typeflag == FTW_F) {
 		if (fnmatch("*.kal", localpath, FNM_CASEFOLD) == 0) {
 			std::string str = std::string (basename(localpath));
 			projectlist_ -> push_back(str.substr(0, str.length()-4));
 		}
-    }
-    return 0;
+	}
+	return 0;
 }
 
 int State::scanProjects ()
 {
 	projectlist_->clear();
-    ftw(user_dir().c_str(), scanProjectsCallback, 16);
-    return 0;
+	ftw(user_dir().c_str(), scanProjectsCallback, 16);
+	return 0;
 }
 
 int State::scanAudioFilesCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
 	//auto mainlog = spdlog::get("main");	
 	char * localpath = strdup (fpath);
-    if (typeflag == FTW_F) {
+	if (typeflag == FTW_F) {
 		if (fnmatch("*.wav", localpath, FNM_CASEFOLD) == 0) {
 			audiofiles_ -> push_back(localpath);
 			//std::string str = std::string (basename(localpath));
 			//audiofiles_ -> push_back(str.substr(0, str.length()-4));
 			//mainlog->info("found {}", str.c_str());
 		}
-    }
-    return 0;
+	}
+	return 0;
 }
 
 int State::scanAudioFiles ()
 {
 	audiofiles_->clear();
-    ftw(getenv("HOME"), scanAudioFilesCallback, 16);
-    return 0;
+	ftw(getenv("HOME"), scanAudioFilesCallback, 16);
+	return 0;
 }
 
 int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
 	char * localpath = strdup (fpath);
-    if (typeflag == FTW_F) {
+	if (typeflag == FTW_F) {
 		if (fnmatch("*.mid", localpath, FNM_CASEFOLD) == 0) {
 			std::string str = std::string (basename(localpath));
 			midifiles_ -> push_back(str.substr(0, str.length()-4));
 		}
-    }
-    return 0;
+	}
+	return 0;
 }
 
 int State::scanMidiFiles ()
 {
 	midifiles_->clear();
-    ftw(getenv("HOME"), scanMidiFilesCallback, 16);
-    return 0;
+	ftw(getenv("HOME"), scanMidiFilesCallback, 16);
+	return 0;
 }
 
