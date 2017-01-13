@@ -1,5 +1,5 @@
 #include "MidiTrack.hpp"
-#include "spdlog/spdlog.h"
+
 
 //-------------
 // Constructor 

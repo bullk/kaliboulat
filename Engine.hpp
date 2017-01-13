@@ -70,7 +70,8 @@ class Waiter
 		inline void addBeat (BaseCommand * command) { beat_.push (command); }
 		inline void addTick (BaseCommand * command) { tick_.push (command); }
 		inline void addMain (BaseCommand * command) { main_.push (command); }
-		void newProject (std::string name);
+		void newProject (std::string);
+		void loadProject (std::string);
 		void saveProject ();
 		
 		// Singleton

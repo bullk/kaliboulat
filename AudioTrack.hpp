@@ -46,8 +46,8 @@ public:
 	void serialize(Archive & archive)
 	{
 		archive (
-			CEREAL_NVP(data_type_),
-			CEREAL_NVP(type_str_),
+			//CEREAL_NVP(data_type_),
+			//CEREAL_NVP(type_str_),
 			CEREAL_NVP(name_),
 			CEREAL_NVP(hue_),
 			CEREAL_NVP(volume_),

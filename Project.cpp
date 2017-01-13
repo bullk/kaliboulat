@@ -2,8 +2,6 @@
 #include <algorithm>
 #include <dirent.h>
 
-#include <spdlog/spdlog.h>
-
 #include "Project.hpp"
 #include "Clock.hpp"
 #include "State.hpp"

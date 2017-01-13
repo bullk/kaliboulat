@@ -18,7 +18,7 @@ class Clip;
 
 struct Screen
 {
-	enum Type { TITLE, PROJECT, CONSOLE, SEQUENCER };
+	enum Type { TITLE, PROJECT, CONSOLE, SEQUENCER, ORGASAMPLE };
 	enum Context { NONE, RESSOURCES, AUDIOCLIP, MIDICLIP }; 
 	Type type;
 	Context context;

@@ -1,5 +1,4 @@
 //#include <stdlib.h>
-#include <spdlog/spdlog.h>
 #include "AudioTrack.hpp"
 
 

@@ -104,27 +104,6 @@ void EndScreen ()
 	ImGui::End();
 }
 
-int browseCallback (const char *fpath, const struct stat *sb, int typeflag)
-{
-	char * localpath = strdup (fpath);
-	switch (typeflag)
-	{
-		case FTW_D:
-			if (ImGui::TreeNode(fpath))
-			{
-				ImGui::TreePop();
-			}
-			break;
-		case FTW_F:
-			if (fnmatch("*.wav", localpath, FNM_CASEFOLD) == 0)
-			{
-				
-			}
-			break;
-	}
-	return 0;
-}
-//FTW_DEPTH
 
 void mainMenu ()
 {
@@ -220,7 +199,7 @@ void mainMenu ()
 		ImGui::Columns(2, NULL, false);
 		if (ImGui::Button("Open", ImVec2(80,0))) 
 		{
-			Waiter::getInstance() -> newProject(State::getProjectList()->at(selected));
+			Waiter::getInstance() -> loadProject(State::getProjectList()->at(selected));
 			ImGui::CloseCurrentPopup();
 			open_project = false;
 		}
@@ -237,30 +216,32 @@ void mainMenu ()
 	{
         ImGui::Text("Select some files and confirm\n or close this window\n");
         ImGui::Separator();
-		ftw(getenv("HOME"), browseCallback, 16);
+		//ftw(getenv("HOME"), browseCallback, 16);
         
-		//static std::vector<bool> selected (State::getAudioFiles()->size(), false);
-        //ImGui::Text("%lu files found", State::getAudioFiles()->size());
-		//ImGui::BeginChild("wav files", ImVec2(800,600), true);
-		//for (unsigned int i=0; i<selected.size(); i++)
-			//if ( ImGui::Selectable(State::getAudioFiles()->at(i).c_str(), selected[i]) )
-				//selected[i] = !selected[i];
-		//ImGui::EndChild();
+		static std::vector<bool> selected (State::getAudioFiles()->size(), false);
+        ImGui::Text("%lu files found", State::getAudioFiles()->size());
+		ImGui::BeginChild("wav files", ImVec2(800,600), true);
+		for (unsigned int i=0; i<selected.size(); i++)
+			if ( ImGui::Selectable(State::getAudioFiles()->at(i).c_str(), selected[i]) )
+				selected[i] = !selected[i];
+		ImGui::EndChild();
         ImGui::Separator();
 		ImGui::Columns(2, NULL, false);
 		if (ImGui::Button("Open", ImVec2(80,0))) 
 		{
-			//for (unsigned int i=0; i<selected.size(); i++)
-				//if ( selected[i] )
-					//State::getProject()->getAudioFiles()->push_back( new AudioFile(State::getAudioFiles()->at(i)) );
+			for (unsigned int i=0; i<selected.size(); i++)
+				if ( selected[i] )
+					State::getProject()->getAudioFiles()->push_back( new AudioFile(State::getAudioFiles()->at(i)) );
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
+			selected.assign(State::getAudioFiles()->size(), false);
 		}
 		ImGui::NextColumn();
 		if (ImGui::Button("Close", ImVec2(80,0))) 
 		{
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
+			selected.assign(State::getAudioFiles()->size(), false);
 		}
 		ImGui::EndPopup();
 	}
@@ -642,7 +623,7 @@ void ProjectScreen (std::shared_ptr<Project> project)
 void ConsoleTitle ()
 {
 	ImGui::Text("   ##  #   #    #  #  #  ##");
-	ImGui::Text("  #   # # # #  #  # # #  #  ");
+	ImGui::Text("  #   # # # #  #  # # #  # ");
 	ImGui::Text("   ##  #  # # #    #  ## ##");
 }
 
@@ -791,7 +772,7 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 void SequencerTitle ()
 {
 	ImGui::Text("  # ##  #  # # ## ##   ## ##  ##");
-	ImGui::Text(" #  #  # # # # #  # # #   #  ##");
+	ImGui::Text(" #  #  # # # # #  # # #   #  ## ");
 	ImGui::Text("#   ##  ## ##  ## # #  ## ## # #");
 }
 
@@ -813,6 +794,33 @@ void SequencerScreen (std::shared_ptr<Project> project)
 	
 	EndScreen ();
 }
+
+void OrgasampleTitle ()
+{
+	ImGui::Text(" #   ##  ##  #    # #  # #  ## #  ##");
+	ImGui::Text("# # ##  # # ###  # ### ### # # #  # ");
+	ImGui::Text(" #  # #  ## # # #  # # # # #   ## ##");
+}
+
+void OrgasampleScreen (std::shared_ptr<Project> project)
+{
+	BeginScreen ();
+	mainMenu ();
+	ControlPanel (project, OrgasampleTitle);
+
+	if ( ressources_panel )
+	{
+		RessourcesPanel (project);
+		ImGui::SameLine ();
+	}
+	// TODO : Afficher les samples
+	int w = ressources_panel * width5;
+	ImGui::BeginChild ("Board", ImVec2(w-3, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::EndChild ();
+	
+	EndScreen ();
+}
+
 
 //======================================================================
 
@@ -840,6 +848,9 @@ void GUI_Main(std::shared_ptr<Project> project)
 						break;
 					case SDL_SCANCODE_F3:
 						ui.type = Screen::SEQUENCER;
+						break;
+					case SDL_SCANCODE_F4:
+						ui.type = Screen::ORGASAMPLE;
 						break;
 					case SDL_SCANCODE_F5:
 						//if ( project -> ctrlPressed () ) project -> addAudioTrack ("AudioTrack");
@@ -886,6 +897,10 @@ void GUI_Main(std::shared_ptr<Project> project)
 		
 		case Screen::SEQUENCER:
 			SequencerScreen (project);
+			break;
+		
+		case Screen::ORGASAMPLE:
+			OrgasampleScreen (project);
 			break;
 		
 		default:

@@ -129,7 +129,7 @@ int main( int argc, char* args[] )
 	mainlog->info("----- engine init -----");
 	mainlog->info("creating State");
 	State * state = State::getInstance ();
-	State::scanAudioFiles ();
+	State::getInstance()->scanAudioFiles ();
 	//State::scanMidiFiles ();
 	mainlog->info("creating Waiter");
 	Waiter * waiter = Waiter::getInstance ();
@@ -219,12 +219,12 @@ int main( int argc, char* args[] )
 	while ( state -> isOn () )
 	{
 		// Clock update
-		if ( project -> getClock () -> getState () ) 
+		if ( State::getProject() -> getClock () -> getState () ) 
 		{
-			midi_ticks = project -> getClock () -> update ();
+			midi_ticks = State::getProject() -> getClock () -> update ();
 			// MIDI flow
 			for (unsigned int i=0; i<midi_ticks; i++) 
-				project -> getMIDI () -> tick (midiout);
+				State::getProject() -> getMIDI () -> tick (midiout);
 		}
 		
 		// Waiter
@@ -232,7 +232,7 @@ int main( int argc, char* args[] )
 		
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (project);
+			GUI_Main (State::getProject());
 		#endif
 
 	}
