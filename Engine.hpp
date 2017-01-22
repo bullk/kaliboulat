@@ -73,6 +73,7 @@ class Waiter
 		void newProject (std::string);
 		void loadProject (std::string);
 		void saveProject ();
+		//void closeProject ();
 		
 		// Singleton
 		static Waiter *getInstance ()

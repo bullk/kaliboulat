@@ -62,6 +62,22 @@ public:
 			CEREAL_NVP(tracks_)
 		);
 	}
+	//template<class Archive>
+	//void save(Archive & archive) const
+	//{
+		//archive (
+			//CEREAL_NVP(name_),
+			//CEREAL_NVP(tracks_)
+		//);
+	//}
+	//template<class Archive>
+	//void load(Archive & archive)
+	//{
+		//archive (
+			//CEREAL_NVP(name_),
+			//CEREAL_NVP(tracks_)
+		//);
+	//}
 	
 protected:
 	std::string name_;

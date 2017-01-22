@@ -30,6 +30,8 @@ State::State () : onoff_(true)
 // Destructor
 State::~State ()
 {
+	track_ = NULL;
+	clip_ = NULL;
 }
 
 int State::loadconf()

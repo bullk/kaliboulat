@@ -97,37 +97,42 @@ void Project::updateRessources ()
 
 void Project::addAudioTrack ( std::string s )
 {
-	std::shared_ptr<Track> track = audio_ -> addTrack (s);
-	//std::shared_ptr<Track> track = new AudioTrack(s);
+	//std::shared_ptr<Track> track = audio_ -> addTrack (s);
+	std::shared_ptr<Track> track (new AudioTrack(s));
 	tracks_.push_back (track);
 	State::getInstance() -> setTrack(track);
 }
 
 void Project::addMidiTrack ( std::string s )
 {
-	std::shared_ptr<Track> track = midi_ -> addTrack (s);
-	//std::shared_ptr<Track> track = new MidiTrack(s);
+	//std::shared_ptr<Track> track = midi_ -> addTrack (s);
+	std::shared_ptr<Track> track (new MidiTrack(s));
 	tracks_.push_back (track);
 	State::getInstance() -> setTrack(track);
 }
 
 void Project::deleteTrack (unsigned int i)
 {
-	std::shared_ptr<Track> track = tracks_[i];
 	tracks_.erase (tracks_.begin() + i);
-	switch ( track -> dataType () )
-	{
-	case AUDIO:
-		audio_ -> deleteTrack (std::static_pointer_cast<AudioTrack>(track));
-		//audio_ -> deleteTrack (track);
-		break;
-	case MIDI:
-		midi_ -> deleteTrack (std::static_pointer_cast<MidiTrack>(track));
-		break;
-	default:
-		break;
-	}
 }
+
+//void Project::deleteTrack (unsigned int i)
+//{
+	//std::shared_ptr<Track> track = tracks_[i];
+	//tracks_.erase (tracks_.begin() + i);
+	//switch ( track -> dataType () )
+	//{
+	//case AUDIO:
+		//audio_ -> deleteTrack (std::static_pointer_cast<AudioTrack>(track));
+		//// audio_ -> deleteTrack (track);
+		//break;
+	//case MIDI:
+		//midi_ -> deleteTrack (std::static_pointer_cast<MidiTrack>(track));
+		//break;
+	//default:
+		//break;
+	//}
+//}
 
 void Project::swapTracks ( unsigned int i, unsigned int j )
 {

@@ -855,10 +855,12 @@ void GUI_Main(std::shared_ptr<Project> project)
 					case SDL_SCANCODE_F5:
 						//if ( project -> ctrlPressed () ) project -> addAudioTrack ("AudioTrack");
 						project -> addAudioTrack ("AudioTrack");
+						State::getInstance() -> shared();
 						break;
 					case SDL_SCANCODE_F6:
 						//if ( project -> ctrlPressed () ) project -> addMidiTrack ("MidiTrack");
 						project -> addMidiTrack ("MidiTrack");
+						State::getInstance() -> shared();
 						break;
 					case SDL_SCANCODE_LCTRL:
 					case SDL_SCANCODE_RCTRL:

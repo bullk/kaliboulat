@@ -73,13 +73,14 @@ void Waiter::main ()
 void Waiter::newProject (std::string name)
 {
 	//sauvegarder le projet courant
-	saveProject ();
+	//closeProject ();
 	std::shared_ptr<Project> project (new Project (name) );
 	State::setProject (project);
 }
 
 void Waiter::loadProject (std::string name)
 {
+	//closeProject ();
 	newProject (name);
     std::ifstream is(State::getProject()->getFile());
     cereal::XMLInputArchive archive(is);
@@ -91,7 +92,13 @@ void Waiter::saveProject ()
 {
     std::ofstream os(State::getProject()->getFile());
     cereal::XMLOutputArchive archive(os);
-    State::getProject()->serialize(archive); 
+    State::getProject()->serialize(archive);
     //archive(State::getProject()); 
 }
+
+//void Waiter::closeProject ()
+//{
+	//saveProject ();
+    //State::setProject (NULL);
+//}
 

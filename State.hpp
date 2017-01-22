@@ -29,7 +29,16 @@ class State
 		inline bool isOn () { return onoff_; }
 		inline void halt () { onoff_ = false; }
 		static inline std::shared_ptr<Project> getProject () { return project_; }
-		static inline void setProject (std::shared_ptr<Project> project) { project_ = project; }
+		static void setProject (std::shared_ptr<Project> project)
+		{
+			//delete project_;
+			project_ = project;
+		}
+		static void shared ()
+		{
+			auto mainlog= spdlog::get("main");
+			mainlog->info("Project shared_ptr count : {}", project_.use_count());
+		}
 		static inline std::shared_ptr<Track> getTrack () { return track_; }
 		static inline void setTrack (std::shared_ptr<Track> track) { track_ = track; }
 		static inline std::shared_ptr<Clip> getClip () { return clip_; }

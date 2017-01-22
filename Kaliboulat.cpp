@@ -127,20 +127,19 @@ int main( int argc, char* args[] )
 
 	auto mainlog= spdlog::get("main");	
 	mainlog->info("----- engine init -----");
+	mainlog->info("creating Waiter");
+	Waiter * waiter = Waiter::getInstance ();
 	mainlog->info("creating State");
 	State * state = State::getInstance ();
 	State::getInstance()->scanAudioFiles ();
 	//State::scanMidiFiles ();
-	mainlog->info("creating Waiter");
-	Waiter * waiter = Waiter::getInstance ();
 	mainlog->info("creating Listener");
 	Listener * listener = Listener::getInstance ();
 
 	mainlog->info("----- project init -----");
 	// INIT PROJECT
-	//std::shared_ptr<Project> project(new Project("test"));
-	std::shared_ptr<Project> project(new Project(".newproject"));
-	State::setProject (project);
+	waiter->newProject(".newproject");
+	state->shared();
 	
 	mainlog->info("----- audio init -----");
 	// AUDIO INIT
@@ -149,7 +148,7 @@ int main( int argc, char* args[] )
 	#else
 		RtAudio * dac = new RtAudio (); // main audio output
 	#endif
-	audioInit (dac, project);
+	audioInit (dac, state->getProject());
 
 	// MIDI INIT
 	mainlog->info("----- MIDI init -----");
@@ -234,10 +233,11 @@ int main( int argc, char* args[] )
 		#ifdef WITH_GUI
 			GUI_Main (State::getProject());
 		#endif
-
 	}
 	
+	state->shared();
 	// CLOSE APP
+	//waiter -> closeProject();
 	
 	#ifdef WITH_GUI
 		GUI_Close ();
@@ -254,7 +254,6 @@ int main( int argc, char* args[] )
 	mainlog->info("closing Audio ports");
 	audioClose (dac);
 
-	waiter->saveProject ();
 	//QUI SE CHARGE DE DETRUIRE LE PROJET ?
 	//mainlog->info("deleting project");
 	//delete project;
@@ -267,10 +266,11 @@ int main( int argc, char* args[] )
 	//delete diApp;
 	mainlog->info("killing Listener");
 	listener -> kill ();
-	mainlog->info("killing Waiter");
-	waiter -> kill ();
 	mainlog->info("killing State");
 	state -> kill ();
+	mainlog->info("killing Waiter");
+	waiter -> kill ();
+	mainlog->info("Done");
 	
 	return 0; /* ISO C requires main to return int. */
 
