@@ -19,7 +19,8 @@ class AudioTrack : public Track
 	
 public:
 	// Constructor 
-	AudioTrack (std::string s);
+	AudioTrack (std::string);
+	AudioTrack (std::string, float, float, std::vector<std::shared_ptr<AudioClip>>);
 	// Destructor 
 	~AudioTrack ();
 
@@ -35,14 +36,6 @@ public:
 	stk::StkFloat tick () const;
 	
 	template <class Archive>
-	static void load_and_construct( Archive & ar, cereal::construct<AudioTrack> & construct )
-	{
-		std::string name;
-		ar( name );
-		construct( name );
-	}
-	
-     template<class Archive>
 	void serialize(Archive & archive)
 	{
 		archive (
@@ -53,6 +46,24 @@ public:
 			CEREAL_NVP(volume_),
 			CEREAL_NVP(clipset_)
 		);
+	}
+	
+	//template <class Archive>
+	//static void load_and_construct( Archive & archive, cereal::construct<AudioTrack> & construct )
+	//{
+		//std::string name;
+		//archive( name );
+		//construct( name );
+	//}
+	
+	template <class Archive>
+	static void load_and_construct( Archive & archive, cereal::construct<AudioTrack> & construct )
+	{
+		std::string name;
+		float hue, volume;
+		std::vector<std::shared_ptr<AudioClip>> clipset;
+		archive( name, hue, volume, clipset );
+		construct( name, hue, volume, clipset );
 	}
 
 protected:

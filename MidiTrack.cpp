@@ -18,9 +18,9 @@ MidiTrack::MidiTrack (std::string name) : Track (MIDI, "MIDI", name)
 
 MidiTrack::~MidiTrack ()
 {
-	spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
+	//spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
 	while (clipset_.size())
-		deleteClip(0);
+		clipset_.pop_back();
     //delete clipset_;
     //clipset_ = NULL;
 }

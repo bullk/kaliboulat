@@ -12,6 +12,7 @@ class Track
 public:
 	// Constructor 
 	Track (DataType dt, std::string ts, std::string s);
+	Track (DataType dt, std::string ts, std::string s, float h);
 	// Destructor 
 	virtual ~Track ();
 

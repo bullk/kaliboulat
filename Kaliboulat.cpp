@@ -36,22 +36,31 @@ void audioClose (RtAudio * dac);
 //----------------------------------------------------------------------
 
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
-		 double streamTime, RtAudioStreamStatus status, void *dataPointer )
+		 double streamTime, RtAudioStreamStatus status, void *dataPointer)
 {
-	AudioModule * audio_module = (AudioModule *) dataPointer;
+	//AudioModule * audio_module = State::getProject()->getAudio();
 	register StkFloat * samples = (StkFloat *) outputBuffer;
-	
+
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
 		if ( State::getProject() -> getClock() -> isStarted() ) 
 		{
-			std::vector<std::shared_ptr<AudioTrack>> * trackset = audio_module -> getTrackSet ();
-			for ( unsigned int j = 0; j < trackset -> size (); j++ )
+			//std::vector<std::shared_ptr<AudioTrack>> * trackset = audio_module -> getTrackSet ();
+			//for ( unsigned int j = 0; j < trackset -> size (); j++ )
+			//{
+				//std::shared_ptr<AudioTrack> daTrack = trackset -> at (j);
+				//if ( daTrack -> isPlaying () )
+					//*samples += daTrack -> tick () * *(daTrack -> getVolume ());
+			//}
+			for ( unsigned int j = 0; j < State::getProject()->nTracks(); j++ )
 			{
-				std::shared_ptr<AudioTrack> daTrack = trackset -> at (j);
-				if ( daTrack -> isPlaying () )
-					*samples += daTrack -> tick () * *(daTrack -> getVolume ());
+				if ( State::getProject() -> getTrack (j) -> dataType () == AUDIO )
+				{
+					std::shared_ptr<AudioTrack> daTrack = std::static_pointer_cast<AudioTrack>(State::getProject() -> getTrack (j));
+					if ( daTrack -> isPlaying () )
+						*samples += daTrack -> tick () * *(daTrack -> getVolume ());
+				}
 			}
 		}
 		//std::vector<std::shared_ptr<AudioClip>> * clipset = project -> getAudio () -> getClipSet ();
@@ -68,7 +77,8 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 }
 
 
-void audioInit (RtAudio * dac, std::shared_ptr<Project> project)
+
+void audioInit (RtAudio * dac)
 {
 	Stk::setSampleRate (GLOBAL_SAMPLE_RATE);
 	Stk::showWarnings (true);
@@ -89,7 +99,7 @@ void audioInit (RtAudio * dac, std::shared_ptr<Project> project)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)project->getAudio(), &options ); }
+	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)NULL, &options ); }
 	catch ( RtAudioError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
@@ -148,7 +158,7 @@ int main( int argc, char* args[] )
 	#else
 		RtAudio * dac = new RtAudio (); // main audio output
 	#endif
-	audioInit (dac, state->getProject());
+	audioInit (dac);
 
 	// MIDI INIT
 	mainlog->info("----- MIDI init -----");
@@ -237,7 +247,6 @@ int main( int argc, char* args[] )
 	
 	state->shared();
 	// CLOSE APP
-	//waiter -> closeProject();
 	
 	#ifdef WITH_GUI
 		GUI_Close ();
@@ -257,6 +266,7 @@ int main( int argc, char* args[] )
 	//QUI SE CHARGE DE DETRUIRE LE PROJET ?
 	//mainlog->info("deleting project");
 	//delete project;
+	//waiter -> closeProject();
 	mainlog->info("deleting RtMidiIn");
 	delete midiin;
 	mainlog->info("deleting RtMidiOut");
@@ -271,6 +281,8 @@ int main( int argc, char* args[] )
 	mainlog->info("killing Waiter");
 	waiter -> kill ();
 	mainlog->info("Done");
+	
+	//spdlog::drop_all();
 	
 	return 0; /* ISO C requires main to return int. */
 

@@ -46,8 +46,13 @@ Project::Project (std::string str)
 }
 
 Project::~Project () {
+	//auto mainlog = spdlog::get("main");	
+	//mainlog->debug("tracks_ contains {} elements", tracks_.size());
 	while (tracks_.size())
-		deleteTrack(0);
+	{
+		tracks_.pop_back();
+		//mainlog->debug("tracks_ contains {} elements", tracks_.size());
+	}	
 	for (unsigned int i=0; i < audiofiles_ -> size(); i++)
 		delete audiofiles_ -> at (i);
 	delete audiofiles_;

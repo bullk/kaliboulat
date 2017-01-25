@@ -12,6 +12,10 @@ AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f
 	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
 }
 
+AudioTrack::AudioTrack (std::string s, float h, float v, std::vector<std::shared_ptr<AudioClip>> cs) :
+	Track (AUDIO, "Audio", s, h), volume_(v), clipset_(cs)
+{
+}
 
 //------------
 // Destructor 
@@ -19,9 +23,9 @@ AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f
 
 AudioTrack::~AudioTrack ()
 {
-	spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
+	//spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
 	while (clipset_.size())
-		deleteClip(0);
+		clipset_.pop_back();
     //delete clipset_;
     //clipset_ = NULL;
 }

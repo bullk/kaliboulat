@@ -32,6 +32,7 @@ State::~State ()
 {
 	track_ = NULL;
 	clip_ = NULL;
+	//delete project_;
 }
 
 int State::loadconf()
