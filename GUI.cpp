@@ -82,7 +82,7 @@ void BeginScreen ()
 	
 	ImGui::Begin("main window", NULL, flags);
 	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
-	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 0.0f);
+	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 10.0f);
 	
 	//width1 = (int)ImGui::GetIO().DisplaySize.x / 6;
 	//width2 = (int)ImGui::GetIO().DisplaySize.x / 3;
@@ -658,7 +658,7 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 	}
 	int w = ressources_panel * width5;
 	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(2, 2));
-	ImGui::BeginChild ("Board", ImVec2(w-3, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+	ImGui::BeginChild ("Board", ImVec2(w-3, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 	// DISPLAYING TRACKS
 	std::shared_ptr<Track> asking_track = NULL;

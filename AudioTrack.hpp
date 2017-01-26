@@ -39,22 +39,12 @@ public:
 	void serialize(Archive & archive)
 	{
 		archive (
-			//CEREAL_NVP(data_type_),
-			//CEREAL_NVP(type_str_),
 			CEREAL_NVP(name_),
 			CEREAL_NVP(hue_),
 			CEREAL_NVP(volume_),
 			CEREAL_NVP(clipset_)
 		);
 	}
-	
-	//template <class Archive>
-	//static void load_and_construct( Archive & archive, cereal::construct<AudioTrack> & construct )
-	//{
-		//std::string name;
-		//archive( name );
-		//construct( name );
-	//}
 	
 	template <class Archive>
 	static void load_and_construct( Archive & archive, cereal::construct<AudioTrack> & construct )

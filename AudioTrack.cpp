@@ -8,7 +8,6 @@
 
 AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f)
 {
-	//clipset_ = new std::vector<std::shared_ptr<AudioClip>>;
 	hue_ =  0.25f + (float)((rand() % 31) -15) / 100 ;
 }
 
@@ -23,11 +22,8 @@ AudioTrack::AudioTrack (std::string s, float h, float v, std::vector<std::shared
 
 AudioTrack::~AudioTrack ()
 {
-	//spdlog::get("main")->info("Deleting {} track {}", type_str_, name_);
 	while (clipset_.size())
 		clipset_.pop_back();
-    //delete clipset_;
-    //clipset_ = NULL;
 }
 
 
@@ -42,7 +38,6 @@ void AudioTrack::addClip (std::shared_ptr<Clip> clip)
 
 void AudioTrack::addClip (std::shared_ptr<AudioClip> clip)
 {
-	//std::cout << "AudioTrack::addClip" << clipset_.size() << std::endl;
 	clipset_.push_back (clip);
 }
 
@@ -50,7 +45,6 @@ void AudioTrack::deleteClip (unsigned int i)
 {
 	std::shared_ptr<AudioClip> clip = clipset_.at(i);
 	clipset_.erase (clipset_.begin() + i);
-	//delete clip;
 }
 
 void AudioTrack::stopAll ()

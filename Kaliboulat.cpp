@@ -38,7 +38,6 @@ void audioClose (RtAudio * dac);
 int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer)
 {
-	//AudioModule * audio_module = State::getProject()->getAudio();
 	register StkFloat * samples = (StkFloat *) outputBuffer;
 
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
@@ -46,13 +45,6 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		*samples = 0;
 		if ( State::getProject() -> getClock() -> isStarted() ) 
 		{
-			//std::vector<std::shared_ptr<AudioTrack>> * trackset = audio_module -> getTrackSet ();
-			//for ( unsigned int j = 0; j < trackset -> size (); j++ )
-			//{
-				//std::shared_ptr<AudioTrack> daTrack = trackset -> at (j);
-				//if ( daTrack -> isPlaying () )
-					//*samples += daTrack -> tick () * *(daTrack -> getVolume ());
-			//}
 			for ( unsigned int j = 0; j < State::getProject()->nTracks(); j++ )
 			{
 				if ( State::getProject() -> getTrack (j) -> dataType () == AUDIO )
@@ -63,13 +55,6 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 				}
 			}
 		}
-		//std::vector<std::shared_ptr<AudioClip>> * clipset = project -> getAudio () -> getClipSet ();
-		//for ( unsigned int j = 0; j < clipset -> size (); j++ )
-		//{
-			//std::shared_ptr<AudioClip> clip = clipset -> at (j);
-			//if ( clip -> isPlaying () )
-				//*samples += clip -> tick () * *(clip -> getVolume ());
-		//}
 		*samples += Listener::getInstance() -> tick();
 		samples++;
 	}

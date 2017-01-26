@@ -81,13 +81,9 @@ int State::scanAudioFilesCallback (const char *fpath, const struct stat *sb, int
 {
 	auto mainlog = spdlog::get("main");
 	char * localpath = strdup (fpath);
-	//mainlog->info("{}", localpath);
 	if (typeflag == FTW_F) {
 		if (fnmatch("*.wav", localpath, FNM_CASEFOLD) == 0) {
 			audiofiles_ -> push_back(localpath);
-			//std::string str = std::string (basename(localpath));
-			//audiofiles_ -> push_back(str.substr(0, str.length()-4));
-			//mainlog->info("found {}", str.c_str());
 			mainlog->info("found {}", localpath);
 		}
 	}
@@ -102,7 +98,6 @@ int State::scanAudioFiles ()
 	{
 		mainlog->info("scanning {}", audiodirs_[i].c_str());
 		ftw(audiodirs_[i].c_str(), scanAudioFilesCallback, 16);
-		//ftw("/home/commun/claude.mcmb.fr/APPRET", scanAudioFilesCallback, 16);
 	}
 	return 0;
 }

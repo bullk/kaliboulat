@@ -41,7 +41,6 @@ public:
 	void serialize(Archive & archive)
 	{
 		archive (
-			//CEREAL_NVP(data_type_),
 			CEREAL_NVP(path_),
 			CEREAL_NVP(name_),
 			CEREAL_NVP(launchstyle_),
@@ -62,20 +61,6 @@ protected:
 	
 };
 
-//namespace cereal
-//{
-  //template <> struct LoadAndConstruct<AudioClip>
-  //{
-	//template <class Archive>
-	//static void load_and_construct( Archive & ar, cereal::construct<AudioClip> & construct )
-	//{
-		//std::string path;
-		//ar( path );
-		//construct( path );
-	//}
-  //};
-//}
- 
 CEREAL_REGISTER_TYPE(AudioClip)
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Clip, AudioClip)
 

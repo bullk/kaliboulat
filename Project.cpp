@@ -46,13 +46,8 @@ Project::Project (std::string str)
 }
 
 Project::~Project () {
-	//auto mainlog = spdlog::get("main");	
-	//mainlog->debug("tracks_ contains {} elements", tracks_.size());
 	while (tracks_.size())
-	{
 		tracks_.pop_back();
-		//mainlog->debug("tracks_ contains {} elements", tracks_.size());
-	}	
 	for (unsigned int i=0; i < audiofiles_ -> size(); i++)
 		delete audiofiles_ -> at (i);
 	delete audiofiles_;
@@ -102,7 +97,6 @@ void Project::updateRessources ()
 
 void Project::addAudioTrack ( std::string s )
 {
-	//std::shared_ptr<Track> track = audio_ -> addTrack (s);
 	std::shared_ptr<Track> track (new AudioTrack(s));
 	tracks_.push_back (track);
 	State::getInstance() -> setTrack(track);
@@ -110,7 +104,6 @@ void Project::addAudioTrack ( std::string s )
 
 void Project::addMidiTrack ( std::string s )
 {
-	//std::shared_ptr<Track> track = midi_ -> addTrack (s);
 	std::shared_ptr<Track> track (new MidiTrack(s));
 	tracks_.push_back (track);
 	State::getInstance() -> setTrack(track);
@@ -120,24 +113,6 @@ void Project::deleteTrack (unsigned int i)
 {
 	tracks_.erase (tracks_.begin() + i);
 }
-
-//void Project::deleteTrack (unsigned int i)
-//{
-	//std::shared_ptr<Track> track = tracks_[i];
-	//tracks_.erase (tracks_.begin() + i);
-	//switch ( track -> dataType () )
-	//{
-	//case AUDIO:
-		//audio_ -> deleteTrack (std::static_pointer_cast<AudioTrack>(track));
-		//// audio_ -> deleteTrack (track);
-		//break;
-	//case MIDI:
-		//midi_ -> deleteTrack (std::static_pointer_cast<MidiTrack>(track));
-		//break;
-	//default:
-		//break;
-	//}
-//}
 
 void Project::swapTracks ( unsigned int i, unsigned int j )
 {
