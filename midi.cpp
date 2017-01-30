@@ -10,8 +10,8 @@ void midiInit ()
 
 void midiPanic (RtMidiOut * midiout)
 {
-	std::vector<unsigned char> cc121 { 0xB0, 0x79, 0xFF }; // Channel 1, all CC OFF
-	std::vector<unsigned char> cc123 { 0xB0, 0x7B, 0xFF }; // Channel 1, all notes OFF
+	std::vector<unsigned char> cc121 { 0xB0, 0x79, 0x00 }; // Channel 1, all CC OFF
+	std::vector<unsigned char> cc123 { 0xB0, 0x7B, 0x00 }; // Channel 1, all notes OFF
 	std::vector<unsigned char> message;
 	
 	for (unsigned short i=0; i<16; i++)

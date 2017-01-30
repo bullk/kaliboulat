@@ -38,6 +38,9 @@ State::~State ()
 int State::loadconf()
 {
 	auto mainlog= spdlog::get("main");
+	mainlog->info("cleaning mididirs_");
+	mididirs_.clear();
+	mididirs_.push_back(getenv("HOME"));
 	mainlog->info("cleaning audiodirs_");
 	audiodirs_.clear();
 	mainlog->info("opening conf file");
@@ -104,11 +107,12 @@ int State::scanAudioFiles ()
 
 int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
+	auto mainlog = spdlog::get("main");
 	char * localpath = strdup (fpath);
 	if (typeflag == FTW_F) {
 		if (fnmatch("*.mid", localpath, FNM_CASEFOLD) == 0) {
-			std::string str = std::string (basename(localpath));
-			midifiles_ -> push_back(str.substr(0, str.length()-4));
+			midifiles_ -> push_back(localpath);
+			mainlog->info("found {}", localpath);
 		}
 	}
 	return 0;
@@ -116,8 +120,13 @@ int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int 
 
 int State::scanMidiFiles ()
 {
+	auto mainlog = spdlog::get("main");
 	midifiles_->clear();
-	ftw(getenv("HOME"), scanMidiFilesCallback, 16);
+	for ( unsigned int i=0; i< mididirs_.size(); i++ )
+	{
+		mainlog->info("scanning {}", mididirs_[i].c_str());
+		ftw(mididirs_[i].c_str(), scanMidiFilesCallback, 16);
+	}
 	return 0;
 }
 

@@ -17,6 +17,7 @@ class State
 		static std::shared_ptr<Track> track_;
 		static std::shared_ptr<Clip> clip_;
 		std::vector<std::string> audiodirs_;
+		std::vector<std::string> mididirs_;
 		static std::vector<std::string> * projectlist_;
 		static std::vector<std::string> * audiofiles_;
 		static std::vector<std::string> * midifiles_;
@@ -45,10 +46,10 @@ class State
 		static inline void setClip (std::shared_ptr<Clip> clip) { clip_ = clip; }
 		static int scanProjects ();
 		int scanAudioFiles ();
-		static int scanMidiFiles ();
+		int scanMidiFiles ();
 		static inline std::vector<std::string> * getProjectList () { return projectlist_; }
 		static inline std::vector<std::string> * getAudioFiles () { return audiofiles_; }
-		static inline std::vector<std::string> * getMidiFiles () { return midifiles_; }
+		static inline std::vector<std::string> * getMIDIFiles () { return midifiles_; }
 		
 		// Singleton
 		static State *getInstance ()

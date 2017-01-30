@@ -250,9 +250,21 @@ void mainMenu ()
 	{
         ImGui::Text("Select some files and confirm\n or close this window\n");
         ImGui::Separator();
+        
+		static std::vector<bool> selected (State::getMIDIFiles()->size(), false);
+        ImGui::Text("%lu files found", State::getMIDIFiles()->size());
+		ImGui::BeginChild("mid files", ImVec2(800,600), true);
+		for (unsigned int i=0; i<selected.size(); i++)
+			if ( ImGui::Selectable(State::getMIDIFiles()->at(i).c_str(), selected[i]) )
+				selected[i] = !selected[i];
+		ImGui::EndChild();
+        ImGui::Separator();
 		ImGui::Columns(2, NULL, false);
 		if (ImGui::Button("Open", ImVec2(80,0))) 
 		{
+			for (unsigned int i=0; i<selected.size(); i++)
+				if ( selected[i] )
+					State::getProject()->getMIDIFiles()->push_back( new MidiFile(State::getMIDIFiles()->at(i)) );
 			ImGui::CloseCurrentPopup();
 			import_midi_files = false;
 		}
