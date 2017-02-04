@@ -22,18 +22,18 @@ void Clip::arm ()
 {
 	switch ( launchstyle_ )
 	{
-		case BAR:
+		case LAUNCH_BAR:
 			state_ = ARMED;
 			Waiter::getInstance() -> addBar (new Command<Clip*, void(Clip::*)()>(this, &Clip::play));
 			break;
-		case BEAT:
+		case LAUNCH_BEAT:
 			state_ = ARMED;
 			Waiter::getInstance() -> addBeat (new Command<Clip*, void(Clip::*)()>(this, &Clip::play));
 			break;
-		case FREE:
+		case LAUNCH_FREE:
 			play ();
 			break;
-		case RESYNC:
+		case LAUNCH_RESYNC:
 			break;
 	}
 }

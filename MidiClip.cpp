@@ -18,8 +18,8 @@ MidiClip::MidiClip (std::string name = "No name") : Clip()
 	time_ = 0;
 	index_ = 0;
 	data_ = new std::vector<ScheduledMidiMessage *>;
-	launchstyle_ = BAR;
-	stopstyle_ = BAR;
+	launchstyle_ = LAUNCH_BAR;
+	stopstyle_ = STOP_BAR;
 	loopstyle_ = FOREVER;
 }
 

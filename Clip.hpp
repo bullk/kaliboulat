@@ -9,8 +9,12 @@ class Clip
 {
 public:	
 	enum ClipState { HALTED, ARMED, PLAYING, RECORDING };
-	enum LaunchStyle { BAR, BEAT, FREE, RESYNC };
+	enum LaunchStyle { LAUNCH_BAR, LAUNCH_BEAT, LAUNCH_FREE, LAUNCH_RESYNC };
+	enum StopStyle { STOP_BAR, STOP_BEAT, STOP_FREE };
 	enum LoopStyle { ONESHOT, MANY, FOREVER };
+	const char * launchText[4] = { "BAR", "BEAT", "FREE", "RESYNC" };
+	const char * stopText[3] = { "BAR", "BEAT", "FREE" };
+	const char * loopText[3] = { "ONESHOT", "MANY", "FOREVER" };
 	
 public:	
 	Clip ();
@@ -23,10 +27,19 @@ public:
 	inline void stop () { state_ = HALTED; }
 	inline virtual std::string getPath ()  { return path_; }
 	inline virtual std::string getName () { return name_; }
-	inline void virtual setName (std::string s) { name_ = s; }
-	inline void virtual setLaunchStyle (LaunchStyle ls) { launchstyle_ = ls; }
-	inline void virtual setStopStyle (LaunchStyle ls) { stopstyle_ = ls; }
-	inline void virtual setLoopStyle (LoopStyle ls) { loopstyle_ = ls; }
+	inline virtual void setName (std::string s) { name_ = s; }
+	inline virtual int getLaunchStyle () { return launchstyle_; }
+	inline virtual const char* getLaunchStyleText () { return launchText[launchstyle_]; }
+	inline virtual void setLaunchStyle (int ls) { launchstyle_ = ls; }
+	inline virtual void nextLaunchStyle () { launchstyle_ = (launchstyle_ + 1) % 4; }
+	inline virtual int getStopStyle () { return stopstyle_; }
+	inline virtual const char* getStopStyleText () { return stopText[stopstyle_]; }
+	inline virtual void setStopStyle (int ls) { launchstyle_ = ls; }
+	inline virtual void nextStopStyle () { stopstyle_ = (stopstyle_ + 1) % 3; }
+	inline virtual int getLoopStyle () { return loopstyle_; }
+	inline virtual const char* getLoopStyleText () { return loopText[loopstyle_]; }
+	inline virtual void setLoopStyle (int ls) { launchstyle_ = ls; }
+	inline virtual void nextLoopStyle () { loopstyle_ = (loopstyle_ + 1) % 3; }
 	virtual unsigned long getLength() = 0;
 	//virtual int getAngle (void) = 0;
    
@@ -35,8 +48,7 @@ protected:
 	ClipState state_;
 	std::string name_;
 	std::string path_;
-	LaunchStyle launchstyle_, stopstyle_;
-	LoopStyle loopstyle_;
+	int launchstyle_, stopstyle_, loopstyle_;
 	//int angle_;
 	
 };

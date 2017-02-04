@@ -585,11 +585,15 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 		case Screen::AUDIOCLIP:
 		if ( State::getInstance() -> getClip() )
 		{
-			
 			std::shared_ptr<AudioClip> clip = std::static_pointer_cast<AudioClip>(State::getInstance() -> getClip());
 			ImGui::Text("%s", clip -> getName().c_str());
 			ImGui::Text("%s", clip -> getPath().c_str());
-			
+			ImGui::Text("Launch"); ImGui::SameLine();
+			if ( ImGui::Button(clip -> getLaunchStyleText()) ) clip -> nextLaunchStyle();
+			ImGui::Text("Stop"); ImGui::SameLine();
+			if ( ImGui::Button(clip -> getStopStyleText()) ) clip -> nextStopStyle();
+			ImGui::Text("Loop"); ImGui::SameLine();
+			if ( ImGui::Button(clip -> getLoopStyleText()) ) clip -> nextLoopStyle();
 		}
 			break;
 		case Screen::MIDICLIP:

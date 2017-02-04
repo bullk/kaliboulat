@@ -14,8 +14,8 @@ AudioClip::AudioClip(std::string path) : Clip(), FileWvIn(path)
 	std::string file = path_.substr(p, path_.length()-p);
 	p = file.rfind(".");
 	name_ = file.substr(0, p);
-	launchstyle_ = BAR;
-	stopstyle_ = FREE;
+	launchstyle_ = LAUNCH_BAR;
+	stopstyle_ = STOP_FREE;
 	loopstyle_ = ONESHOT;
 	//angle_ = 0;
 	setRate(1);
