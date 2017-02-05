@@ -396,8 +396,8 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 {
 	unsigned short beats_per_bar = 4;
 	ImGui::PushItemWidth(100);
-	ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
-	ImGui::Text("Location : %s", clip -> getPath().c_str());
+	//ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
+	//ImGui::Text("Location : %s", clip -> getPath().c_str());
 	ImGui::Text("size : %lu events", clip -> getSize());
 	ImGui::Text("division value : %d ticks/beat", clip -> getDivision());
 	ImGui::Text("length : %lu ticks", clip -> getLength());
@@ -434,8 +434,8 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 void displayAudioClipDetails (std::shared_ptr<AudioClip> clip)
 {
 	ImGui::PushItemWidth(100);
-	ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
-	ImGui::Text("Location : %s", clip -> getPath().c_str());
+	//ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
+	//ImGui::Text("Location : %s", clip -> getPath().c_str());
 	ImGui::Separator();
 	ImGui::SliderFloat("volume", clip -> getVolume(), 0.0f, 1.0f, "%.3f");
 	ImGui::SliderFloat("rate", clip -> getGUIRateP(), 0.125f, 8.0f, "%.3f"); clip -> updateRate();
@@ -604,6 +604,7 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 			{
 				ClipProperties (State::getInstance() -> getClip());
 				std::shared_ptr<AudioClip> clip = std::static_pointer_cast<AudioClip>(State::getInstance() -> getClip());
+				displayAudioClipDetails (clip);
 			}
 			break;
 		case Screen::MIDICLIP:
@@ -611,6 +612,7 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 			{
 				ClipProperties (State::getInstance() -> getClip());
 				std::shared_ptr<MidiClip> clip = std::static_pointer_cast<MidiClip>(State::getInstance() -> getClip());
+				displayMidiClipDetails (clip);
 			}
 			break;
 		default:
