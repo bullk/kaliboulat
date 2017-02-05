@@ -9,6 +9,15 @@ Clip::Clip () : state_(HALTED), name_(""), path_("")
 {
 }
 
+Clip::Clip (std::string name) : state_(HALTED), name_(name), path_("")
+{
+}
+
+Clip::Clip (std::string name, int launch, int stop, int loop) :
+	state_(HALTED), name_(name), path_(""), launchstyle_(launch), stopstyle_(stop), loopstyle_(loop)
+{
+}
+
 //------------
 // Destructor 
 //------------

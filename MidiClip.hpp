@@ -16,6 +16,7 @@ class MidiClip : public Clip
 
 public:
 	MidiClip (std::string name);
+	MidiClip (std::string, int, int, int);
 	~MidiClip ();
 	inline unsigned long getLength () { return length_; }
 	inline void setLength (unsigned long l) { length_ = l; }
@@ -30,29 +31,26 @@ public:
 	void tick (RtMidiOut *);
 	void appendEvent (unsigned long time, std::vector<unsigned char> * event);
 	
-	template <class Archive>
-	static void load_and_construct( Archive & ar, cereal::construct<MidiClip> & construct )
-	{
-		std::string name;
-		ar( name );
-		construct( name );
-	}
-	
     template<class Archive>
 	void serialize(Archive & archive)
 	{
 		archive (
-			//CEREAL_NVP(data_type_),
-			CEREAL_NVP(path_),
 			CEREAL_NVP(name_),
 			CEREAL_NVP(launchstyle_),
 			CEREAL_NVP(stopstyle_),
-			CEREAL_NVP(loopstyle_),
-			CEREAL_NVP(division_),
-			CEREAL_NVP(length_)
+			CEREAL_NVP(loopstyle_)
 		);
 	}
 
+	template <class Archive>
+	static void load_and_construct( Archive & archive, cereal::construct<MidiClip> & construct )
+	{
+		std::string name;
+		int launchstyle, stopstyle, loopstyle;
+		archive ( name, launchstyle, stopstyle, loopstyle );
+		construct ( name, launchstyle, stopstyle, loopstyle );
+	}
+	
 protected:
 	int division_;
 	unsigned long length_, time_, index_;

@@ -23,6 +23,19 @@ MidiClip::MidiClip (std::string name = "No name") : Clip()
 	loopstyle_ = FOREVER;
 }
 
+MidiClip::MidiClip (std::string name, int launch, int stop, int loop) : Clip(name, launch, stop, loop)
+{
+	data_type_ = MIDI;
+	//path_ = path;
+	//int p = path_.rfind("/") + 1;
+	//name_ = path_.substr(p, path_.length()-p);
+	name_ = name;
+	length_ = 0;
+	time_ = 0;
+	index_ = 0;
+	data_ = new std::vector<ScheduledMidiMessage *>;
+}
+
 //------------
 // Destructor 
 //------------

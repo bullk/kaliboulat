@@ -18,6 +18,8 @@ public:
 	
 public:	
 	Clip ();
+	Clip (std::string);
+	Clip (std::string, int, int, int);
 	virtual ~Clip ();
 	inline DataType dataType () { return data_type_; }
 	inline ClipState getState () { return state_; }

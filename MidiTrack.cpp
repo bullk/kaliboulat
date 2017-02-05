@@ -39,9 +39,9 @@ void MidiTrack::addClip (std::shared_ptr<Clip> clip)
 	addClip ( std::static_pointer_cast<MidiClip>(clip) );
 }
 
-void MidiTrack::addClip(std::shared_ptr<MidiClip> daClip)
+void MidiTrack::addClip(std::shared_ptr<MidiClip> clip)
 {
-	clipset_.push_back (daClip);
+	clipset_.push_back (clip);
 }
 
 void MidiTrack::deleteClip (unsigned int i)

@@ -564,6 +564,23 @@ static void DragClipOverlay (bool* p_open)
 	ImGui::End();
 }
 
+void ClipProperties (std::shared_ptr<Clip> clip)
+{
+	ImGui::Text("%s", clip -> getName().c_str());
+	ImGui::Text("%s", clip -> getPath().c_str());
+	ImGui::Columns(4, NULL, false);
+	ImGui::PushID("launch"); ImGui::Text("Launch"); ImGui::NextColumn();
+	if ( ImGui::Button(clip -> getLaunchStyleText()) ) clip -> nextLaunchStyle();
+	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
+	ImGui::PushID("stop"); ImGui::Text("Stop"); ImGui::NextColumn();
+	if ( ImGui::Button(clip -> getStopStyleText()) ) clip -> nextStopStyle();
+	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
+	ImGui::PushID("loop"); ImGui::Text("Loop"); ImGui::NextColumn();
+	if ( ImGui::Button(clip -> getLoopStyleText()) ) clip -> nextLoopStyle();
+	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
+	ImGui::Columns(1);
+}
+
 void RessourcesPanel (std::shared_ptr<Project> project)
 {
 	ImGui::BeginChild ("Ressources", ImVec2(width1-3,0), true);
@@ -583,20 +600,18 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 			displayMidiFiles (project);
 			break;
 		case Screen::AUDIOCLIP:
-		if ( State::getInstance() -> getClip() )
-		{
-			std::shared_ptr<AudioClip> clip = std::static_pointer_cast<AudioClip>(State::getInstance() -> getClip());
-			ImGui::Text("%s", clip -> getName().c_str());
-			ImGui::Text("%s", clip -> getPath().c_str());
-			ImGui::Text("Launch"); ImGui::SameLine();
-			if ( ImGui::Button(clip -> getLaunchStyleText()) ) clip -> nextLaunchStyle();
-			ImGui::Text("Stop"); ImGui::SameLine();
-			if ( ImGui::Button(clip -> getStopStyleText()) ) clip -> nextStopStyle();
-			ImGui::Text("Loop"); ImGui::SameLine();
-			if ( ImGui::Button(clip -> getLoopStyleText()) ) clip -> nextLoopStyle();
-		}
+			if ( State::getInstance() -> getClip() )
+			{
+				ClipProperties (State::getInstance() -> getClip());
+				std::shared_ptr<AudioClip> clip = std::static_pointer_cast<AudioClip>(State::getInstance() -> getClip());
+			}
 			break;
 		case Screen::MIDICLIP:
+			if ( State::getInstance() -> getClip() )
+			{
+				ClipProperties (State::getInstance() -> getClip());
+				std::shared_ptr<MidiClip> clip = std::static_pointer_cast<MidiClip>(State::getInstance() -> getClip());
+			}
 			break;
 		default:
 			break;
