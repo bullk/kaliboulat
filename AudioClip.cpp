@@ -8,8 +8,8 @@
 AudioClip::AudioClip(std::string path) : Clip(), FileWvIn(path)
 {
 	data_type_ = AUDIO;
-	openFile(path);
 	path_ = path;
+	openFile(path_);
 	int p = path_.rfind("/") + 1;
 	std::string file = path_.substr(p, path_.length()-p);
 	p = file.rfind(".");
@@ -24,6 +24,23 @@ AudioClip::AudioClip(std::string path) : Clip(), FileWvIn(path)
 	pitshift_ -> setEffectMix(1.0);
 	gui_rate_ = 1.0f;
 	gui_pitch_ = 0;
+	//gui_data_[data_.size()];
+	//for ( unsigned int i=0; i<=data_.size(); i++ )	{ gui_data_[i] = (float) data_[i]; }
+	//for ( unsigned int i=0; i<=sizeof(gui_data_); i++ )	{ gui_data_[i] = (float) data_[i]; }
+	updateRate(); updatePitch();
+}
+
+AudioClip::AudioClip
+	(std::string path, std::string name, int launch, int stop, int loop, float vol, float rate, int pitch) :
+	Clip(name, launch, stop, loop), FileWvIn(path),
+	volume_(vol), gui_rate_(rate), gui_pitch_(pitch)
+{
+	data_type_ = AUDIO;
+	path_ = path;
+	openFile(path);
+	//angle_ = 0;
+	pitshift_ = new stk::PitShift();
+	pitshift_ -> setEffectMix(1.0);
 	//gui_data_[data_.size()];
 	//for ( unsigned int i=0; i<=data_.size(); i++ )	{ gui_data_[i] = (float) data_[i]; }
 	//for ( unsigned int i=0; i<=sizeof(gui_data_); i++ )	{ gui_data_[i] = (float) data_[i]; }

@@ -48,8 +48,7 @@ public:
 protected:
 	DataType data_type_;
 	ClipState state_;
-	std::string name_;
-	std::string path_;
+	std::string name_, path_;
 	int launchstyle_, stopstyle_, loopstyle_;
 	//int angle_;
 	

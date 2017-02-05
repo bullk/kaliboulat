@@ -15,7 +15,8 @@ class AudioClip : public Clip, public stk::FileWvIn
 {
 	
 public:
-	AudioClip (std::string path);
+	AudioClip (std::string);
+	AudioClip (std::string, std::string, int, int, int, float, float, int);
 	~AudioClip ();
 	long unsigned int getLength ();
 	stk::StkFloat getTime ();
@@ -30,15 +31,7 @@ public:
 	//int getAngle (void);
 
 	template <class Archive>
-	static void load_and_construct( Archive & ar, cereal::construct<AudioClip> & construct )
-	{
-		std::string path;
-		ar( path );
-		construct( path );
-	}
-	
-	template<class Archive>
-	void serialize(Archive & archive)
+	void serialize (Archive & archive)
 	{
 		archive (
 			CEREAL_NVP(path_),
@@ -50,6 +43,17 @@ public:
 			CEREAL_NVP(gui_rate_),
 			CEREAL_NVP(gui_pitch_)
 		);
+	}
+	
+	template <class Archive>
+	static void load_and_construct (Archive & archive, cereal::construct<AudioClip> & construct)
+	{
+		std::string path, name;
+		int launch, stop, loop;
+		float volume, gui_rate;
+		int gui_pitch;
+		archive (path, name, launch, stop, loop, volume, gui_rate, gui_pitch);
+		construct (path, name, launch, stop, loop, volume, gui_rate, gui_pitch);
 	}
 	
 protected:    
