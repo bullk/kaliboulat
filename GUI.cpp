@@ -231,7 +231,12 @@ void mainMenu ()
 		{
 			for (unsigned int i=0; i<selected.size(); i++)
 				if ( selected[i] )
-					State::getProject()->getAudioFiles()->push_back( new AudioFile(State::getAudioFiles()->at(i)) );
+				{
+					std::string name_in = State::getAudioFiles()->at(i);
+					std::string name_out = State::getProject()->getAudioDir() + "/" + name_from_path (name_in);
+					importAudioFile (name_in, name_out);
+					State::getProject()->getAudioFiles()->push_back( new AudioFile(name_out) );
+				}
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
 			selected.assign(State::getAudioFiles()->size(), false);

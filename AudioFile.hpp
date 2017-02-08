@@ -13,5 +13,6 @@ public:
 
 };
 	
+void importAudioFile (std::string name_in, std::string name_out);
 
 #endif

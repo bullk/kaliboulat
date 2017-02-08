@@ -6,14 +6,29 @@
 #include "Engine.hpp"
 #include "State.hpp"
 
+std::string name_from_path (std::string path)
+{
+	int p = path.rfind("/") + 1;
+	return path.substr(p, path.length()-p);
+}
+
+RessourceFile::RessourceFile (DataType dt) : data_type_(dt)
+{
+}
+
 RessourceFile::RessourceFile (DataType dt, std::string path) : data_type_(dt), path_(path)
 {
-	int p = path_.rfind("/") + 1;
-	name_ = path_.substr(p, path_.length()-p);
+	name_ = name_from_path (path_);
 }
 
 RessourceFile::~RessourceFile ()
 {
+}
+
+void RessourceFile::setPath (std::string path)
+{
+	path_ = path;
+	name_ = name_from_path (path_);
 }
 
 // Initialisation du singleton à NULL
