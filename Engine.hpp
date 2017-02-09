@@ -79,6 +79,7 @@ class Waiter
 		void newProject (std::string);
 		void loadProject (std::string);
 		void saveProject ();
+		void importAudioFile (std::string);
 		//void closeProject ();
 		
 		// Singleton

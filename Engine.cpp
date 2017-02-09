@@ -5,6 +5,7 @@
 
 #include "Engine.hpp"
 #include "State.hpp"
+#include "AudioFile.hpp"
 
 std::string name_from_path (std::string path)
 {
@@ -117,3 +118,20 @@ void Waiter::saveProject ()
     //State::setProject (NULL);
 //}
 
+void Waiter::importAudioFile (std::string name_in)
+{
+	std::string name_out = State::getProject()->getAudioDir() + "/" + name_from_path (name_in);
+    FILE * infile  = fopen(name_in.c_str(), "rb");
+    FILE * outfile = fopen(name_out.c_str(), "wb");
+     
+    char  buffer[1024];
+    size_t count_in;
+
+    /* copy from input to output */
+    while ((count_in = fread(buffer, 1, sizeof(buffer), infile)))
+        fwrite(buffer, 1, count_in, outfile);
+
+    fclose(infile);    
+    fclose(outfile);
+	State::getProject()->getAudioFiles()->push_back( new AudioFile(name_out) );
+}

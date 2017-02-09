@@ -26,6 +26,7 @@ protected:
 	long unsigned int length_, time_;
 	std::vector<std::shared_ptr<MidiClip>> * miditracks_;
 	//std::vector<long unsigned int> track_indexes_;
+	void parseTrack (unsigned int);
 };
 
 #endif
