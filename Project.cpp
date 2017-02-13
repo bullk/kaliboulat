@@ -45,7 +45,8 @@ Project::Project (std::string str)
 	ctrl_ = false; // à passer dans State
 }
 
-Project::~Project () {
+Project::~Project ()
+{
 	while (tracks_.size())
 		tracks_.pop_back();
 	for (unsigned int i=0; i < audiofiles_ -> size(); i++)
@@ -55,6 +56,16 @@ Project::~Project () {
 	delete audio_;
 	delete midi_;
 	delete clock_;
+}
+
+void Project::addAudioFile (std::string s)
+{
+	audiofiles_ -> push_back(new AudioFile (s.c_str()));
+}
+
+void Project::addMidiFile (std::string s)
+{
+	midifiles_ -> push_back(new MidiFile (s.c_str()));
 }
 
 //TODO : factoriser
@@ -78,7 +89,7 @@ void Project::updateRessources ()
 		}
 	closedir (audiodir);
 	
-	DIR * mididir = testandcreatedir (getMIDIDir());
+	DIR * mididir = testandcreatedir (getMidiDir());
 	daFile = NULL;
 	while ((daFile = readdir(mididir)) != NULL)
 		if ( daFile -> d_type == DT_REG )
@@ -87,12 +98,12 @@ void Project::updateRessources ()
 			std::size_t found = str.find_last_of(".");
 			if ( (str.substr(found+1) == "mid") or (str.substr(found+1) == "MID") )
 			{
-				midifiles_ -> push_back(new MidiFile(getMIDIDir() + "/" +str));
+				midifiles_ -> push_back(new MidiFile(getMidiDir() + "/" +str));
 				mainlog->info("MIDI ressource : {}", str);
 			}
 		}
 	closedir (mididir);
-	
+
 }
 
 void Project::addAudioTrack ( std::string s )

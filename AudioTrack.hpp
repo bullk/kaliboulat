@@ -24,6 +24,7 @@ public:
 	// Destructor 
 	~AudioTrack ();
 
+	void addClip (std::string, int);
 	void addClip (std::shared_ptr<Clip> clip);
 	void addClip (std::shared_ptr<AudioClip> clip);
 	void deleteClip (unsigned int i);
@@ -63,7 +64,7 @@ protected:
 
 };
 
-CEREAL_REGISTER_TYPE(AudioTrack)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Track, AudioTrack)
+CEREAL_REGISTER_TYPE (AudioTrack)
+CEREAL_REGISTER_POLYMORPHIC_RELATION (Track, AudioTrack)
 
 #endif

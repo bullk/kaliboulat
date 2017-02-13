@@ -34,7 +34,7 @@ public:
 	void serialize (Archive & archive)
 	{
 		archive (
-			CEREAL_NVP(path_),
+			CEREAL_NVP(filename_),
 			CEREAL_NVP(name_),
 			CEREAL_NVP(launchstyle_),
 			CEREAL_NVP(stopstyle_),
@@ -48,12 +48,12 @@ public:
 	template <class Archive>
 	static void load_and_construct (Archive & archive, cereal::construct<AudioClip> & construct)
 	{
-		std::string path, name;
+		std::string fname, name;
 		int launch, stop, loop;
 		float volume, gui_rate;
 		int gui_pitch;
-		archive (path, name, launch, stop, loop, volume, gui_rate, gui_pitch);
-		construct (path, name, launch, stop, loop, volume, gui_rate, gui_pitch);
+		archive (fname, name, launch, stop, loop, volume, gui_rate, gui_pitch);
+		construct (fname, name, launch, stop, loop, volume, gui_rate, gui_pitch);
 	}
 	
 protected:    
@@ -65,7 +65,7 @@ protected:
 	
 };
 
-CEREAL_REGISTER_TYPE(AudioClip)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Clip, AudioClip)
+CEREAL_REGISTER_TYPE (AudioClip)
+CEREAL_REGISTER_POLYMORPHIC_RELATION (Clip, AudioClip)
 
 #endif

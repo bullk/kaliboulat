@@ -41,15 +41,17 @@ public:
 	AudioModule * getAudio ();
 	MidiModule * getMIDI ();
 	inline std::string getAudioDir () { return dir_ + "/Audio"; }
-	inline std::string getMIDIDir () { return dir_ + "/MIDI"; }
+	inline std::string getMidiDir () { return dir_ + "/MIDI"; }
 	void addAudioTrack (std::string s);
 	void addMidiTrack (std::string s);
 	void deleteTrack (unsigned int i);
 	void swapTracks (unsigned int i, unsigned int j);
 	inline unsigned int nTracks () { return tracks_.size (); }
 	inline std::shared_ptr<Track> getTrack (unsigned int i) { return tracks_[i]; }
+	void addAudioFile (std::string s);
 	inline std::vector<AudioFile *> * getAudioFiles () { return audiofiles_; }
-	inline std::vector<MidiFile *> * getMIDIFiles () { return midifiles_; }
+	void addMidiFile (std::string s);
+	inline std::vector<MidiFile *> * getMidiFiles () { return midifiles_; }
 	inline bool ctrlPressed () { return ctrl_; }
 	inline void ctrlDown () { ctrl_ = true; }
 	inline void ctrlUp () { ctrl_ = false; }

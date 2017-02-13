@@ -13,7 +13,7 @@ inline std::string user_dir()
 std::string name_from_path (std::string);
 
 
-enum DataType { AUDIO, MIDI, OSC, COM };
+enum DataType { NONE, AUDIO, MIDI, OSC, COM };
 
 
 class RessourceFile
@@ -80,6 +80,7 @@ class Waiter
 		void loadProject (std::string);
 		void saveProject ();
 		void importAudioFile (std::string);
+		void importMidiFile (std::string);
 		//void closeProject ();
 		
 		// Singleton

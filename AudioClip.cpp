@@ -1,29 +1,25 @@
 #include "AudioClip.hpp"
-
+#include "State.hpp"
 
 //-------------
 // Constructor 
 //-------------
 
-AudioClip::AudioClip(std::string path) : Clip(), FileWvIn(path)
+AudioClip::AudioClip(std::string fname) : Clip(), FileWvIn(),
+	volume_(0.5f), gui_rate_(1.0f), gui_pitch_(0)
 {
 	data_type_ = AUDIO;
-	path_ = path;
-	openFile(path_);
-	int p = path_.rfind("/") + 1;
-	std::string file = path_.substr(p, path_.length()-p);
-	p = file.rfind(".");
-	name_ = file.substr(0, p);
+	filename_ = fname;
+	int p = filename_.rfind(".");
+	name_ = filename_.substr(0, p);
 	launchstyle_ = LAUNCH_BAR;
 	stopstyle_ = STOP_FREE;
 	loopstyle_ = ONESHOT;
+	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
+	openFile( uri );
 	//angle_ = 0;
-	setRate(1);
-	volume_ = 0.5f;
 	pitshift_ = new stk::PitShift();
-	pitshift_ -> setEffectMix(1.0);
-	gui_rate_ = 1.0f;
-	gui_pitch_ = 0;
+	pitshift_ -> setEffectMix( 1.0 );
 	//gui_data_[data_.size()];
 	//for ( unsigned int i=0; i<=data_.size(); i++ )	{ gui_data_[i] = (float) data_[i]; }
 	//for ( unsigned int i=0; i<=sizeof(gui_data_); i++ )	{ gui_data_[i] = (float) data_[i]; }
@@ -31,13 +27,14 @@ AudioClip::AudioClip(std::string path) : Clip(), FileWvIn(path)
 }
 
 AudioClip::AudioClip
-	(std::string path, std::string name, int launch, int stop, int loop, float vol, float rate, int pitch) :
-	Clip(name, launch, stop, loop), FileWvIn(path),
+	(std::string fname, std::string name, int launch, int stop, int loop, float vol, float rate, int pitch) :
+	Clip(name, launch, stop, loop), FileWvIn(),
 	volume_(vol), gui_rate_(rate), gui_pitch_(pitch)
 {
 	data_type_ = AUDIO;
-	path_ = path;
-	openFile(path);
+	filename_ = fname;
+	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
+	openFile( uri );
 	//angle_ = 0;
 	pitshift_ = new stk::PitShift();
 	pitshift_ -> setEffectMix(1.0);
@@ -54,6 +51,7 @@ AudioClip::AudioClip
 
 AudioClip::~AudioClip()
 {
+	closeFile() ;
 	delete pitshift_;
 }
 

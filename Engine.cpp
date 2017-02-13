@@ -5,7 +5,6 @@
 
 #include "Engine.hpp"
 #include "State.hpp"
-#include "AudioFile.hpp"
 
 std::string name_from_path (std::string path)
 {
@@ -86,7 +85,7 @@ void Waiter::main ()
 	}
 }
 
-void Waiter::newProject (std::string name)
+void Waiter::newProject( std::string name )
 {
 	//sauvegarder le projet courant
 	//closeProject ();
@@ -94,7 +93,7 @@ void Waiter::newProject (std::string name)
 	State::setProject (project);
 }
 
-void Waiter::loadProject (std::string name)
+void Waiter::loadProject( std::string name )
 {
 	//closeProject ();
 	newProject (name);
@@ -104,11 +103,11 @@ void Waiter::loadProject (std::string name)
     //archive(State::getProject()); 
 }
 
-void Waiter::saveProject ()
+void Waiter::saveProject()
 {
-    std::ofstream os(State::getProject()->getFile());
-    cereal::XMLOutputArchive archive(os);
-    State::getProject()->serialize(archive);
+    std::ofstream os( State::getProject()->getFile() );
+    cereal::XMLOutputArchive archive( os );
+    State::getProject() -> serialize( archive );
     //archive(State::getProject()); 
 }
 
@@ -118,20 +117,35 @@ void Waiter::saveProject ()
     //State::setProject (NULL);
 //}
 
-void Waiter::importAudioFile (std::string name_in)
+void copyFile( const char * name_in, const char * name_out )
 {
-	std::string name_out = State::getProject()->getAudioDir() + "/" + name_from_path (name_in);
-    FILE * infile  = fopen(name_in.c_str(), "rb");
-    FILE * outfile = fopen(name_out.c_str(), "wb");
+    FILE * infile  = fopen(name_in, "rb");
+    FILE * outfile = fopen(name_out, "wb");
      
     char  buffer[1024];
     size_t count_in;
 
     /* copy from input to output */
-    while ((count_in = fread(buffer, 1, sizeof(buffer), infile)))
-        fwrite(buffer, 1, count_in, outfile);
+    while ( ( count_in = fread( buffer, 1, sizeof( buffer ), infile ) ) )
+        fwrite( buffer, 1, count_in, outfile );
 
-    fclose(infile);    
-    fclose(outfile);
-	State::getProject()->getAudioFiles()->push_back( new AudioFile(name_out) );
+    fclose( infile );    
+    fclose( outfile );
 }
+
+void Waiter::importAudioFile( std::string name_in )
+{
+	std::string filename = name_from_path( name_in );
+	std::string name_out = State::getProject() -> getAudioDir() + "/" + name_from_path( filename );
+	copyFile( name_in.c_str(), name_out.c_str() );
+	State::getProject() -> addAudioFile( filename );
+}
+
+void Waiter::importMidiFile( std::string name_in )
+{
+	std::string filename = name_from_path( name_in );
+	std::string name_out = State::getProject() -> getMidiDir() + "/" + name_from_path( filename );
+	copyFile( name_in.c_str(), name_out.c_str() );
+	State::getProject() -> addMidiFile( filename );
+}
+

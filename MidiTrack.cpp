@@ -34,6 +34,12 @@ MidiTrack::~MidiTrack ()
 // Add a clip
 //------------
 
+void MidiTrack::addClip (std::string path, int tn)
+{
+	std::shared_ptr<MidiClip> clip (new MidiClip(path));
+	addClip ( clip );
+}
+
 void MidiTrack::addClip (std::shared_ptr<Clip> clip)
 {
 	addClip ( std::static_pointer_cast<MidiClip>(clip) );

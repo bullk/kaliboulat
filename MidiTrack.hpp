@@ -20,6 +20,7 @@ public:
 	// Destructor 
 	~MidiTrack ();
 
+	void addClip (std::string, int);
 	void addClip (std::shared_ptr<Clip> clip);
 	void addClip (std::shared_ptr<MidiClip> clip);
 	void deleteClip (unsigned int i);
@@ -57,7 +58,7 @@ private:
 
 };
 
-CEREAL_REGISTER_TYPE(MidiTrack)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Track, MidiTrack)
+CEREAL_REGISTER_TYPE (MidiTrack)
+CEREAL_REGISTER_POLYMORPHIC_RELATION (Track, MidiTrack)
 
 #endif

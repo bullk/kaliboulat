@@ -7,11 +7,13 @@
 #include <RtMidi.h>
 #include "Scheduled.hpp"
 
+
 typedef std::vector<unsigned char> MidiRaw;
 
 void midiInit ();
 void midiPanic (RtMidiOut * midiout);
 void midiCallback (double timeStamp, std::vector< unsigned char > *message, void *userData);
+std::string char_vector_to_hex (std::vector<unsigned char> v);
 
 // MIDI message types filtered by status byte, sorted by categories (events, channel mode, system common, realtime)
 // source : https://www.midi.org/specifications/item/table-1-summary-of-midi-message
@@ -25,14 +27,14 @@ enum MidiMessageType { MMT_NOTE_OFF, MMT_NOTE_ON, MMT_AFTERTOUCH, MMT_CONTROL_CH
 class MidiMessage
 {
 public:
-	MidiMessage (std::vector<unsigned char> * data);
+	MidiMessage (std::vector<unsigned char> data);
 	~MidiMessage ();
-	inline std::vector<unsigned char> * getData () { return data_; }
+	inline std::vector<unsigned char> * getData () { return &data_; }
 	std::string hexData ();
 	
 protected:
 	int type;
-	std::vector<unsigned char> * data_;
+	std::vector<unsigned char> data_;
 	
 };
 
@@ -41,7 +43,7 @@ protected:
 class ScheduledMidiMessage : public Scheduled, public MidiMessage
 {
 public:
-	ScheduledMidiMessage (long unsigned int time, std::vector<unsigned char> * data);
+	ScheduledMidiMessage (long unsigned int time, std::vector<unsigned char> data);
 	~ScheduledMidiMessage ();
 
 protected:

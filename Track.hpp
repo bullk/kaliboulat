@@ -23,6 +23,7 @@ public:
 	inline void setState (bool b) { state_ = b; }
 	inline void muteSwitch () { state_ = not(state_); }
 	inline bool isPlaying () const { return state_; }
+    virtual void addClip (std::string, int) = 0;
     virtual void addClip (std::shared_ptr<Clip> clip) = 0;
     virtual void deleteClip (unsigned int i) = 0;
     virtual std::shared_ptr<Clip> getClip (unsigned int i) const = 0;

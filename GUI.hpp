@@ -8,7 +8,7 @@
 #include "imgui/imgui_impl_sdl.h"
 
 #include "globals.h"
-
+#include "Engine.hpp"
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
@@ -22,13 +22,14 @@ struct Screen
 	enum Context { NONE, RESSOURCES, AUDIOCLIP, MIDICLIP }; 
 	Type type;
 	Context context;
-	//unsigned int audioclip, midiclip;
-	//AudioFile * dragged_audio_file;
 	RessourceFile * dragged_file;
-	std::shared_ptr<Clip> dragged_clip;
-	//Clip * selected_clip;
-	//std::shared_ptr<Track> selected_track;
+	//std::shared_ptr<Clip> dragged_clip;
 	
+	struct source_clip {
+		DataType dt;
+		std::string path;
+		int track;
+	} dragged_clip;
 };
 
 class GUI

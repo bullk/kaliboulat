@@ -49,7 +49,7 @@ class State
 		int scanMidiFiles ();
 		static inline std::vector<std::string> * getProjectList () { return projectlist_; }
 		static inline std::vector<std::string> * getAudioFiles () { return audiofiles_; }
-		static inline std::vector<std::string> * getMIDIFiles () { return midifiles_; }
+		static inline std::vector<std::string> * getMidiFiles () { return midifiles_; }
 		
 		// Singleton
 		static State *getInstance ()

@@ -109,10 +109,13 @@ int main( int argc, char* args[] )
 {
 	try
 	{         
-		// Create basic file logger (not rotated)
 		// trace, debug, info, warn, error, critical
-		auto mainlog = spdlog::stdout_color_mt("main");
+		//spdlog::level::level_enum LOGLEVEL = spdlog::level::debug;
+		spdlog::level::level_enum LOGLEVEL = spdlog::level::info;
+		
 		//auto mainlog = spdlog::basic_logger_mt("main", "main.log");
+		auto mainlog = spdlog::stdout_color_mt("main");
+		mainlog->set_level(LOGLEVEL);
 		mainlog->info("Kaliboulat version 0.1 pre-alpha");
 	}
 	catch (const spdlog::spdlog_ex& ex)

@@ -27,7 +27,7 @@ public:
 	void arm ();
 	inline void play () { state_ = PLAYING; }
 	inline void stop () { state_ = HALTED; }
-	inline virtual std::string getPath ()  { return path_; }
+	inline virtual std::string getFileName ()  { return filename_; }
 	inline virtual std::string getName () { return name_; }
 	inline virtual void setName (std::string s) { name_ = s; }
 	inline virtual int getLaunchStyle () { return launchstyle_; }
@@ -48,7 +48,7 @@ public:
 protected:
 	DataType data_type_;
 	ClipState state_;
-	std::string name_, path_;
+	std::string name_, filename_;
 	int launchstyle_, stopstyle_, loopstyle_;
 	//int angle_;
 	

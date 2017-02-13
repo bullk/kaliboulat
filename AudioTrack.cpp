@@ -31,6 +31,12 @@ AudioTrack::~AudioTrack ()
 // Add a clip
 //------------
 
+void AudioTrack::addClip (std::string path, int tn)
+{
+	std::shared_ptr<AudioClip> clip (new AudioClip(path));
+	addClip ( clip );
+}
+
 void AudioTrack::addClip (std::shared_ptr<Clip> clip)
 {
 	addClip ( std::static_pointer_cast<AudioClip>(clip)  );
@@ -38,7 +44,7 @@ void AudioTrack::addClip (std::shared_ptr<Clip> clip)
 
 void AudioTrack::addClip (std::shared_ptr<AudioClip> clip)
 {
-	clipset_.push_back (clip);
+	clipset_.push_back( clip );
 }
 
 void AudioTrack::deleteClip (unsigned int i)

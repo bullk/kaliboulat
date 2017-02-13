@@ -2,6 +2,7 @@
 #define INC_MIDICLIP_H
 
 #include "Clip.hpp"
+#include "midi.hpp"
 
 #include <cereal/types/memory.hpp>
 //#include <cereal/archives/binary.hpp>
@@ -9,14 +10,15 @@
 #include <cereal/types/polymorphic.hpp>
 
 class RtMidiOut;
-class ScheduledMidiMessage;
+//class ScheduledMidiMessage;
 
 class MidiClip : public Clip
 {
 
 public:
-	MidiClip (std::string name);
-	MidiClip (std::string, int, int, int);
+	MidiClip (std::string);
+	MidiClip (std::string, int);
+	MidiClip (std::string, int, std::string, int, int, int);
 	~MidiClip ();
 	inline unsigned long getLength () { return length_; }
 	inline void setLength (unsigned long l) { length_ = l; }
@@ -25,8 +27,8 @@ public:
 	inline unsigned long getTime () { return time_; }
 	//void setTime (long unsigned int time);
 	inline unsigned long getIndex () { return index_; }
-	inline unsigned long getSize () { return data_ -> size(); }
-	inline ScheduledMidiMessage * getEvent (unsigned long i) { return data_ -> at(i); }
+	inline unsigned long getSize () { return events_.size(); }
+	inline ScheduledMidiMessage * getEvent (unsigned long i) { return &events_[i]; }
 	void rewind ();
 	void tick (RtMidiOut *);
 	void appendEvent (unsigned long time, std::vector<unsigned char> * event);
@@ -35,6 +37,8 @@ public:
 	void serialize(Archive & archive)
 	{
 		archive (
+			CEREAL_NVP(filename_),
+			CEREAL_NVP(tracknum_),
 			CEREAL_NVP(name_),
 			CEREAL_NVP(launchstyle_),
 			CEREAL_NVP(stopstyle_),
@@ -45,20 +49,20 @@ public:
 	template <class Archive>
 	static void load_and_construct( Archive & archive, cereal::construct<MidiClip> & construct )
 	{
-		std::string name;
-		int launchstyle, stopstyle, loopstyle;
-		archive ( name, launchstyle, stopstyle, loopstyle );
-		construct ( name, launchstyle, stopstyle, loopstyle );
+		std::string filename, name;
+		int tracknum, launchstyle, stopstyle, loopstyle;
+		archive ( filename, tracknum, name, launchstyle, stopstyle, loopstyle );
+		construct ( filename, tracknum, name, launchstyle, stopstyle, loopstyle );
 	}
 	
 protected:
-	int division_;
+	int tracknum_, division_;
 	unsigned long length_, time_, index_;
-	std::vector<ScheduledMidiMessage *> * data_;
+	std::vector<ScheduledMidiMessage> events_;
 
 };
 
-CEREAL_REGISTER_TYPE(MidiClip)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(Clip, MidiClip)
+CEREAL_REGISTER_TYPE (MidiClip)
+CEREAL_REGISTER_POLYMORPHIC_RELATION (Clip, MidiClip)
 
 #endif

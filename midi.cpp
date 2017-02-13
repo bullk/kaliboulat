@@ -1,4 +1,5 @@
 #include "midi.hpp"
+#include "spdlog/spdlog.h"
 
 //----------------------------------------------------------------------
 // MIDI FUNCTIONS
@@ -126,10 +127,9 @@ void midiCallback (double timeStamp, std::vector< unsigned char > *message, void
 // Constructor 
 //-------------
 
-MidiMessage::MidiMessage (std::vector<unsigned char> * data)
+MidiMessage::MidiMessage (std::vector<unsigned char> data) :
+	data_(data)
 {
-	data_ = new std::vector<unsigned char>;
-	*data_ = *data;
 }
 
 
@@ -139,21 +139,26 @@ MidiMessage::MidiMessage (std::vector<unsigned char> * data)
 
 MidiMessage::~MidiMessage ()
 {
-	delete data_;
 }
 
 //------------
 
-std::string MidiMessage::hexData ()
+std::string char_vector_to_hex (std::vector<unsigned char> v)
 {
 	std::string s = "";
-	char buffer[4];
-	for ( unsigned int i = 0; i < data_ -> size (); i++ )
+	char buf[4];
+	for ( unsigned int i = 0; i < v.size (); i++ )
 	{
-		sprintf (buffer, "%02X ", data_ -> at (i));
-		s += buffer;
+		sprintf (buf, "%02X ", v.at (i));
+		s += buf;
 	}
 	return s;
+}
+
+
+std::string MidiMessage::hexData ()
+{
+	return char_vector_to_hex (data_);
 }
 
 
@@ -163,11 +168,15 @@ std::string MidiMessage::hexData ()
 // Constructor 
 //-------------
 
-ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, std::vector<unsigned char> * data) : Scheduled (time), MidiMessage (data)
+ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, std::vector<unsigned char> data) :
+	Scheduled (time), MidiMessage (data)
 {
+	auto mainlog= spdlog::get("main");	
+	mainlog->debug("ScheduledMidiMessage::ScheduledMidiMessage {} {}", time, hexData());
 	bar_ = 0;
 	beat_ = 0;
 	tick_ = 0;
+	mainlog->debug("/ScheduledMidiMessage::ScheduledMidiMessage");
 }
 
 
@@ -177,6 +186,8 @@ ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, std::vector<
 
 ScheduledMidiMessage::~ScheduledMidiMessage ()
 {
+	auto mainlog= spdlog::get("main");	
+	mainlog->debug("ScheduledMidiMessage::~ScheduledMidiMessage {}", hexData());
 }
 
 //------------
