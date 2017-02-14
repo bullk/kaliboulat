@@ -1,6 +1,8 @@
 #include "MidiClip.hpp"
 #include <RtMidi.h>
 #include "midi.hpp"
+#include "State.hpp"
+#include "MidiFile.hpp"
 //#include <unistd.h> // sleep
 
 
@@ -20,30 +22,30 @@ MidiClip::MidiClip (std::string name = "No name") : Clip()
 	index_ = 0;
 }
 
-MidiClip::MidiClip (std::string filename, int tn) : Clip()
+MidiClip::MidiClip( std::string filename, int tn ) : Clip()
 {
 	data_type_ = MIDI;
-	filename_ = filename;
-	int p = filename_.rfind(".");
-	name_ = filename_.substr(0, p);
+	filename_ = name_from_path( filename );
+	tracknum_ = tn;
 	launchstyle_ = LAUNCH_BAR;
 	stopstyle_ = STOP_BAR;
 	loopstyle_ = FOREVER;
 	length_ = 0;
 	time_ = 0;
 	index_ = 0;
+	getEventsFromSource( true );
 }
 
-MidiClip::MidiClip (std::string filename, int tn, std::string name, int launch, int stop, int loop) :
-	Clip(name, launch, stop, loop)
+MidiClip::MidiClip( std::string filename, int tn, std::string name, int launch, int stop, int loop ) :
+	Clip( name, launch, stop, loop )
 {
 	data_type_ = MIDI;
-	filename_ = filename;
+	filename_ = name_from_path( filename );
 	tracknum_ = tn;
-	
 	length_ = 0;
 	time_ = 0;
 	index_ = 0;
+	getEventsFromSource( false );
 }
 
 //------------
@@ -57,6 +59,72 @@ MidiClip::~MidiClip ()
 //------------
 
 
+void MidiClip::getEventsFromSource( bool rename )
+{
+	auto mainlog= spdlog::get( "main" );	
+	mainlog->info( "MidiClip::getEventsFromSource" );
+	std::string uri = State::getProject()->getMidiDir() + "/" + filename_;
+	MidiFile source( uri );
+	
+	std::vector<unsigned char> * event = new std::vector<unsigned char> ();
+	unsigned long delta_time, abs_time;
+
+	if ( rename )
+	{
+		int p = filename_.rfind( "." );
+		name_ = filename_.substr( 0, p );
+		char buffer[50];
+		sprintf( buffer, "%s-track-%02d", name_.c_str(), tracknum_ );
+		name_ = buffer;
+	}
+	
+	setDivision( source.getDivision() );
+	source.rewindTrack( tracknum_ );
+
+	mainlog->info( "parsing events" );
+	abs_time=0;
+	mainlog->info( "getting first event" );
+	delta_time = source.getNextEvent( event, tracknum_ );
+	while ( event -> size () > 0 )
+	{
+		abs_time += delta_time;
+		switch ( event -> at(0) )
+		{
+		case 0xFF:
+			mainlog->info( "time {} : SMF meta : {} {}", abs_time, char_vector_to_hex( *event ) );
+			switch ( event -> at(1) )
+			{
+			case 0x03:
+			{
+				if (rename)
+				{
+					name_ = "";
+					unsigned int strend = event->at(2) + 3;
+					for ( unsigned int i=3; i < strend; i++ )
+						name_ += (char) event -> at(i);
+					mainlog->info( "time {} : setting clip name to {}", abs_time, name_ );
+				}
+				break;
+			}
+			}
+			break;
+		}
+		mainlog->info( "time {} : event {}", abs_time, event -> at(0) );
+		appendEvent( abs_time, event );
+		mainlog->info( "." );
+		mainlog->info( "getting next event" );
+		delta_time = source.getNextEvent( event, tracknum_ );
+	}
+	mainlog->info( "/parsing events" );
+	
+	setLength ( abs_time );
+	if ( abs_time > length_ ) length_ = abs_time;
+					
+	delete event;
+	mainlog->info( "/MidiClip::getEventsFromSource" );
+	
+}
+
 void MidiClip::rewind ()
 {
 	//std::cout << "rewind" << std::endl;
@@ -64,7 +132,7 @@ void MidiClip::rewind ()
 	index_ = 0;
 }
 
-void MidiClip::tick (RtMidiOut * midiout)
+void MidiClip::tick( RtMidiOut * midiout )
 {
 	while ( events_[index_].getTime () == time_ )
 	{

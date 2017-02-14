@@ -29,7 +29,6 @@ protected:
 	std::vector<std::string> tracks_;
 	//std::vector<long unsigned int> track_indexes_;
 	std::string trackName (unsigned int);
-	void parseTrack (unsigned int);
 };
 
 #endif

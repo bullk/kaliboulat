@@ -534,26 +534,26 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 	ImGui::Text("DATA"); 
 	ImGui::Separator();
 
-	ScheduledMidiMessage * event = NULL;
-	for (unsigned long i=0; i < clip -> getSize(); i++)
-	{
-		event = clip -> getEvent(i);
-		int nbeats = event -> getTime() / clip -> getDivision();
-		int tick = event -> getTime() % clip -> getDivision();
-		int beat = 1 + nbeats % beats_per_bar;
-		int bar = 1 + nbeats / beats_per_bar;
+	//ScheduledMidiMessage * event = NULL;
+	//for (unsigned long i=0; i < clip -> getSize(); i++)
+	//{
+		//event = clip -> getEvent(i);
+		//int nbeats = event -> getTime() / clip -> getDivision();
+		//int tick = event -> getTime() % clip -> getDivision();
+		//int beat = 1 + nbeats % beats_per_bar;
+		//int bar = 1 + nbeats / beats_per_bar;
 		
-		bool selected = ( clip -> getIndex () == i );
-		char bbt[13];
-		sprintf (bbt, "%02d:%02d:%03d   ", bar, beat, tick);
-		ImGui::Selectable(bbt, selected); ImGui::SameLine();
-		ImGui::Text("%x      ", event -> getData() -> at (0)); ImGui::SameLine();
-		for (unsigned int j=1; j < event -> getData() -> size(); j++)
-		{
-			if (j>1) ImGui::SameLine();
-			ImGui::Text("%x", event -> getData() -> at (j));
-		}
-	}
+		//bool selected = ( clip -> getIndex () == i );
+		//char bbt[13];
+		//sprintf (bbt, "%02d:%02d:%03d   ", bar, beat, tick);
+		//ImGui::Selectable(bbt, selected); ImGui::SameLine();
+		//ImGui::Text("%x      ", event -> getData() -> at (0)); ImGui::SameLine();
+		//for (unsigned int j=1; j < event -> getData() -> size(); j++)
+		//{
+			//if (j>1) ImGui::SameLine();
+			//ImGui::Text("%x", event -> getData() -> at (j));
+		//}
+	//}
 	ImGui::Separator();
 }
 
@@ -577,8 +577,6 @@ void ClipProperties (std::shared_ptr<Clip> clip)
 	mainlog->debug("ClipProperties");
 	mainlog->debug("* name");
 	ImGui::Text("%s", clip -> getName().c_str());
-	mainlog->debug("* path");
-	ImGui::Text("%s", clip -> getFileName().c_str());
 	ImGui::Columns(4, NULL, false);
 	mainlog->debug("* launch");
 	ImGui::PushID("launch"); ImGui::Text("Launch"); ImGui::NextColumn();
@@ -593,6 +591,8 @@ void ClipProperties (std::shared_ptr<Clip> clip)
 	if ( ImGui::Button(clip -> getLoopStyleText()) ) clip -> nextLoopStyle();
 	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
 	ImGui::Columns(1);
+	mainlog->debug("* path");
+	ImGui::Text("%s", clip -> getFileName().c_str());
 	mainlog->debug("/ClipProperties");
 }
 

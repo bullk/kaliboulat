@@ -59,6 +59,7 @@ protected:
 	int tracknum_, division_;
 	unsigned long length_, time_, index_;
 	std::vector<ScheduledMidiMessage> events_;
+	void getEventsFromSource (bool);
 
 };
 
