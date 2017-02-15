@@ -1,5 +1,5 @@
 #include "MidiTrack.hpp"
-
+#include "State.hpp"
 
 //-------------
 // Constructor 
@@ -57,11 +57,11 @@ void MidiTrack::deleteClip( unsigned int i )
 	//delete clip;
 }
 
-void MidiTrack::tick( RtMidiOut * midiout )
+void MidiTrack::tick()
 {
 	for ( unsigned int i = 0; i < clipset_.size(); i++ )
 		if ( clipset_.at(i)->getState() == Clip::PLAYING )
-			clipset_.at(i)->tick( midiout );
+			clipset_.at(i)->tick( State::getInstance() -> getMidiOut() );
 }
 
 void MidiTrack::stopAll()

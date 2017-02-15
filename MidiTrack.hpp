@@ -26,7 +26,7 @@ public:
 	void deleteClip (unsigned int i);
 	inline std::shared_ptr<Clip> getClip (unsigned int i) const { return clipset_.at(i); }
 	inline unsigned int nClips () const { return clipset_.size(); }
-	void tick (RtMidiOut *);
+	void tick ();
 	void stopAll ();
 	//inline std::vector<std::shared_ptr<MidiClip>> * getClipSet () { return clipset_; }
 	inline RtMidiOut * getOutput () const { return output_; }

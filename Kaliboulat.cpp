@@ -224,16 +224,8 @@ int main( int argc, char* args[] )
 		{
 			midi_ticks = State::getProject() -> getClock () -> update ();
 			// MIDI flow
-			for (unsigned int i=0; i<midi_ticks; i++) 
-				for ( unsigned int j = 0; j < State::getProject()->nTracks(); j++ )
-				{
-					if ( State::getProject() -> getTrack (j) -> dataType () == MIDI )
-					{
-						std::shared_ptr<MidiTrack> daTrack = std::static_pointer_cast<MidiTrack>(State::getProject() -> getTrack (j));
-						if ( daTrack -> isPlaying () )
-							daTrack -> tick (midiout);
-					}
-				}
+			for (unsigned int i=0; i<midi_ticks; i++)
+				Waiter::getInstance() -> tick();
 		}
 		
 		// Waiter

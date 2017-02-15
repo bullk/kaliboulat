@@ -12,6 +12,7 @@ class Clock
 private:
 	bool state_;
 	std::chrono::time_point<std::chrono::system_clock> startTime_;
+	std::chrono::time_point<std::chrono::system_clock> pauseTime_;
 	std::chrono::time_point<std::chrono::system_clock> now_;
 	long long unsigned int delta_;
 	int tempo_;
@@ -25,6 +26,7 @@ public:
 	Clock ();
 	~Clock ();
 	void start ();
+	void pause ();
 	void stop ();
 	void rewind ();
 	unsigned int update ();

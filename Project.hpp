@@ -37,6 +37,7 @@ public:
 	inline std::string getName () { return name_; }
 	inline std::string getFile () { return file_; }
 	Clock * getClock ();
+	void tick ();
 	AudioModule * getAudio ();
 	MidiModule * getMIDI ();
 	inline std::string getAudioDir () { return dir_ + "/Audio"; }

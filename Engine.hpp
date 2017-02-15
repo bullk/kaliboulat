@@ -68,7 +68,10 @@ class Waiter
 		static Waiter * singleton_;
 		
 	public:
-		void panic();
+		void panic ();
+		void start ();
+		void pause ();
+		void stop ();
 		void bar ();
 		void beat ();
 		void tick ();

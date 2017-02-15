@@ -58,6 +58,19 @@ Project::~Project ()
 	delete clock_;
 }
 
+void Project::tick ()
+{
+	for ( unsigned int j = 0; j < nTracks(); j++ )
+	{
+		if ( getTrack(j) -> dataType() == MIDI )
+		{
+			std::shared_ptr<MidiTrack> daTrack = std::static_pointer_cast<MidiTrack>( getTrack(j) );
+			if ( daTrack -> isPlaying() )
+				daTrack -> tick ();
+		}
+	}
+}
+
 void Project::addAudioFile (std::string s)
 {
 	audiofiles_ -> push_back(new AudioFile (s.c_str()));

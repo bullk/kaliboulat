@@ -58,6 +58,21 @@ void Waiter::panic()
 	midiPanic( State::getInstance()->getMidiOut() );
 }
 
+void Waiter::start ()
+{
+	State::getProject() -> getClock() -> start();
+}
+		
+void Waiter::pause ()
+{
+	State::getProject() -> getClock() -> stop();
+}
+		
+void Waiter::stop ()
+{
+	pause();
+	State::getProject() -> getClock() -> rewind();
+}
 		
 void Waiter::bar ()
 {
@@ -81,7 +96,8 @@ void Waiter::tick ()
 {
 	while ( !tick_.empty() )
 	{
-		tick_.front() -> execute ();
+		State::getProject() -> tick();
+		tick_.front() -> execute();
 		tick_.pop();
 	}
 }

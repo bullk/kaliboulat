@@ -337,6 +337,13 @@ void ControlPanel (std::shared_ptr<Project> project, void (*title_func)())
 	title_func ();
 	ImGui::NextColumn ();
 	
+	// Clock
+	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
+	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
+
+	// MIDI Clock
+	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
+	if ( project -> ctrlPressed () ) ImGui::TextColored (ImColor(192,64,64), "CTRL");
 	//TODO : Intégrer les images de boutons
 	if ( project -> getClock() -> getState () )
 	{ // STOP button
@@ -355,23 +362,15 @@ void ControlPanel (std::shared_ptr<Project> project, void (*title_func)())
 		ImGui::PopStyleColor(3);
 	}
 	
-	// Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
-	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
-
-	// MIDI Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
-	if ( project -> ctrlPressed () ) ImGui::TextColored (ImColor(192,64,64), "CTRL");
 	ImGui::NextColumn ();
 	
 	ImGui::Checkbox ("Ressources panel", &ressources_panel);
 	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
-	ImGui::NextColumn ();
-	
+
+	//ImGui::NextColumn ();
 	//ImGui::Text("width1 : %d", width1); ImGui::SameLine (); ImGui::Text("width4 : %d", width4);
 	//ImGui::Text("width2 : %d", width2); ImGui::SameLine (); ImGui::Text("width5 : %d", width5);
 	//ImGui::Text("width3 : %d", width3);
-	
 	
 	ImGui::Columns(1);
 

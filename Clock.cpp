@@ -19,8 +19,18 @@ void Clock::start ()
 {
 	if (not(state_))
 	{
-		startTime_ = std::chrono::system_clock::now();
+		startTime_ = startTime_ + (std::chrono::system_clock::now() - pauseTime_);
+		pauseTime_ = startTime_;
 		state_ = true;
+	}
+}
+
+void Clock::pause ()
+{
+	if (state_)
+	{
+		pauseTime_ = std::chrono::system_clock::now();
+		state_ = false;
 	}
 }
 
@@ -39,6 +49,7 @@ void Clock::rewind ()
 	second_ = 0;
 	previous_ticks_ = 0;
 	now_ticks_ = 0;
+	delta_ = 0;
 }
 	
 unsigned int Clock::update ()
@@ -71,8 +82,8 @@ unsigned int Clock::update ()
 		if (now_ticks_ < previous_ticks_)
 			previous_ticks_ = now_ticks_;
 		unsigned int ticks_delta = now_ticks_ - previous_ticks_;
-		if ((previous_ticks_ == 0) and (ticks_delta == 0)) midi_ticks = 1;
-		if (ticks_delta > 0) midi_ticks = ticks_delta;
+		if ( (previous_ticks_ == 0) and (ticks_delta == 0) ) midi_ticks = 1;
+		if ( ticks_delta > 0 ) midi_ticks = ticks_delta;
 
 		// MIDI Clock update
 		previous_ticks_ = now_ticks_;
