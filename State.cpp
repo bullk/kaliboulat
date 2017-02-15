@@ -61,6 +61,17 @@ int State::loadconf()
 	return 0;
 }
 
+RtMidiOut * State::getMidiOut()
+{
+	return midiout_;
+}
+
+void State::setMidiOut( RtMidiOut * midiout )
+{
+	midiout_ = midiout;
+}
+
+
 int State::scanProjectsCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
 	char * localpath = strdup (fpath);

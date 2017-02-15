@@ -1,7 +1,7 @@
 #ifndef INC_STATE_H
 #define INC_STATE_H
 
-
+#include <RtMidi.h>
 #include "Project.hpp"
 
 class State
@@ -11,6 +11,7 @@ class State
 		State ();
 		// Destructor
 		~State ();
+		RtMidiOut * midiout_;
 		bool onoff_;
 		static State * singleton_;
 		static std::shared_ptr<Project> project_;
@@ -27,10 +28,12 @@ class State
 		int loadconf();
 
 	public:
+		RtMidiOut * getMidiOut();
+		void setMidiOut( RtMidiOut * midiout );
 		inline bool isOn () { return onoff_; }
 		inline void halt () { onoff_ = false; }
 		static inline std::shared_ptr<Project> getProject () { return project_; }
-		static void setProject (std::shared_ptr<Project> project)
+		static void setProject( std::shared_ptr<Project> project )
 		{
 			//delete project_;
 			project_ = project;

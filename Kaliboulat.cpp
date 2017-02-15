@@ -169,6 +169,9 @@ int main( int argc, char* args[] )
 		error.printMessage ();
 		exit ( EXIT_FAILURE );
 	}
+	
+	State::getInstance()->setMidiOut( midiout );
+	
 	midiin->setCallback (midiCallback);
 	midiin->ignoreTypes( false, true, true );
 	//unsigned int nPorts = midiout -> getPortCount (); // Check available ports.

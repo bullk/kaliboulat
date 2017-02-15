@@ -5,6 +5,7 @@
 
 #include "Engine.hpp"
 #include "State.hpp"
+#include "midi.hpp"
 
 std::string name_from_path (std::string path)
 {
@@ -48,6 +49,15 @@ Waiter::~Waiter ()
 	//while ( !bar_.empty() ) bar_.pop();
 	//while ( !midilog_.empty() ) midilog_.pop_back();
 }
+
+//-------------------------------------------------------
+
+
+void Waiter::panic()
+{
+	midiPanic( State::getInstance()->getMidiOut() );
+}
+
 		
 void Waiter::bar ()
 {

@@ -365,11 +365,14 @@ void ControlPanel (std::shared_ptr<Project> project, void (*title_func)())
 	ImGui::NextColumn ();
 	
 	ImGui::Checkbox ("Ressources panel", &ressources_panel);
+	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
 	ImGui::NextColumn ();
 	
-	ImGui::Text("width1 : %d", width1); ImGui::SameLine (); ImGui::Text("width4 : %d", width4);
-	ImGui::Text("width2 : %d", width2); ImGui::SameLine (); ImGui::Text("width5 : %d", width5);
-	ImGui::Text("width3 : %d", width3);
+	//ImGui::Text("width1 : %d", width1); ImGui::SameLine (); ImGui::Text("width4 : %d", width4);
+	//ImGui::Text("width2 : %d", width2); ImGui::SameLine (); ImGui::Text("width5 : %d", width5);
+	//ImGui::Text("width3 : %d", width3);
+	
+	
 	ImGui::Columns(1);
 
 	ImGui::EndChild ();
@@ -520,7 +523,7 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 {
 	auto mainlog= spdlog::get("main");	
 	mainlog->debug("displayMidiClipDetails");
-	unsigned short beats_per_bar = 4;
+	//unsigned short beats_per_bar = 4;
 	ImGui::PushItemWidth(100);
 	//ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
 	//ImGui::Text("Location : %s", clip -> getFileName().c_str());
