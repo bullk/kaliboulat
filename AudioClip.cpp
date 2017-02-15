@@ -5,11 +5,11 @@
 // Constructor 
 //-------------
 
-AudioClip::AudioClip(std::string fname) : Clip(), FileWvIn(),
+AudioClip::AudioClip( std::string fname ) : Clip(), FileWvIn(),
 	volume_(0.5f), gui_rate_(1.0f), gui_pitch_(0)
 {
 	data_type_ = AUDIO;
-	filename_ = fname;
+	filename_ = name_from_path( fname );
 	int p = filename_.rfind(".");
 	name_ = filename_.substr(0, p);
 	launchstyle_ = LAUNCH_BAR;
@@ -32,7 +32,7 @@ AudioClip::AudioClip
 	volume_(vol), gui_rate_(rate), gui_pitch_(pitch)
 {
 	data_type_ = AUDIO;
-	filename_ = fname;
+	filename_ = name_from_path( fname );
 	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
 	openFile( uri );
 	//angle_ = 0;

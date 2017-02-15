@@ -136,16 +136,16 @@ void copyFile( const char * name_in, const char * name_out )
 void Waiter::importAudioFile( std::string name_in )
 {
 	std::string filename = name_from_path( name_in );
-	std::string name_out = State::getProject() -> getAudioDir() + "/" + name_from_path( filename );
+	std::string name_out = State::getProject() -> getAudioDir() + "/" + filename;
 	copyFile( name_in.c_str(), name_out.c_str() );
-	State::getProject() -> addAudioFile( filename );
+	State::getProject() -> addAudioFile( name_out );
 }
 
 void Waiter::importMidiFile( std::string name_in )
 {
 	std::string filename = name_from_path( name_in );
-	std::string name_out = State::getProject() -> getMidiDir() + "/" + name_from_path( filename );
+	std::string name_out = State::getProject() -> getMidiDir() + "/" + filename;
 	copyFile( name_in.c_str(), name_out.c_str() );
-	State::getProject() -> addMidiFile( filename );
+	State::getProject() -> addMidiFile( name_out );
 }
 
