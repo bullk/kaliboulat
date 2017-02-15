@@ -10,7 +10,7 @@
 // Constructor 
 //-------------
 
-MidiClip::MidiClip (std::string name = "No name") : Clip()
+MidiClip::MidiClip (std::string name = "No name") : Clip(), divscale_(1)
 {
 	data_type_ = MIDI;
 	name_ = name;
@@ -22,7 +22,7 @@ MidiClip::MidiClip (std::string name = "No name") : Clip()
 	index_ = 0;
 }
 
-MidiClip::MidiClip( std::string filename, int tn ) : Clip()
+MidiClip::MidiClip( std::string filename, int tn ) : Clip(), divscale_(1)
 {
 	data_type_ = MIDI;
 	filename_ = name_from_path( filename );
@@ -37,7 +37,7 @@ MidiClip::MidiClip( std::string filename, int tn ) : Clip()
 }
 
 MidiClip::MidiClip( std::string filename, int tn, std::string name, int launch, int stop, int loop ) :
-	Clip( name, launch, stop, loop )
+	Clip( name, launch, stop, loop ), divscale_(1)
 {
 	data_type_ = MIDI;
 	filename_ = name_from_path( filename );
@@ -57,6 +57,18 @@ MidiClip::~MidiClip ()
 }
 
 //------------
+
+int ppcm(int X, int Y)
+{
+  int A=X;
+  int B=Y;
+  while (A!=B)
+  {
+    while (A>B) B=B+Y;
+    while (A<B) A=A+X;
+  }
+  return A;
+}
 
 
 void MidiClip::getEventsFromSource( bool rename )
@@ -79,6 +91,11 @@ void MidiClip::getEventsFromSource( bool rename )
 	}
 	
 	setDivision( source.getDivision() );
+	if ( State::getProject()->getClock()->getTicksPerBeat() % division_ != 0 )
+		State::getProject()->getClock()->setTicksPerBeat(
+			ppcm( State::getProject()->getClock()->getTicksPerBeat(), division_ )
+		);
+	divscale_ = State::getProject()->getClock()->getTicksPerBeat() / division_;
 	source.rewindTrack( tracknum_ );
 
 	mainlog->info( "parsing events" );
@@ -134,13 +151,15 @@ void MidiClip::rewind ()
 
 void MidiClip::tick( RtMidiOut * midiout )
 {
-	while ( events_[index_].getTime () == time_ )
-	{
-		//std::cout << time_ << " : " << index_ << " : " << events_ -> at (index_) -> hexData () << std::endl;
-		midiout -> sendMessage (events_[index_].getData ());
-		if ( index_ < events_.size () ) index_++;
-		if ( index_ == events_.size () ) rewind ();
-	}
+	//unsigned int localtime;
+	if ( time_ % divscale_ == 0 )
+		while ( events_[index_].getTime() == time_ / divscale_ )
+		{
+			//std::cout << time_ << " : " << index_ << " : " << events_ -> at (index_) -> hexData () << std::endl;
+			midiout -> sendMessage( events_[index_].getData() );
+			if ( index_ < events_.size() ) index_++;
+			if ( index_ == events_.size() ) rewind ();
+		}
 	time_++;
 }
 

@@ -4,25 +4,23 @@
 ## MAINTENANT
 
 * Rangement et nettoyage
-	* extraire de Project tout ce qui est relatif au type de données
-	* modulariser entièrement l'audio et le midi
 	* Passer les commandes par le Waiter
 	* Découper les fichier GUI
 	* réagencer le code source dans des répertoires (core? audio midi...)
 
-* MIDI 
+* Etudier et mettre en place
+	* isoler l'interface graphique dans un thread
+	* Documentation
+	* Tests
+
+* MIDI
+	* adapter la vitesse de lecture
 	* MIDI IN parsing a finir
 	* revoir les logs MIDI
 
 * Gestion des projets
-	* Nouveau
-	* Ouvrir
 	* Enregistrer (/sous)
 	* historique
-
-* Etudier et mettre en place
-	* Documentation
-	* Tests
 
 ### Fonctionnalités
 
@@ -38,7 +36,6 @@
 
 ### Architecture / Moteur
 
-* Logger
 * Playlist / TrackList
 * Bases de séquençage pour les clips
 * Baie de brassage ?
@@ -63,8 +60,6 @@
 
 ---------------
 ## Architecture
-
-* isoler l'interface graphique dans un thread
 
 * Trouver un modèle modulaire permettant de d'intégrer 
 	* Horloge + Audio + Midi

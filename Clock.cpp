@@ -46,8 +46,8 @@ unsigned int Clock::update ()
 	unsigned int midi_ticks = 0;
 	if (state_) {
 		
-		int previous_bar = bar_;
-		int previous_beat = beat_;
+		unsigned int previous_bar = bar_;
+		unsigned int previous_beat = beat_;
 		
 		now_ = std::chrono::system_clock::now();
 		delta_ = std::chrono::duration_cast<std::chrono::microseconds> (now_ - startTime_).count();

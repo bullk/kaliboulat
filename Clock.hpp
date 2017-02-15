@@ -14,10 +14,11 @@ private:
 	std::chrono::time_point<std::chrono::system_clock> startTime_;
 	std::chrono::time_point<std::chrono::system_clock> now_;
 	long long unsigned int delta_;
-	int tempo_, ticks_per_beat_, beats_per_bar_;
+	int tempo_;
+	unsigned int ticks_per_beat_, beats_per_bar_;
 	float tick_duration_;
-	int bar_, beat_, tick_;
-	int hour_, minute_, second_;
+	unsigned int bar_, beat_, tick_;
+	unsigned int hour_, minute_, second_;
 	long unsigned int previous_ticks_, now_ticks_;
 
 public:
@@ -29,12 +30,14 @@ public:
 	unsigned int update ();
 	bool getState () { return state_; }
 	inline bool isStarted () { return state_; }
-	int getHour () { return hour_; }
-	int getMinute () { return minute_; }
-	int getSecond () { return second_; }
-	int getBar () { return bar_; }
-	int getBeat () { return beat_; }
-	int getTick () { return tick_; }
+	inline unsigned int getHour () { return hour_; }
+	inline unsigned int getMinute () { return minute_; }
+	inline unsigned int getSecond () { return second_; }
+	inline unsigned int getBar () { return bar_; }
+	inline unsigned int getBeat () { return beat_; }
+	inline unsigned int getTick () { return tick_; }
+	inline unsigned int getTicksPerBeat () { return ticks_per_beat_; }
+	inline void setTicksPerBeat (unsigned int tpb) { ticks_per_beat_ = tpb; }
 
 };
 

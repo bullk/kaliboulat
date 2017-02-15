@@ -22,8 +22,10 @@ public:
 	~MidiClip ();
 	inline unsigned long getLength () { return length_; }
 	inline void setLength (unsigned long l) { length_ = l; }
-	inline int getDivision () const { return division_; }
-	inline void setDivision (int d) { division_ = d; }
+	inline unsigned int getDivScale () const { return divscale_; }
+	inline void setDivScale (unsigned int d) { divscale_ = d; }
+	inline unsigned int getDivision () const { return division_; }
+	inline void setDivision (unsigned int d) { division_ = d; }
 	inline unsigned long getTime () { return time_; }
 	//void setTime (long unsigned int time);
 	inline unsigned long getIndex () { return index_; }
@@ -56,7 +58,7 @@ public:
 	}
 	
 protected:
-	int tracknum_, division_;
+	unsigned int tracknum_, division_, divscale_;
 	unsigned long length_, time_, index_;
 	std::vector<ScheduledMidiMessage> events_;
 	void getEventsFromSource (bool);
