@@ -37,6 +37,7 @@ void Clock::pause ()
 void Clock::stop ()
 {
 	state_ = false;
+	rewind ();
 }
 	
 void Clock::rewind ()

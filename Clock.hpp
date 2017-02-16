@@ -30,7 +30,8 @@ public:
 	void stop ();
 	void rewind ();
 	unsigned int update ();
-	bool getState () { return state_; }
+	inline bool getState () { return state_; }
+	inline bool atZero () { return ( delta_ == 0 ); }
 	inline bool isStarted () { return state_; }
 	inline unsigned int getHour () { return hour_; }
 	inline unsigned int getMinute () { return minute_; }

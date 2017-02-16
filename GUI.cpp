@@ -327,7 +327,64 @@ void mainMenu ()
 	}	
 }
 
-void ControlPanel (std::shared_ptr<Project> project, void (*title_func)())
+void PlayButton ()
+{
+	// PLAY button
+	if ( State::getInstance() -> getProject() -> getClock() -> getState () )
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+	}
+	else
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+	}
+	if (ImGui::Button ("PLAY")) State::getInstance() -> getProject() -> getClock() -> start();
+	ImGui::PopStyleColor(3); 
+}
+
+void PauseButton ()
+{
+	// PAUSE button
+	if ( !State::getInstance() -> getProject() -> getClock() -> getState () )
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+	}
+	else
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+	}
+	if (ImGui::Button ("PAUSE")) State::getInstance() -> getProject() -> getClock() -> pause();
+	ImGui::PopStyleColor(3); 
+}
+
+void StopButton ()
+{
+	// STOP button
+	if ( State::getInstance() -> getProject() -> getClock() -> atZero () )
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
+	}
+	else
+	{
+		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(0/7.0f, 0.6f, 0.6f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0/7.0f, 0.7f, 0.7f));
+		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0/7.0f, 0.8f, 0.8f));
+	}
+	if (ImGui::Button ("STOP")) State::getInstance() -> getProject() -> getClock() -> stop();
+	ImGui::PopStyleColor (3);
+}
+
+void ControlPanel (void (*title_func)())
 // TODO : factoriser le panneau de commande (boutons, horloges...)
 {
 	ImGui::BeginChild ("Master Controls", ImVec2(0, 64), true);
@@ -338,29 +395,29 @@ void ControlPanel (std::shared_ptr<Project> project, void (*title_func)())
 	ImGui::NextColumn ();
 	
 	// Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", project -> getClock() -> getHour(), project -> getClock() -> getMinute(), project -> getClock() -> getSecond());
+	Clock * clock = State::getInstance() -> getProject() -> getClock();
+	ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", clock->getHour(), clock->getMinute(), clock->getSecond());
 	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
 
 	// MIDI Clock
-	ImGui::SameLine (); ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", project -> getClock() -> getBar(), project -> getClock() -> getBeat(), project -> getClock() -> getTick());
-	if ( project -> ctrlPressed () ) ImGui::TextColored (ImColor(192,64,64), "CTRL");
+	ImGui::SameLine ();
+	ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", clock->getBar(), clock->getBeat(), clock->getTick());
+
+	// CTRL PRESSED
+	if ( State::getInstance() -> getProject() -> ctrlPressed () )
+	{
+		ImGui::SameLine ();
+		ImGui::TextColored (ImColor(192,64,64), "CTRL");
+	}
+	
 	//TODO : Intégrer les images de boutons
-	if ( project -> getClock() -> getState () )
-	{ // STOP button
-		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button ("STOP")) project -> getClock() -> stop();
-		ImGui::PopStyleColor (3);
-	}
-	else
-	{ // PLAY button
-		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button ("PLAY")) project -> getClock() -> start();
-		ImGui::PopStyleColor(3);
-	}
+	//if ( State::getInstance() -> getProject() -> getClock() -> getState () )
+
+	PlayButton ();
+	ImGui::SameLine ();
+	PauseButton ();
+	ImGui::SameLine ();
+	StopButton();
 	
 	ImGui::NextColumn ();
 	
@@ -654,7 +711,7 @@ void ProjectScreen (std::shared_ptr<Project> project)
 {
 	BeginScreen ();
 	mainMenu ();
-	ControlPanel (project, ProjectTitle);
+	ControlPanel (ProjectTitle);
 	ImGui::BeginChild ("MIDI input log", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
 	//std::vector<MidiRaw *> * midilog = State::getInstance()->getMidiLog();
 	//for ( unsigned int i=0; i<midilog->size(); i++ )
@@ -712,7 +769,7 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 {	
 	BeginScreen ();
 	mainMenu ();
-	ControlPanel (project, ConsoleTitle);
+	ControlPanel (ConsoleTitle);
 	
 	if ( ressources_panel )
 	{
@@ -844,7 +901,7 @@ void SequencerScreen (std::shared_ptr<Project> project)
 {
 	BeginScreen ();
 	mainMenu ();
-	ControlPanel (project, SequencerTitle);
+	ControlPanel (SequencerTitle);
 
 	if ( ressources_panel )
 	{
@@ -870,7 +927,7 @@ void OrgasampleScreen (std::shared_ptr<Project> project)
 {
 	BeginScreen ();
 	mainMenu ();
-	ControlPanel (project, OrgasampleTitle);
+	ControlPanel (OrgasampleTitle);
 
 	if ( ressources_panel )
 	{

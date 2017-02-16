@@ -65,13 +65,13 @@ void Waiter::start ()
 		
 void Waiter::pause ()
 {
-	State::getProject() -> getClock() -> stop();
+	State::getProject() -> getClock() -> pause();
 }
 		
 void Waiter::stop ()
 {
-	pause();
-	State::getProject() -> getClock() -> rewind();
+	State::getProject() -> getClock() -> stop();
+	panic();
 }
 		
 void Waiter::bar ()
