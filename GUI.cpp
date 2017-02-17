@@ -773,7 +773,7 @@ void SelectConsoleClip (std::shared_ptr<Clip> clip)
 
 void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue, float val)
 {
-	float sat = 1.0f;
+	float sat = CLIP_SATURATION;
 	ImGui::PushID (id);
 	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(hue, sat, val));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(hue, sat, val));
@@ -821,13 +821,13 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 		else
 		{
 			// background color
-			float saturation = 0.5f;
-			float value = 0.25f;
+			float saturation = TRACK_SATURATION;
+			float value = TRACK_VALUE;
 			float alpha = 1.00f;
 			if ( State::getInstance() -> getTrack() == track )
 			{
-				saturation = 0.6f;
-				value = 0.5f;
+				saturation = ACTIVE_TRACK_SATURATION;
+				value = ACTIVE_TRACK_VALUE;
 			}
 			ImColor color_bg = ImColor::HSV(track -> getHue (), saturation, value, alpha);
 			// begining TrackUI
