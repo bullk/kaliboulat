@@ -780,8 +780,9 @@ void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue, float val)
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(hue, sat, val));
 	if ( ImGui::Button(">") ) clip -> arm() ; 
 	ImGui::SameLine ();
-	if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
-		SelectConsoleClip( clip );
+	//if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
+		//SelectConsoleClip( clip );
+	ImGui::ProgressBar( clip->getProgress(), ImVec2( 100, 0.f ), clip->getName().c_str() );
 	ImGui::PopStyleColor(3);
 	ImGui::PopID ();
 }

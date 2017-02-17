@@ -28,6 +28,7 @@ public:
 	inline void setDivision (unsigned int d) { division_ = d; }
 	inline unsigned long getTime () { return time_; }
 	//void setTime (long unsigned int time);
+	float getProgress() { return (float) time_ / length_; }
 	inline unsigned long getIndex () { return index_; }
 	inline unsigned long getSize () { return events_.size(); }
 	inline ScheduledMidiMessage * getEvent (unsigned long i) { return &events_[i]; }
@@ -59,7 +60,7 @@ public:
 	
 protected:
 	unsigned int tracknum_, division_, divscale_;
-	unsigned long length_, time_, index_;
+	unsigned long length_, time_, index_, clock_time_;
 	std::vector<ScheduledMidiMessage> events_;
 	void getEventsFromSource (bool);
 

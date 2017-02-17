@@ -63,6 +63,8 @@ unsigned long AudioClip::getLength () { return getSize(); }
 
 stk::StkFloat AudioClip::getTime () { return time_; }
 
+float AudioClip::getProgress() { return time_ / getSize(); }
+
 float * AudioClip::getVolume () { return &volume_; }
 
 float * AudioClip::getGUIRateP () { return &gui_rate_; }

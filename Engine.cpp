@@ -94,9 +94,9 @@ void Waiter::beat ()
 
 void Waiter::tick ()
 {
+	State::getProject() -> tick();
 	while ( !tick_.empty() )
 	{
-		State::getProject() -> tick();
 		tick_.front() -> execute();
 		tick_.pop();
 	}

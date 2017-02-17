@@ -20,6 +20,7 @@ MidiClip::MidiClip (std::string name = "No name") : Clip(), divscale_(1)
 	length_ = 0;
 	time_ = 0;
 	index_ = 0;
+	clock_time_ = 0;
 }
 
 MidiClip::MidiClip( std::string filename, int tn ) : Clip(), divscale_(1)
@@ -33,6 +34,7 @@ MidiClip::MidiClip( std::string filename, int tn ) : Clip(), divscale_(1)
 	length_ = 0;
 	time_ = 0;
 	index_ = 0;
+	clock_time_ = 0;
 	getEventsFromSource( true );
 }
 
@@ -45,6 +47,7 @@ MidiClip::MidiClip( std::string filename, int tn, std::string name, int launch, 
 	length_ = 0;
 	time_ = 0;
 	index_ = 0;
+	clock_time_ = 0;
 	getEventsFromSource( false );
 }
 
@@ -135,7 +138,7 @@ void MidiClip::getEventsFromSource( bool rename )
 	mainlog->info( "/parsing events" );
 	
 	setLength ( abs_time );
-	if ( abs_time > length_ ) length_ = abs_time;
+	//if ( abs_time > length_ ) length_ = abs_time;
 					
 	delete event;
 	mainlog->info( "/MidiClip::getEventsFromSource" );
@@ -147,20 +150,23 @@ void MidiClip::rewind ()
 	//std::cout << "rewind" << std::endl;
 	time_ = 0;
 	index_ = 0;
+	clock_time_ = 0;
 }
 
 void MidiClip::tick( RtMidiOut * midiout )
 {
-	//unsigned int localtime;
-	if ( time_ % divscale_ == 0 )
-		while ( events_[index_].getTime() == time_ / divscale_ )
+	if ( clock_time_ % divscale_ == 0 )
+	{
+		time_ = clock_time_ / divscale_;
+		while ( events_[index_].getTime() == time_ )
 		{
 			//std::cout << time_ << " : " << index_ << " : " << events_ -> at (index_) -> hexData () << std::endl;
 			midiout -> sendMessage( events_[index_].getData() );
 			if ( index_ < events_.size() ) index_++;
-			if ( index_ == events_.size() ) rewind ();
+			if ( index_ == events_.size() ) rewind();
 		}
-	time_++;
+	}
+	clock_time_++;
 }
 
 void MidiClip::appendEvent (unsigned long time, std::vector<unsigned char> * event)

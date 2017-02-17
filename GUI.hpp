@@ -13,9 +13,9 @@
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 
 #define CLIP_SATURATION 0.8f
-#define TRACK_SATURATION 0.5f
-#define TRACK_VALUE 0.25f
-#define ACTIVE_TRACK_SATURATION 0.6f
+#define TRACK_SATURATION 0.4f
+#define TRACK_VALUE 0.3f
+#define ACTIVE_TRACK_SATURATION 0.5f
 #define ACTIVE_TRACK_VALUE 0.5f
 
 

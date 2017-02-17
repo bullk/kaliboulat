@@ -46,6 +46,7 @@ public:
 	inline virtual void setLoopStyle (int ls) { launchstyle_ = ls; }
 	inline virtual void nextLoopStyle () { loopstyle_ = (loopstyle_ + 1) % 3; }
 	virtual unsigned long getLength() = 0;
+	virtual float getProgress() = 0;
 	//virtual int getAngle (void) = 0;
    
 protected:
@@ -54,6 +55,7 @@ protected:
 	std::string name_, filename_;
 	int launchstyle_, stopstyle_, loopstyle_;
 	bool selected_;
+	float progress_;
 	//int angle_;
 	
 };

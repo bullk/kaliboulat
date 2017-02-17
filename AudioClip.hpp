@@ -18,8 +18,9 @@ public:
 	AudioClip (std::string);
 	AudioClip (std::string, std::string, int, int, int, float, float, int);
 	~AudioClip ();
-	long unsigned int getLength ();
+	unsigned long getLength ();
 	stk::StkFloat getTime ();
+	float getProgress();
 	float * getVolume ();
 	float * getGUIData ();
 	float * getGUIRateP ();
