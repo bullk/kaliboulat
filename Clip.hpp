@@ -24,6 +24,9 @@ public:
 	inline DataType dataType () { return data_type_; }
 	inline ClipState getState () { return state_; }
 	inline bool isPlaying () { return (state_ == PLAYING); }
+	inline void select () { selected_ = true; }
+	inline void unselect () { selected_ = false; }
+	inline bool isSelected () { return selected_; }
 	void arm ();
 	inline void play () { state_ = PLAYING; }
 	inline void stop () { state_ = HALTED; }
@@ -50,6 +53,7 @@ protected:
 	ClipState state_;
 	std::string name_, filename_;
 	int launchstyle_, stopstyle_, loopstyle_;
+	bool selected_;
 	//int angle_;
 	
 };

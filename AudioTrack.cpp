@@ -33,8 +33,13 @@ AudioTrack::~AudioTrack ()
 
 void AudioTrack::addClip (std::string path, int tn)
 {
+	auto mainlog= spdlog::get("main");	
+	mainlog->debug("AudioTrack::addClip");
 	std::shared_ptr<AudioClip> clip (new AudioClip(path));
 	addClip ( clip );
+	mainlog->debug("* select clip");
+	Waiter::getInstance() -> selectClip( std::static_pointer_cast<Clip>( clip ) );
+	mainlog->debug("/AudioTrack::addClip");
 }
 
 void AudioTrack::addClip (std::shared_ptr<Clip> clip)

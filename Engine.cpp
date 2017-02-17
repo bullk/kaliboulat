@@ -175,3 +175,16 @@ void Waiter::importMidiFile( std::string name_in )
 	State::getProject() -> addMidiFile( name_out );
 }
 
+void Waiter::selectClip (std::shared_ptr<Clip> clip)
+{
+	auto mainlog= spdlog::get("main");	
+	mainlog->debug("Waiter::selectClip");
+	mainlog->debug("* unselect");
+	if ( State::getInstance() -> getClip() )
+		State::getInstance() -> getClip() -> unselect();
+	mainlog->debug("* select");
+	clip -> select();
+	mainlog->debug("* setClip");
+	State::getInstance() -> setClip( clip );
+	mainlog->debug("/Waiter::selectClip");
+}

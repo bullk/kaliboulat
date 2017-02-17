@@ -111,7 +111,7 @@ int main( int argc, char* args[] )
 	{         
 		// trace, debug, info, warn, error, critical
 		//spdlog::level::level_enum LOGLEVEL = spdlog::level::debug;
-		spdlog::level::level_enum LOGLEVEL = spdlog::level::info;
+		spdlog::level::level_enum LOGLEVEL = spdlog::level::debug;
 		
 		//auto mainlog = spdlog::basic_logger_mt("main", "main.log");
 		auto mainlog = spdlog::stdout_color_mt("main");

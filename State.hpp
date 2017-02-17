@@ -43,10 +43,10 @@ class State
 			auto mainlog= spdlog::get("main");
 			mainlog->info("Project shared_ptr count : {}", project_.use_count());
 		}
-		static inline std::shared_ptr<Track> getTrack () { return track_; }
-		static inline void setTrack (std::shared_ptr<Track> track) { track_ = track; }
-		static inline std::shared_ptr<Clip> getClip () { return clip_; }
-		static inline void setClip (std::shared_ptr<Clip> clip) { clip_ = clip; }
+		inline std::shared_ptr<Track> getTrack () { return track_; }
+		inline void setTrack (std::shared_ptr<Track> track) { track_ = track; }
+		inline std::shared_ptr<Clip> getClip () { return clip_; }
+		void setClip (std::shared_ptr<Clip> clip) { clip_ = clip; }
 		static int scanProjects ();
 		int scanAudioFiles ();
 		int scanMidiFiles ();

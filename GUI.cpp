@@ -1,7 +1,5 @@
 #include <typeinfo>
 //#include <unistd.h> // sleep
-#include <ftw.h>
-#include <fnmatch.h>
 
 #include "GUI.hpp"
 #include "Clock.hpp"
@@ -26,6 +24,7 @@ Screen ui = { Screen::CONSOLE, Screen::RESSOURCES, NULL, { NONE, "", 0} };
 unsigned int width1, width2, width3, width4, width5;
 unsigned int control_panel_columns;
 
+bool clip_panel = true;
 bool ressources_panel = true;
 bool action_drag_clip = false;
 
@@ -54,7 +53,8 @@ int GUI_Init ()
 	// Setup ImGui binding
 	ImGui_ImplSdl_Init(window);
 
-	clear_color = ImColor(114, 144, 154);
+	//clear_color = ImColor(114, 144, 154);
+	clear_color = ImColor(0, 0, 0);
 
 	return 0;
 }
@@ -72,6 +72,7 @@ void GUI_Close()
 
 void BeginScreen ()
 {
+	ImVec4 PAD_COLOR = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);
 	ImGuiWindowFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoTitleBar;
 	flags |= ImGuiWindowFlags_NoResize;
@@ -82,9 +83,13 @@ void BeginScreen ()
 	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
 	ImGui::SetNextWindowPos(ImVec2(0,0));
 	
+	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
 	ImGui::Begin("main window", NULL, flags);
-	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImVec4(0.0f, 0.0f, 0.0f, 1.00f));
+	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, PAD_COLOR);
+	ImGui::PushStyleColor (ImGuiCol_Border, PAD_COLOR);
 	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 10.0f);
+	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(10, 10));
+	ImGui::PushStyleVar (ImGuiStyleVar_FrameRounding, 5.0f);
 	
 	//width1 = (int)ImGui::GetIO().DisplaySize.x / 6;
 	//width2 = (int)ImGui::GetIO().DisplaySize.x / 3;
@@ -101,9 +106,13 @@ void BeginScreen ()
 
 void EndScreen ()
 {
-	ImGui::PopStyleColor ();
 	ImGui::PopStyleVar ();
+	ImGui::PopStyleVar ();
+	ImGui::PopStyleVar ();
+	ImGui::PopStyleColor ();
+	ImGui::PopStyleColor ();
 	ImGui::End();
+	ImGui::PopStyleVar ();
 }
 
 
@@ -389,9 +398,12 @@ void ControlPanel (void (*title_func)())
 {
 	ImGui::BeginChild ("Master Controls", ImVec2(0, 64), true);
 
-	control_panel_columns = (int) ImGui::GetWindowContentRegionWidth() / 230;
-	ImGui::Columns (control_panel_columns);
+	//control_panel_columns = (int) ImGui::GetWindowContentRegionWidth() / 230;
+	//ImGui::Columns (control_panel_columns);
+	ImGui::Columns (6, NULL, false);
+	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 	title_func ();
+	ImGui::PopStyleVar ();
 	ImGui::NextColumn ();
 	
 	// Clock
@@ -412,6 +424,7 @@ void ControlPanel (void (*title_func)())
 	
 	//TODO : Intégrer les images de boutons
 	//if ( State::getInstance() -> getProject() -> getClock() -> getState () )
+	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(6, 6));
 
 	PlayButton ();
 	ImGui::SameLine ();
@@ -422,6 +435,9 @@ void ControlPanel (void (*title_func)())
 	ImGui::NextColumn ();
 	
 	ImGui::Checkbox ("Ressources panel", &ressources_panel);
+	ImGui::Checkbox ("Clip panel", &clip_panel);
+	
+	ImGui::NextColumn ();
 	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
 
 	//ImGui::NextColumn ();
@@ -431,6 +447,7 @@ void ControlPanel (void (*title_func)())
 	
 	ImGui::Columns(1);
 
+	ImGui::PopStyleVar ();
 	ImGui::EndChild ();
 }
 
@@ -737,16 +754,8 @@ void ConsoleTitle ()
 	ImGui::Text("   ##  #  # # #    #  ## ##");
 }
 
-void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue)
+void SelectConsoleClip (std::shared_ptr<Clip> clip)
 {
-	ImGui::PushID (id);
-	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(hue, 0.4f, 0.4f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(hue, 0.4f, 0.4f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(hue, 0.4f, 0.4f));
-	if ( ImGui::Button(">") ) clip -> arm() ; 
-	ImGui::SameLine ();
-	if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
-	{
 		State::getInstance() -> setClip (clip); 
 		ressources_panel = true;
 		switch (clip -> dataType ())
@@ -760,7 +769,19 @@ void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue)
 		default:
 			ui.context = Screen::RESSOURCES;
 		}
-	}
+}
+
+void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue, float val)
+{
+	float sat = 1.0f;
+	ImGui::PushID (id);
+	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(hue, sat, val));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(hue, sat, val));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(hue, sat, val));
+	if ( ImGui::Button(">") ) clip -> arm() ; 
+	ImGui::SameLine ();
+	if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
+		SelectConsoleClip( clip );
 	ImGui::PopStyleColor(3);
 	ImGui::PopID ();
 }
@@ -777,9 +798,9 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 		ImGui::SameLine ();
 	}
 	int w = ressources_panel * width5;
-	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(2, 2));
+	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::BeginChild ("Board", ImVec2(w-3, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
+	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 	// DISPLAYING TRACKS
 	std::shared_ptr<Track> asking_track = NULL;
 	for (unsigned int i=0; i < project -> nTracks (); i++)
@@ -800,13 +821,13 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 		else
 		{
 			// background color
-			float saturation = 0.3f;
-			float value = 0.1f;
+			float saturation = 0.5f;
+			float value = 0.25f;
 			float alpha = 1.00f;
-			if ( State::getTrack() == track )
+			if ( State::getInstance() -> getTrack() == track )
 			{
-				saturation = 1.0f;
-				value = 0.2f;
+				saturation = 0.6f;
+				value = 0.5f;
 			}
 			ImColor color_bg = ImColor::HSV(track -> getHue (), saturation, value, alpha);
 			// begining TrackUI
@@ -845,9 +866,11 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 
 				ImGui::Spacing ();
 				ImGui::Separator ();
+				float clip_value = (1.0f-value);
+				clip_value *= clip_value;
 				// displaying Clips
 				for ( unsigned int j=0; j < track -> nClips(); j++ )
-					ConsoleClip (track->getClip(j), j, track->getHue());
+					ConsoleClip (track->getClip(j), j, track->getHue(), clip_value);
 			}
 			
 			// track selection behavior
@@ -865,8 +888,9 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 	}
 
 	// SETTING NEW ACTIVE TRACK
-	if ( action_drag_clip and not asking_track ) State::setTrack(NULL);
-	if ( asking_track and asking_track != State::getTrack() ) State::setTrack(asking_track);
+	if ( action_drag_clip and not asking_track ) State::getInstance() -> setTrack(NULL);
+	if ( asking_track and asking_track != State::getInstance() -> getTrack() )
+		State::getInstance() -> setTrack(asking_track);
 	asking_track = NULL;
 
 	// DROPPING A CLIP
@@ -874,9 +898,9 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 	{
 		if ( ImGui::IsMouseReleased(0) ) // if mouse released
 		{
-			if ( State::getTrack() and ui.dragged_clip.dt == State::getTrack() -> dataType() )
-				State::getTrack() -> addClip (ui.dragged_clip.path, ui.dragged_clip.track);
-			//ui.dragged_clip = NULL;
+			if ( State::getInstance() -> getTrack() and ui.dragged_clip.dt == State::getInstance() -> getTrack() -> dataType() )
+				State::getInstance() -> getTrack() -> addClip (ui.dragged_clip.path, ui.dragged_clip.track);
+			ui.dragged_clip = { NONE, "", 0};
 			action_drag_clip = false;
 		}
 		else DragClipOverlay (&action_drag_clip); // display clip overlay

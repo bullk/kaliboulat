@@ -48,6 +48,7 @@ void MidiTrack::addClip( std::shared_ptr<Clip> clip )
 void MidiTrack::addClip( std::shared_ptr<MidiClip> clip )
 {
 	clipset_.push_back( clip );
+	Waiter::getInstance() -> selectClip( clip );
 }
 
 void MidiTrack::deleteClip( unsigned int i )

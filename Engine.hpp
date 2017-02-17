@@ -3,7 +3,9 @@
 
 #include <iostream> // cout, endl
 #include <queue>
+#include <memory>
 
+class Clip;
 
 inline std::string user_dir()
 {
@@ -27,7 +29,7 @@ public:
 	void setPath (std::string path);
 	inline std::string getName () { return name_; }
 	inline void setName (std::string name) { name_ = name; }
-
+	
 protected:
 	DataType data_type_;
 	std::string path_, name_;
@@ -85,6 +87,7 @@ class Waiter
 		void saveProject ();
 		void importAudioFile (std::string);
 		void importMidiFile (std::string);
+		void selectClip (std::shared_ptr<Clip>);
 		//void closeProject ();
 		
 		// Singleton
