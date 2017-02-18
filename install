@@ -1,0 +1,23 @@
+#!/bin/bash
+
+SCRIPT_DIR=~/.bin
+SCRIPT_FILE=$SCRIPT_DIR/Kaliboulat
+
+mkdir -p $SCRIPT_DIR
+cat <<EOF >$SCRIPT_FILE
+#!/bin/bash
+
+LOGDIR=~/.log/Bullk
+mkdir -p $LOGDIR
+DATE=$( date +%Y%m%d-%H%M%S )
+
+~/.src/kaliboulat/Kaliboulat &> \$LOGDIR/Kaliboulat.\$DATE.log
+EOF
+
+chmod 700 $SCRIPT_FILE
+
+pushd ~/.src/kaliboulat
+git pull
+make
+
+popd

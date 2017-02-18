@@ -37,16 +37,16 @@ AudioFile.o: AudioFile.hpp Engine.hpp
 AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp 
 Clip.o: Clip.hpp globals.h Engine.hpp 
 Clock.o: Clock.hpp Engine.hpp 
-Engine.o: Engine.hpp State.hpp 
+Engine.o: Engine.hpp State.hpp midi.hpp 
 GUI.o: GUI.hpp Clock.hpp State.hpp midi.hpp MidiFile.hpp MidiClip.hpp AudioFile.hpp AudioClip.hpp Listener.hpp imgui/imgui.h imgui/imgui_impl_sdl.h globals.h Engine.hpp 
 Kaliboulat.o: midi.hpp Clock.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp globals.h Clock.hpp AudioTrack.hpp MidiTrack.hpp MidiFile.hpp Project.hpp Modules.hpp GUI.hpp 
 Listener.o: Listener.hpp 
-MidiClip.o: MidiClip.hpp midi.hpp Clip.hpp midi.hpp 
+MidiClip.o: MidiClip.hpp midi.hpp State.hpp MidiFile.hpp Clip.hpp midi.hpp 
 midi.o: midi.hpp spdlog/spdlog.h Scheduled.hpp 
 MidiFile.o: MidiFile.hpp MidiClip.hpp Engine.hpp 
-MidiTrack.o: MidiTrack.hpp MidiClip.hpp Track.hpp 
+MidiTrack.o: MidiTrack.hpp State.hpp MidiClip.hpp Track.hpp 
 Modules.o: Modules.hpp globals.h AudioTrack.hpp MidiTrack.hpp 
-Project.o: Project.hpp Clock.hpp State.hpp Modules.hpp AudioFile.hpp MidiFile.hpp globals.h Track.hpp 
+Project.o: Project.hpp Clock.hpp State.hpp Modules.hpp AudioFile.hpp MidiFile.hpp globals.h Track.hpp Clock.hpp 
 Scheduled.o: Scheduled.hpp 
 State.o: State.hpp Project.hpp 
 Track.o: Track.hpp globals.h Clip.hpp 
