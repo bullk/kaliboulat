@@ -10,17 +10,14 @@
 // Constructor 
 //-------------
 
-MidiClip::MidiClip (std::string name = "No name") : Clip(), divscale_(1)
+MidiClip::MidiClip (std::string name = "No name") : Clip(), divscale_(1), length_(0)
 {
 	data_type_ = MIDI;
 	name_ = name;
 	launchstyle_ = LAUNCH_BAR;
 	stopstyle_ = STOP_BAR;
 	loopstyle_ = FOREVER;
-	length_ = 0;
-	time_ = 0;
-	index_ = 0;
-	clock_time_ = 0;
+	rewind();
 }
 
 MidiClip::MidiClip( std::string filename, int tn ) : Clip(), divscale_(1)
@@ -31,10 +28,7 @@ MidiClip::MidiClip( std::string filename, int tn ) : Clip(), divscale_(1)
 	launchstyle_ = LAUNCH_BAR;
 	stopstyle_ = STOP_BAR;
 	loopstyle_ = FOREVER;
-	length_ = 0;
-	time_ = 0;
-	index_ = 0;
-	clock_time_ = 0;
+	rewind();
 	getEventsFromSource( true );
 }
 
@@ -44,10 +38,7 @@ MidiClip::MidiClip( std::string filename, int tn, std::string name, int launch, 
 	data_type_ = MIDI;
 	filename_ = name_from_path( filename );
 	tracknum_ = tn;
-	length_ = 0;
-	time_ = 0;
-	index_ = 0;
-	clock_time_ = 0;
+	rewind();
 	getEventsFromSource( false );
 }
 
@@ -71,6 +62,14 @@ int ppcm(int X, int Y)
     while (A<B) A=A+X;
   }
   return A;
+}
+
+
+void MidiClip::rewind ()
+{
+	clock_time_ = 0;
+	time_ = 0;
+	index_ = 0;
 }
 
 
@@ -143,14 +142,6 @@ void MidiClip::getEventsFromSource( bool rename )
 	delete event;
 	mainlog->info( "/MidiClip::getEventsFromSource" );
 	
-}
-
-void MidiClip::rewind ()
-{
-	//std::cout << "rewind" << std::endl;
-	time_ = 0;
-	index_ = 0;
-	clock_time_ = 0;
 }
 
 void MidiClip::tick( RtMidiOut * midiout )
