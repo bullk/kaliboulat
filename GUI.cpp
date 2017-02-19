@@ -2,15 +2,12 @@
 //#include <unistd.h> // sleep
 
 #include "GUI.hpp"
-#include "Clock.hpp"
 #include "State.hpp"
-#include "midi.hpp"
 #include "MidiFile.hpp"
 #include "MidiClip.hpp"
 #include "AudioFile.hpp"
 #include "AudioClip.hpp"
 #include "Listener.hpp"
-//#include "Engine.hpp"
 
 using namespace std;
 

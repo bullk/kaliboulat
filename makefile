@@ -38,8 +38,8 @@ AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp
 Clip.o: Clip.hpp globals.h Engine.hpp 
 Clock.o: Clock.hpp Engine.hpp 
 Engine.o: Engine.hpp State.hpp midi.hpp 
-GUI.o: GUI.hpp Clock.hpp State.hpp midi.hpp MidiFile.hpp MidiClip.hpp AudioFile.hpp AudioClip.hpp Listener.hpp imgui/imgui.h imgui/imgui_impl_sdl.h globals.h Engine.hpp 
-Kaliboulat.o: midi.hpp Clock.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp globals.h Clock.hpp AudioTrack.hpp MidiTrack.hpp MidiFile.hpp Project.hpp Modules.hpp GUI.hpp 
+GUI.o: GUI.hpp State.hpp MidiFile.hpp MidiClip.hpp AudioFile.hpp AudioClip.hpp Listener.hpp imgui/imgui.h imgui/imgui_impl_sdl.h globals.h Engine.hpp 
+Kaliboulat.o: midi.hpp Clock.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp 
 Listener.o: Listener.hpp 
 MidiClip.o: MidiClip.hpp midi.hpp State.hpp MidiFile.hpp Clip.hpp midi.hpp 
 midi.o: midi.hpp spdlog/spdlog.h Scheduled.hpp 
