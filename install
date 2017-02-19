@@ -1,6 +1,14 @@
 #!/bin/bash
 
+if [ -z $1 ]
+then 
 SCRIPT_DIR=~/.bin
+SOURCE_DIR=~/.src/kaliboulat
+else
+SCRIPT_DIR=~/bin
+SOURCE_DIR=~/src/kaliboulat
+fi
+
 SCRIPT_FILE=$SCRIPT_DIR/Kaliboulat
 
 mkdir -p $SCRIPT_DIR
@@ -8,16 +16,17 @@ cat <<EOF >$SCRIPT_FILE
 #!/bin/bash
 
 LOGDIR=~/.log/Bullk
-mkdir -p $LOGDIR
-DATE=$( date +%Y%m%d-%H%M%S )
+mkdir -p \$LOGDIR
+DATE=\$( date +%Y%m%d-%H%M%S )
 
-~/.src/kaliboulat/Kaliboulat &> \$LOGDIR/Kaliboulat.\$DATE.log
+$SOURCE_DIR/Kaliboulat &> \$LOGDIR/Kaliboulat.\$DATE.log
 EOF
 
 chmod 700 $SCRIPT_FILE
 
-pushd ~/.src/kaliboulat
+pushd $SOURCE_DIR
 git pull
+#make clean
 make
 
 popd
