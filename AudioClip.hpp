@@ -2,6 +2,7 @@
 #define INC_AUDIOCLIP_H
 
 #include <stk/FileWvIn.h>
+//#include <stk/LentPitShift.h>
 #include <stk/PitShift.h>
 #include "Clip.hpp"
 
@@ -62,7 +63,9 @@ protected:
 	float gui_rate_;
 	int gui_pitch_;
 	float gui_data_[];
+	//stk::LentPitShift * pitshift_;
 	stk::PitShift * pitshift_;
+	void initPitShift();
 	
 };
 

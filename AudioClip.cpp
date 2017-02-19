@@ -17,13 +17,11 @@ AudioClip::AudioClip( std::string fname ) : Clip(), FileWvIn(),
 	loopstyle_ = ONESHOT;
 	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
 	openFile( uri );
+	initPitShift();
 	//angle_ = 0;
-	pitshift_ = new stk::PitShift();
-	pitshift_ -> setEffectMix( 1.0 );
 	//gui_data_[data_.size()];
 	//for ( unsigned int i=0; i<=data_.size(); i++ )	{ gui_data_[i] = (float) data_[i]; }
 	//for ( unsigned int i=0; i<=sizeof(gui_data_); i++ )	{ gui_data_[i] = (float) data_[i]; }
-	updateRate(); updatePitch();
 }
 
 AudioClip::AudioClip
@@ -35,13 +33,11 @@ AudioClip::AudioClip
 	filename_ = name_from_path( fname );
 	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
 	openFile( uri );
+	initPitShift();
 	//angle_ = 0;
-	pitshift_ = new stk::PitShift();
-	pitshift_ -> setEffectMix(1.0);
 	//gui_data_[data_.size()];
 	//for ( unsigned int i=0; i<=data_.size(); i++ )	{ gui_data_[i] = (float) data_[i]; }
 	//for ( unsigned int i=0; i<=sizeof(gui_data_); i++ )	{ gui_data_[i] = (float) data_[i]; }
-	updateRate(); updatePitch();
 }
 
 
@@ -56,6 +52,14 @@ AudioClip::~AudioClip()
 }
 
 //------------
+
+void AudioClip::initPitShift()
+{
+	//pitshift_ = new stk::LentPitShift();
+	pitshift_ = new stk::PitShift();
+	pitshift_ -> setEffectMix(1.0);
+	updateRate(); updatePitch();
+}
 
 float * AudioClip::getGUIData () { return &gui_data_[0]; }
 
