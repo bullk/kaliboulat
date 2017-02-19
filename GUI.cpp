@@ -675,10 +675,21 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 	ImGui::BeginChild ("Ressources", ImVec2(width1-3,0), true);
 	if ( ImGui::Button("Files") ) ui.context = Screen::RESSOURCES;
 	ImGui::SameLine();
-	if ( ImGui::Button("Audio") ) ui.context = Screen::AUDIOCLIP;
-	ImGui::SameLine();
-	if ( ImGui::Button("MIDI") ) ui.context = Screen::MIDICLIP;
-	ImGui::Separator();
+	
+	if ( State::getInstance()->getClip() )
+	{
+		if ( State::getInstance()->getClip()->dataType() == AUDIO )
+		{
+			if ( ImGui::Button("Audio") ) ui.context = Screen::AUDIOCLIP;
+			ImGui::SameLine();
+		}
+	
+		if ( State::getInstance()->getClip()->dataType() == MIDI )
+		{
+			if ( ImGui::Button("MIDI") ) ui.context = Screen::MIDICLIP;
+			ImGui::Separator();
+		}
+	}
 	
 	switch (ui.context)
 	{
