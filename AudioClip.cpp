@@ -87,13 +87,21 @@ void AudioClip::updatePitch ()
 
 stk::StkFloat AudioClip::tick (unsigned int channel)
 {
-	if ( isFinished () )
+	stk::StkFloat res = 0;
+	if ( isPlaying () )
 	{
-		stop ();
-		reset ();
-		return 0;
+		if ( isFinished () )
+		{
+			reset();
+			if ( loopstyle_ == FOREVER )
+				res = pitshift_->tick( FileWvIn::tick(channel) ) * volume_;
+			else
+				stop ();
+		}
+		else
+			res = pitshift_->tick( FileWvIn::tick(channel) ) * volume_;
 	}
-	else return pitshift_->tick(FileWvIn::tick(channel));
+	return res;
 }
 
 

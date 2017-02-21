@@ -28,7 +28,7 @@ public:
 	int * getGUIPitchP ();
 	void updateRate ();
 	void updatePitch ();
-	stk::StkFloat tick (unsigned int channel = 0);
+	stk::StkFloat tick (unsigned int channel=0);
 	//void setVolume (StkFloat);
 	//int getAngle (void);
 

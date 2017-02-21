@@ -71,9 +71,7 @@ stk::StkFloat AudioTrack::tick() const
 	sample = 0;
 	for ( unsigned int j = 0; j < clipset_.size (); j++ )
 	{
-		std::shared_ptr<AudioClip> clip = clipset_.at (j);
-		if ( clip -> isPlaying () )
-			sample += clip -> tick () * *(clip -> getVolume ());
+		sample += clipset_.at(j) -> tick();
 	}
 	return sample;
 }
