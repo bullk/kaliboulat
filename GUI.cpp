@@ -123,6 +123,7 @@ void mainMenu ()
 	static bool new_midi_track = false;
 	static bool import_audio_files = false;
 	static bool import_midi_files = false;
+	static bool options = false;
 	bool menu_mask = not(project -> getClock() -> getState());
 	
 	if (ImGui::BeginMenuBar())
@@ -139,7 +140,6 @@ void mainMenu ()
 				Waiter::getInstance()->saveProject();
 			if (ImGui::MenuItem("Save As..", NULL, false, menu_mask)) {}
 			ImGui::Separator();
-			if (ImGui::MenuItem("Options")) {}
 			if (ImGui::MenuItem("Quit", "Alt+F4")) State::getInstance() -> halt();
 			ImGui::EndMenu();
 		}
@@ -154,6 +154,10 @@ void mainMenu ()
 			{
 				//State::scanMidiFiles();
 				import_midi_files = true;
+			}
+			if (ImGui::MenuItem("Options"))
+			{
+				options = true;
 			}
 			ImGui::EndMenu();
 		}
@@ -179,6 +183,7 @@ void mainMenu ()
 	if (new_midi_track) ImGui::OpenPopup("New MIDI track");
 	if (import_audio_files) ImGui::OpenPopup("Import audio files");
 	if (import_midi_files) ImGui::OpenPopup("Import MIDI files");
+	if (options) ImGui::OpenPopup("Options");
 	if (about_open) ImGui::OpenPopup("About");
 	
 	if (ImGui::BeginPopupModal("New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -318,6 +323,26 @@ void mainMenu ()
 		}
 		ImGui::EndPopup();
 	}
+
+	if (ImGui::BeginPopupModal("Options", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Options\n");
+		ImGui::Columns(3, NULL, false);
+		if (ImGui::Button("Save", ImVec2(80,0))) 
+		{
+			State::getInstance() -> saveConfiguration();
+			ImGui::CloseCurrentPopup();
+			options = false;
+		}
+		ImGui::NextColumn(); ImGui::NextColumn(); 
+		if (ImGui::Button("Close", ImVec2(80,0))) 
+		{
+			ImGui::CloseCurrentPopup();
+			options = false;
+		}
+		ImGui::Columns(1);
+		ImGui::EndPopup();
+	}	
 	
 	if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{

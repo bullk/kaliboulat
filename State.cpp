@@ -6,7 +6,7 @@
 #include <ftw.h>
 #include <fnmatch.h>
 #include <libgen.h>
-
+#include <fstream>
 
 // Initialisation du singleton à NULL
 State * State::singleton_ = NULL;
@@ -24,7 +24,7 @@ State::State () : onoff_(true)
 	projectlist_ = new std::vector<std::string>;
 	audiofiles_ = new std::vector<std::string>;
 	midifiles_ = new std::vector<std::string>;
-	loadconf ();
+	loadConfiguration();
 }
 
 // Destructor
@@ -35,30 +35,35 @@ State::~State ()
 	//delete project_;
 }
 
-int State::loadconf()
+std::string State::getConfigurationFileName()
 {
-	auto mainlog= spdlog::get("main");
-	mainlog->info("cleaning mididirs_");
-	mididirs_.clear();
-	mididirs_.push_back(getenv("HOME"));
-	mainlog->info("cleaning audiodirs_");
-	audiodirs_.clear();
-	mainlog->info("opening conf file");
-	FILE * cfile = NULL;
-	char fname[64] = "";
-	sprintf(fname, "%s/.Kaliboulat", getenv("HOME"));
-	cfile = fopen(fname, "r");
-	mainlog->info("reading conf");
-	char buf[256] = "";
-	while (fgets(buf, 256, cfile) != NULL)
-	{
-		char *p = strchr(buf, '\n');
-		if (p) *p = 0;
-		mainlog->info("adding {} to audiodirs_", buf);
-		audiodirs_.push_back(std::string(buf));
-	}
-	fclose (cfile);
-	return 0;
+	char fname[128] = "";
+	sprintf( fname, "%s/.Kaliboulat.xml", getenv("HOME") );
+	return std::string( fname );
+}
+
+void State::loadConfiguration()
+{
+    std::ifstream is( getConfigurationFileName() );
+    cereal::XMLInputArchive archive( is );
+    serialize( archive ); 
+}
+
+void State::saveConfiguration()
+{
+	auto mainlog= spdlog::get( "main" );
+	mainlog->info( "State::saveConfiguration" );
+	mainlog->info( "* audiodirs_ contains {} element(s)", audiodirs_.size() );
+	mainlog->info( "* {}", audiodirs_.at(0) );
+	mainlog->info( "* mididirs_ contains {} element(s)", mididirs_.size() );
+	mainlog->info( "* {}", mididirs_.at(0) );
+	mainlog->info( "* get stream" );
+    std::ofstream os( getConfigurationFileName() );
+	mainlog->info( "* create archive" );
+    cereal::XMLOutputArchive archive( os );
+	mainlog->info( "* serialize" );
+    serialize( archive ); 
+	mainlog->info( "/State::saveConfiguration" );
 }
 
 RtMidiOut * State::getMidiOut()
@@ -72,13 +77,13 @@ void State::setMidiOut( RtMidiOut * midiout )
 }
 
 
-int State::scanProjectsCallback (const char *fpath, const struct stat *sb, int typeflag)
+int State::scanProjectsCallback( const char *fpath, const struct stat *sb, int typeflag )
 {
-	char * localpath = strdup (fpath);
-	if (typeflag == FTW_F) {
-		if (fnmatch("*.kal", localpath, FNM_CASEFOLD) == 0) {
-			std::string str = std::string (basename(localpath));
-			projectlist_ -> push_back(str.substr(0, str.length()-4));
+	char * localpath = strdup( fpath );
+	if ( typeflag == FTW_F ) {
+		if ( fnmatch( "*.kal", localpath, FNM_CASEFOLD ) == 0 ) {
+			std::string str = std::string( basename( localpath ) );
+			projectlist_ -> push_back( str.substr( 0, str.length()-4 ) );
 		}
 	}
 	return 0;
@@ -87,18 +92,18 @@ int State::scanProjectsCallback (const char *fpath, const struct stat *sb, int t
 int State::scanProjects ()
 {
 	projectlist_->clear();
-	ftw(user_dir().c_str(), scanProjectsCallback, 16);
+	ftw( user_dir().c_str(), scanProjectsCallback, 16 );
 	return 0;
 }
 
-int State::scanAudioFilesCallback (const char *fpath, const struct stat *sb, int typeflag)
+int State::scanAudioFilesCallback( const char *fpath, const struct stat *sb, int typeflag )
 {
-	auto mainlog = spdlog::get("main");
-	char * localpath = strdup (fpath);
-	if (typeflag == FTW_F) {
-		if (fnmatch("*.wav", localpath, FNM_CASEFOLD) == 0) {
-			audiofiles_ -> push_back(localpath);
-			mainlog->info("found {}", localpath);
+	auto mainlog = spdlog::get( "main" );
+	char * localpath = strdup( fpath );
+	if ( typeflag == FTW_F ) {
+		if ( fnmatch( "*.wav", localpath, FNM_CASEFOLD ) == 0 ) {
+			audiofiles_ -> push_back( localpath );
+			mainlog->info( "found {}", localpath );
 		}
 	}
 	return 0;
@@ -106,12 +111,12 @@ int State::scanAudioFilesCallback (const char *fpath, const struct stat *sb, int
 
 int State::scanAudioFiles ()
 {
-	auto mainlog = spdlog::get("main");
+	auto mainlog = spdlog::get( "main" );
 	audiofiles_->clear();
 	for ( unsigned int i=0; i< audiodirs_.size(); i++ )
 	{
-		mainlog->info("scanning {}", audiodirs_[i].c_str());
-		ftw(audiodirs_[i].c_str(), scanAudioFilesCallback, 16);
+		mainlog->info( "scanning {}", audiodirs_[i].c_str() );
+		ftw( audiodirs_[i].c_str(), scanAudioFilesCallback, 16 );
 	}
 	return 0;
 }

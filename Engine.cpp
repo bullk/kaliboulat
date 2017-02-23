@@ -116,16 +116,16 @@ void Waiter::newProject( std::string name )
 	//sauvegarder le projet courant
 	//closeProject ();
 	std::shared_ptr<Project> project (new Project (name) );
-	State::setProject (project);
+	State::setProject( project );
 }
 
 void Waiter::loadProject( std::string name )
 {
 	//closeProject ();
-	newProject (name);
-    std::ifstream is(State::getProject()->getFile());
-    cereal::XMLInputArchive archive(is);
-    State::getProject()->serialize(archive); 
+	newProject( name );
+    std::ifstream is( State::getProject()->getFile() );
+    cereal::XMLInputArchive archive( is );
+    State::getProject()->serialize( archive ); 
     //archive(State::getProject()); 
 }
 
@@ -133,7 +133,7 @@ void Waiter::saveProject()
 {
     std::ofstream os( State::getProject()->getFile() );
     cereal::XMLOutputArchive archive( os );
-    State::getProject() -> serialize( archive );
+    State::getProject()->serialize( archive );
     //archive(State::getProject()); 
 }
 
@@ -145,8 +145,8 @@ void Waiter::saveProject()
 
 void copyFile( const char * name_in, const char * name_out )
 {
-    FILE * infile  = fopen(name_in, "rb");
-    FILE * outfile = fopen(name_out, "wb");
+    FILE * infile  = fopen( name_in, "rb" );
+    FILE * outfile = fopen( name_out, "wb" );
      
     char  buffer[1024];
     size_t count_in;
