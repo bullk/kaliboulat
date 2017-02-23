@@ -11,6 +11,14 @@
 
 using namespace std;
 
+
+#define TRACK_WIDTH 150
+#define CLIP_SATURATION 0.8f
+#define TRACK_SATURATION 0.4f
+#define TRACK_VALUE 0.3f
+#define ACTIVE_TRACK_SATURATION 0.5f
+#define ACTIVE_TRACK_VALUE 0.5f
+
 SDL_GLContext glcontext;
 SDL_Window * window = NULL;
 ImVec4 clear_color;
@@ -789,50 +797,63 @@ void ConsoleTitle ()
 
 void SelectConsoleClip (std::shared_ptr<Clip> clip)
 {
-		State::getInstance() -> setClip (clip); 
-		ressources_panel = true;
-		switch (clip -> dataType ())
-		{
-		case AUDIO:	
-			ui.context = Screen::AUDIOCLIP;
-			break;
-		case MIDI:	
-			ui.context = Screen::MIDICLIP;
-			break;
-		default:
-			ui.context = Screen::RESSOURCES;
-		}
+	Waiter::getInstance() -> selectClip( clip ); 
+	ressources_panel = true;
+	switch (clip -> dataType ())
+	{
+	case AUDIO:	
+		ui.context = Screen::AUDIOCLIP;
+		break;
+	case MIDI:	
+		ui.context = Screen::MIDICLIP;
+		break;
+	default:
+		ui.context = Screen::RESSOURCES;
+	}
 }
 
-void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue, float val)
+void ConsoleClip ( std::shared_ptr<Clip> clip, int id, float hue, float val )
 {
-	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 	float sat = CLIP_SATURATION;
-	ImGui::PushID (id);
-	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(hue, sat, val));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(hue, sat, val));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(hue, sat, val));
+	ImGui::PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
+	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2(10, 0) );
+	ImGui::BeginChild( id, ImVec2(0, 30) );
+	ImGui::PushStyleColor( ImGuiCol_Button, ImColor::HSV( hue, sat, val ) );
+	ImGui::PushStyleColor( ImGuiCol_ButtonHovered, ImColor::HSV( hue, sat, val ) );
+	ImGui::PushStyleColor( ImGuiCol_ButtonActive, ImColor::HSV( hue, sat, val ) );
 	if ( ImGui::Button(">") ) clip -> arm() ; 
 	ImGui::SameLine ();
 	ImGui::ProgressBar( clip->getProgress(), ImVec2( 100, 0.f ), clip->getName().c_str() );
-	ImGui::SameLine ();
-	if ( ImGui::Button ("§", ImVec2(-1.0f, 0.0f)) ) 
-		SelectConsoleClip( clip );
+	ImGui::SameLine();
 	ImGui::PopStyleColor(3);
-	ImGui::PopID ();
-	ImGui::PopStyleVar ();
+	if ( ImGui::IsMouseHoveringWindow () )
+	{
+		if ( ImGui::IsMouseClicked (0) )
+			SelectConsoleClip( clip );
+		//else if ( ImGui::IsMouseClicked (1) ) 
+			//ImGui::OpenPopup( "popup-midiclip" );
+	}
+	//if ( ImGui::BeginPopup( "popup-midiclip" ) )
+	//{
+		//if ( ImGui::Selectable( "delete this clip" ) )
+		//{
+		//}
+		//ImGui::EndPopup();
+	//}
+	ImGui::EndChild();
+	ImGui::PopStyleVar(2);
 }
 
-void ConsoleScreen (std::shared_ptr<Project> project) 
+void ConsoleScreen( std::shared_ptr<Project> project ) 
 {	
-	BeginScreen ();
-	mainMenu ();
-	ControlPanel (ConsoleTitle);
+	BeginScreen();
+	mainMenu();
+	ControlPanel( ConsoleTitle );
 	
 	if ( ressources_panel )
 	{
-		RessourcesPanel (project);
-		ImGui::SameLine ();
+		RessourcesPanel( project );
+		ImGui::SameLine();
 	}
 	int w = ressources_panel * width5;
 	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
@@ -851,7 +872,7 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 		if ( action_drag_clip and ui.dragged_clip.dt != track->dataType() ) 
 		{
 			ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImColor::HSV(0.0f, 0.0f, 0.15f));
-			ImGui::BeginChild (child_id, ImVec2(180, 0), true);
+			ImGui::BeginChild (child_id, ImVec2(TRACK_WIDTH, 0), true);
 			ImGui::EndChild ();
 			ImGui::PopStyleColor ();
 		}
@@ -870,7 +891,7 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 			// begining TrackUI
 			ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
 			ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, color_bg);
-			ImGui::BeginChild (child_id, ImVec2(150, 0), true);
+			ImGui::BeginChild (child_id, ImVec2(TRACK_WIDTH, 0), true);
 			ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(8, 8));
 
 			if ( ImGui::Button("X") ) project -> deleteTrack (i); // track delete button
