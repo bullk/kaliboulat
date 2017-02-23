@@ -45,8 +45,16 @@ std::string State::getConfigurationFileName()
 void State::loadConfiguration()
 {
     std::ifstream is( getConfigurationFileName() );
-    cereal::XMLInputArchive archive( is );
-    serialize( archive ); 
+    if ( is.is_open() )
+    {
+		cereal::XMLInputArchive archive( is );
+		serialize( archive );
+	}
+	else
+	{
+		audiodirs_.push_back( std::string( getenv( "HOME" ) ) );
+		mididirs_.push_back( std::string( getenv( "HOME" ) ) );
+	}
 }
 
 void State::saveConfiguration()
