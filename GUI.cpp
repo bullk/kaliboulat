@@ -806,6 +806,7 @@ void SelectConsoleClip (std::shared_ptr<Clip> clip)
 
 void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue, float val)
 {
+	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(2, 2));
 	float sat = CLIP_SATURATION;
 	ImGui::PushID (id);
 	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(hue, sat, val));
@@ -813,11 +814,13 @@ void ConsoleClip (std::shared_ptr<Clip> clip, int id, float hue, float val)
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(hue, sat, val));
 	if ( ImGui::Button(">") ) clip -> arm() ; 
 	ImGui::SameLine ();
-	//if ( ImGui::Button (clip -> getName().c_str(), ImVec2(-1.0f, 0.0f)) ) 
-		//SelectConsoleClip( clip );
 	ImGui::ProgressBar( clip->getProgress(), ImVec2( 100, 0.f ), clip->getName().c_str() );
+	ImGui::SameLine ();
+	if ( ImGui::Button ("§", ImVec2(-1.0f, 0.0f)) ) 
+		SelectConsoleClip( clip );
 	ImGui::PopStyleColor(3);
 	ImGui::PopID ();
+	ImGui::PopStyleVar ();
 }
 
 void ConsoleScreen (std::shared_ptr<Project> project) 
@@ -848,7 +851,7 @@ void ConsoleScreen (std::shared_ptr<Project> project)
 		if ( action_drag_clip and ui.dragged_clip.dt != track->dataType() ) 
 		{
 			ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImColor::HSV(0.0f, 0.0f, 0.15f));
-			ImGui::BeginChild (child_id, ImVec2(150, 0), true);
+			ImGui::BeginChild (child_id, ImVec2(180, 0), true);
 			ImGui::EndChild ();
 			ImGui::PopStyleColor ();
 		}
