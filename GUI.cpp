@@ -22,6 +22,9 @@ using namespace std;
 SDL_GLContext glcontext;
 SDL_Window * window = NULL;
 ImVec4 clear_color;
+ImVec4 SELECTED_CLIP_BORDER = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+ImVec4 CLIP_BUTTON_BG = ImVec4(0.2f, 0.2f, 0.2f, 1.0f);
+
 //Screen ui = { Screen::CONSOLE, Screen::RESSOURCES, 0, 0, NULL, NULL, NULL };
 //Screen ui = { Screen::CONSOLE, Screen::RESSOURCES, NULL, NULL };
 Screen ui = { Screen::CONSOLE, Screen::RESSOURCES, NULL, { NONE, "", 0} };
@@ -85,22 +88,18 @@ void BeginScreen ()
 	flags |= ImGuiWindowFlags_NoCollapse;
 	flags |= ImGuiWindowFlags_MenuBar;
 	
-	ImGui::SetNextWindowSize(ImVec2((int)ImGui::GetIO().DisplaySize.x,(int)ImGui::GetIO().DisplaySize.y));
-	ImGui::SetNextWindowPos(ImVec2(0,0));
+	ImGui::SetNextWindowSize( ImVec2( (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y ) );
+	ImGui::SetNextWindowPos( ImVec2( 0, 0 ) );
 	
-	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
+	ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2(10, 10) );
 	ImGui::Begin("main window", NULL, flags);
 	ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, PAD_COLOR);
 	ImGui::PushStyleColor (ImGuiCol_Border, PAD_COLOR);
-	ImGui::PushStyleVar (ImGuiStyleVar_ChildWindowRounding, 10.0f);
-	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(10, 10));
-	ImGui::PushStyleVar (ImGuiStyleVar_FrameRounding, 5.0f);
+	ImGui::PushStyleVar( ImGuiStyleVar_ChildWindowRounding, 5.0f );
+	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2(10, 10) );
+	ImGui::PushStyleVar( ImGuiStyleVar_FrameRounding, 5.0f);
 	
-	//width1 = (int)ImGui::GetIO().DisplaySize.x / 6;
-	//width2 = (int)ImGui::GetIO().DisplaySize.x / 3;
-	//width3 = (int)ImGui::GetIO().DisplaySize.x / 2;
-	//width4 = 2 * (int)ImGui::GetIO().DisplaySize.x / 3;
-	//width5 = 5 * (int)ImGui::GetIO().DisplaySize.x / 6;
+	//int w = (int)ImGui::GetIO().DisplaySize.x;
 	int w = (int) ImGui::GetWindowContentRegionWidth();
 	width1 = w / 6;
 	width2 = w / 3;
@@ -815,17 +814,26 @@ void SelectConsoleClip (std::shared_ptr<Clip> clip)
 void ConsoleClip ( std::shared_ptr<Clip> clip, int id, float hue, float val )
 {
 	float sat = CLIP_SATURATION;
-	ImGui::PushStyleVar( ImGuiStyleVar_WindowRounding, 0.0f );
-	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2(10, 0) );
-	ImGui::BeginChild( id, ImVec2(0, 30) );
+	bool selected = false;
+	
+	if ( State::getInstance()->getClip() == clip ) selected = true;
+	if ( selected ) ImGui::PushStyleColor( ImGuiCol_Border, SELECTED_CLIP_BORDER );
+	ImGui::PushStyleVar( ImGuiStyleVar_ChildWindowRounding, 0.0f );
+	ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 0, 0 ) );
+	ImGui::PushStyleVar( ImGuiStyleVar_FrameRounding, 0.0f );
+	ImGui::BeginChild( id, ImVec2( 0, 20 ), true );
+	
+	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 2, 0 ) );
 	ImGui::PushStyleColor( ImGuiCol_Button, ImColor::HSV( hue, sat, val ) );
 	ImGui::PushStyleColor( ImGuiCol_ButtonHovered, ImColor::HSV( hue, sat, val ) );
 	ImGui::PushStyleColor( ImGuiCol_ButtonActive, ImColor::HSV( hue, sat, val ) );
 	if ( ImGui::Button(">") ) clip -> arm() ; 
-	ImGui::SameLine ();
-	ImGui::ProgressBar( clip->getProgress(), ImVec2( 100, 0.f ), clip->getName().c_str() );
+	ImGui::SameLine();
+	ImGui::ProgressBar( clip->getProgress(), ImVec2( -1, 0 ), clip->getName().c_str() );
 	ImGui::SameLine();
 	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar();
+	
 	if ( ImGui::IsMouseHoveringWindow () )
 	{
 		if ( ImGui::IsMouseClicked (0) )
@@ -840,8 +848,10 @@ void ConsoleClip ( std::shared_ptr<Clip> clip, int id, float hue, float val )
 		//}
 		//ImGui::EndPopup();
 	//}
+	
 	ImGui::EndChild();
-	ImGui::PopStyleVar(2);
+	ImGui::PopStyleVar(3);
+	if ( selected )	ImGui::PopStyleColor();
 }
 
 void ConsoleScreen( std::shared_ptr<Project> project ) 
@@ -856,12 +866,12 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 		ImGui::SameLine();
 	}
 	int w = ressources_panel * width5;
-	ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::BeginChild ("Board", ImVec2(w-3, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 0, 0 ) );
+	ImGui::BeginChild( "Board", ImVec2( w-3, 0 ), false, ImGuiWindowFlags_HorizontalScrollbar );
+	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 0, 0 ) );
 	// DISPLAYING TRACKS
 	std::shared_ptr<Track> asking_track = NULL;
-	for (unsigned int i=0; i < project -> nTracks (); i++)
+	for ( unsigned int i=0; i < project -> nTracks (); i++ )
 	{
 		std::shared_ptr<Track> track = project -> getTrack(i);
 		// track name/id
@@ -871,10 +881,10 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 		if ( i > 0 ) ImGui::SameLine ();
 		if ( action_drag_clip and ui.dragged_clip.dt != track->dataType() ) 
 		{
-			ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, ImColor::HSV(0.0f, 0.0f, 0.15f));
-			ImGui::BeginChild (child_id, ImVec2(TRACK_WIDTH, 0), true);
-			ImGui::EndChild ();
-			ImGui::PopStyleColor ();
+			ImGui::PushStyleColor( ImGuiCol_ChildWindowBg, ImColor::HSV( 0.0f, 0.0f, 0.15f ) );
+			ImGui::BeginChild( child_id, ImVec2( TRACK_WIDTH, 0 ), true );
+			ImGui::EndChild();
+			ImGui::PopStyleColor();
 		}
 		else
 		{
@@ -887,12 +897,12 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 				saturation = ACTIVE_TRACK_SATURATION;
 				value = ACTIVE_TRACK_VALUE;
 			}
-			ImColor color_bg = ImColor::HSV(track -> getHue (), saturation, value, alpha);
+			ImColor color_bg = ImColor::HSV( track -> getHue (), saturation, value, alpha );
 			// begining TrackUI
-			ImGui::PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-			ImGui::PushStyleColor (ImGuiCol_ChildWindowBg, color_bg);
-			ImGui::BeginChild (child_id, ImVec2(TRACK_WIDTH, 0), true);
-			ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(8, 8));
+			ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2(5, 5) );
+			ImGui::PushStyleColor( ImGuiCol_ChildWindowBg, color_bg );
+			ImGui::BeginChild( child_id, ImVec2( TRACK_WIDTH, 0 ), true );
+			ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2(8, 8) );
 
 			if ( ImGui::Button("X") ) project -> deleteTrack (i); // track delete button
 			else
