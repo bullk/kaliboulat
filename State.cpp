@@ -55,6 +55,7 @@ void State::loadConfiguration()
 		audiodirs_.push_back( std::string( getenv( "HOME" ) ) );
 		mididirs_.push_back( std::string( getenv( "HOME" ) ) );
 	}
+	saveConfiguration();
 }
 
 void State::saveConfiguration()
