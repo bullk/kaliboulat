@@ -205,7 +205,9 @@ int main( int argc, char* args[] )
 	
 	//mainlog->info("...MIDI module");
 	//midiInit ();
-
+	mainlog->info("creating MidiWaiter");
+	MidiWaiter * midi_waiter = MidiWaiter::getInstance();
+	
 	mainlog->info("----- GUI init -----");
 	// GUI INIT
 	#ifdef WITH_GUI
@@ -228,7 +230,7 @@ int main( int argc, char* args[] )
 				Waiter::getInstance() -> tick();
 		}
 		
-		// Waiter
+		// Waiters
 		waiter -> main ();
 		
 		// GUI
@@ -259,6 +261,8 @@ int main( int argc, char* args[] )
 	//mainlog->info("deleting project");
 	//delete project;
 	//waiter -> closeProject();
+	mainlog->info("killing MidiWaiter");
+	midi_waiter -> kill ();
 	mainlog->info("deleting RtMidiIn");
 	delete midiin;
 	mainlog->info("deleting RtMidiOut");

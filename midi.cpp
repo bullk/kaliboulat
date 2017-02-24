@@ -11,9 +11,9 @@ void midiInit ()
 
 void midiPanic (RtMidiOut * midiout)
 {
-	std::vector<unsigned char> cc121 { 0xB0, 0x79, 0x00 }; // Channel 1, all CC OFF
-	std::vector<unsigned char> cc123 { 0xB0, 0x7B, 0x00 }; // Channel 1, all notes OFF
-	std::vector<unsigned char> message;
+	MidiRaw cc121 { 0xB0, 0x79, 0x00 }; // Channel 1, all CC OFF
+	MidiRaw cc123 { 0xB0, 0x7B, 0x00 }; // Channel 1, all notes OFF
+	MidiRaw message;
 	
 	for (unsigned short i=0; i<16; i++)
 	{
@@ -26,96 +26,96 @@ void midiPanic (RtMidiOut * midiout)
 	}
 }
 
-void midiCallback (double timeStamp, std::vector< unsigned char > *message, void *userData)
+void midiCallback (double timeStamp, MidiRaw *message, void *userData)
 {
 	unsigned int high_digit = message->at(0) >> 4;
 	unsigned int low_digit = message->at(0) & 0xF;
 	switch ( high_digit )
 	{
 		case 0x8: // note off
-			std::cout << "channel " << low_digit +1
-				<< " NOTE OFF " << (unsigned int)message->at(1)
-				<< std::endl;
+			//std::cout << "channel " << low_digit +1
+				//<< " NOTE OFF " << (unsigned int)message->at(1)
+				//<< std::endl;
 			break;
 		case 0x9: // note on
-			std::cout << "channel " << low_digit +1
-				<< " NOTE ON " << (unsigned int)message->at(1)
-				<< " velocity " << (unsigned int)message->at(2)
-				<< std::endl;
+			//std::cout << "channel " << low_digit +1
+				//<< " NOTE ON " << (unsigned int)message->at(1)
+				//<< " velocity " << (unsigned int)message->at(2)
+				//<< std::endl;
 			break;
 		case 0xA: // polyphonic after touch
-			std::cout << "channel " << low_digit +1
-				<< " polyphonic after touch note " << (unsigned int)message->at(1)
-				<< " pressure " << (unsigned int)message->at(2)
-				<< std::endl;
+			//std::cout << "channel " << low_digit +1
+				//<< " polyphonic after touch note " << (unsigned int)message->at(1)
+				//<< " pressure " << (unsigned int)message->at(2)
+				//<< std::endl;
 			break;
 		case 0xB: // control change
-			std::cout << "channel " << low_digit +1
-				<< " controller " << (unsigned int)message->at(1)
-				<< " value " << (unsigned int)message->at(2)
-				<< std::endl;
+			//std::cout << "channel " << low_digit +1
+				//<< " controller " << (unsigned int)message->at(1)
+				//<< " value " << (unsigned int)message->at(2)
+				//<< std::endl;
 			break;
 		case 0xC: // program change
-			std::cout << "channel " << low_digit +1
-				<< " program change " << (unsigned int)message->at(1)
-				<< std::endl;
+			//std::cout << "channel " << low_digit +1
+				//<< " program change " << (unsigned int)message->at(1)
+				//<< std::endl;
 			break;
 		case 0xD: // channel after touch
-			std::cout << "channel " << low_digit +1
-				<< " after touch " << (unsigned int)message->at(1)
-				<< std::endl;
+			//std::cout << "channel " << low_digit +1
+				//<< " after touch " << (unsigned int)message->at(1)
+				//<< std::endl;
 			break;
 		case 0xE: // pitch bend
-			std::cout << "channel " << low_digit +1
-				<< " pitch bend " << (unsigned int)message->at(2)
-				<< std::endl;
+			//std::cout << "channel " << low_digit +1
+				//<< " pitch bend " << (unsigned int)message->at(2)
+				//<< std::endl;
 			break;
 		case 0xF: // system message
 			switch ( low_digit )
 			{
 				case 0x0:
-					std::cout << "SYSEX" << std::endl;
+					//std::cout << "SYSEX" << std::endl;
 					break;
 				case 0x1:
-					std::cout << "MTC" << std::endl;
+					//std::cout << "MTC" << std::endl;
 					break;
 				case 0x2:
-					std::cout << "Song Position" << std::endl;
+					//std::cout << "Song Position" << std::endl;
 					break;
 				case 0x3:
-					std::cout << "Song Select" << std::endl;
+					//std::cout << "Song Select" << std::endl;
 					break;
 				case 0x6:
-					std::cout << "Tune request" << std::endl;
+					//std::cout << "Tune request" << std::endl;
 					break;
 				case 0x8:
-					std::cout << "Timing clock" << std::endl;
+					//std::cout << "Timing clock" << std::endl;
 					break;
 				case 0x9:
-					std::cout << "Mesure end" << std::endl;
+					//std::cout << "Mesure end" << std::endl;
 					break;
 				case 0xA:
-					std::cout << "Start" << std::endl;
+					//std::cout << "Start" << std::endl;
 					break;
 				case 0xB:
-					std::cout << "Continue" << std::endl;
+					//std::cout << "Continue" << std::endl;
 					break;
 				case 0xC:
-					std::cout << "Stop" << std::endl;
+					//std::cout << "Stop" << std::endl;
 					break;
 				case 0xE:
-					std::cout << "Active sensing" << std::endl;
+					//std::cout << "Active sensing" << std::endl;
 					break;
 				case 0xF:
-					std::cout << "System reset" << std::endl;
+					//std::cout << "System reset" << std::endl;
 					break;
 				default:
-					std::cout << "WARNING : unknown MIDI data" << std::endl;
+					//std::cout << "WARNING : unknown MIDI data" << std::endl;
 					break;
 			}
 			break;
 		default:
-			std::cout << "WARNING : unknown MIDI data" << std::endl;
+			//std::cout << "WARNING : unknown MIDI data" << std::endl;
 			break;
 	}
 	//State::getInstance() -> midiLog (message);
@@ -127,7 +127,7 @@ void midiCallback (double timeStamp, std::vector< unsigned char > *message, void
 // Constructor 
 //-------------
 
-MidiMessage::MidiMessage (std::vector<unsigned char> data) :
+MidiMessage::MidiMessage (MidiRaw data) :
 	data_(data)
 {
 }
@@ -143,7 +143,7 @@ MidiMessage::~MidiMessage ()
 
 //------------
 
-std::string char_vector_to_hex (std::vector<unsigned char> v)
+std::string char_vector_to_hex (MidiRaw v)
 {
 	std::string s = "";
 	char buf[4];
@@ -168,7 +168,7 @@ std::string MidiMessage::hexData ()
 // Constructor 
 //-------------
 
-ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, std::vector<unsigned char> data) :
+ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, MidiRaw data) :
 	Scheduled (time), MidiMessage (data)
 {
 	auto mainlog= spdlog::get("main");	
@@ -192,3 +192,41 @@ ScheduledMidiMessage::~ScheduledMidiMessage ()
 
 //------------
 
+MidiRaw note_on_trigger (char channel, char key)
+{
+	MidiRaw trigger;
+	trigger.push_back((9<<4) + channel-1);
+	trigger.push_back(key);
+	return trigger;
+}
+
+MidiRaw note_off_trigger (char channel, char key)
+{
+	MidiRaw trigger;
+	trigger.push_back((8<<4) + channel-1);
+	trigger.push_back(key);
+	return trigger;
+}
+
+//------------
+
+// Initialisation du singleton à NULL
+MidiWaiter *MidiWaiter::singleton_ = NULL;
+
+// Constructor
+MidiWaiter::MidiWaiter ()
+{
+}
+
+// Destructor
+MidiWaiter::~MidiWaiter ()
+{
+}
+
+void MidiWaiter::addCommand( MidiRaw mr, BaseCommand * c )
+{
+}
+
+void MidiWaiter::deleteCommand( MidiRaw mr, BaseCommand * c )
+{
+}

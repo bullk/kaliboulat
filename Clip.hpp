@@ -17,9 +17,9 @@ public:
 	const char * loopText[3] = { "ONESHOT", "MANY", "FOREVER" };
 	
 public:	
-	Clip ();
-	Clip (std::string);
-	Clip (std::string, int, int, int);
+	Clip();
+	Clip( std::string );
+	Clip( std::string, int, int, int, char );
 	virtual ~Clip ();
 	inline DataType dataType () { return data_type_; }
 	inline ClipState getState () { return state_; }
@@ -27,9 +27,12 @@ public:
 	inline void select () { selected_ = true; }
 	inline void unselect () { selected_ = false; }
 	inline bool isSelected () { return selected_; }
-	void arm ();
 	inline void play () { state_ = PLAYING; }
 	inline void stop () { state_ = HALTED; }
+	void armLaunch();
+	void armStop();
+	void arm ();
+	void MIDIKey(char k);
 	inline virtual std::string getFileName ()  { return filename_; }
 	inline virtual std::string getName () { return name_; }
 	inline virtual void setName (std::string s) { name_ = s; }
@@ -54,8 +57,10 @@ protected:
 	ClipState state_;
 	std::string name_, filename_;
 	int launchstyle_, stopstyle_, loopstyle_;
+	char armMIDIchannel_, armMIDIkey_;
 	bool selected_;
 	float progress_;
+
 	//int angle_;
 	
 };

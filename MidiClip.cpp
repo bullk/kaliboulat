@@ -32,8 +32,8 @@ MidiClip::MidiClip( std::string filename, int tn ) : Clip(), divscale_(1)
 	getEventsFromSource( true );
 }
 
-MidiClip::MidiClip( std::string filename, int tn, std::string name, int launch, int stop, int loop ) :
-	Clip( name, launch, stop, loop ), divscale_(1)
+MidiClip::MidiClip( std::string filename, int tn, std::string name, int launch, int stop, int loop, char amk ) :
+	Clip( name, launch, stop, loop, amk ), divscale_(1)
 {
 	data_type_ = MIDI;
 	filename_ = name_from_path( filename );

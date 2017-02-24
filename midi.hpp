@@ -3,17 +3,18 @@
 
 #include <string>
 #include <vector>
+#include <map>
 //#include <memory>
 #include <RtMidi.h>
 #include "Scheduled.hpp"
-
+#include "Engine.hpp"
 
 typedef std::vector<unsigned char> MidiRaw;
 
 void midiInit ();
 void midiPanic (RtMidiOut * midiout);
-void midiCallback (double timeStamp, std::vector< unsigned char > *message, void *userData);
-std::string char_vector_to_hex (std::vector<unsigned char> v);
+void midiCallback (double timeStamp, MidiRaw *message, void *userData);
+std::string char_vector_to_hex (MidiRaw v);
 
 // MIDI message types filtered by status byte, sorted by categories (events, channel mode, system common, realtime)
 // source : https://www.midi.org/specifications/item/table-1-summary-of-midi-message
@@ -27,19 +28,18 @@ enum MidiMessageType { MMT_NOTE_OFF, MMT_NOTE_ON, MMT_AFTERTOUCH, MMT_CONTROL_CH
 class MidiMessage
 {
 public:
-	MidiMessage( std::vector<unsigned char> data );
+	MidiMessage( MidiRaw data );
 	~MidiMessage();
-	inline std::vector<unsigned char> * getData() { return &data_; }
+	inline MidiRaw * getData() { return &data_; }
 	std::string hexData();
-	inline bool equals( std::vector<unsigned char> * const & v ) const { return data_ == *v; }
+	inline bool equals( MidiRaw * const & v ) const { return data_ == *v; }
 	
 protected:
 	int type;
-	std::vector<unsigned char> data_;
-	
+	MidiRaw data_;
 };
 
-inline bool operator==( MidiMessage const & m, std::vector<unsigned char> * const & v )
+inline bool operator==( MidiMessage const & m, MidiRaw * const & v )
 {
 	return m.equals(v);
 }
@@ -47,7 +47,7 @@ inline bool operator==( MidiMessage const & m, std::vector<unsigned char> * cons
 class ScheduledMidiMessage : public Scheduled, public MidiMessage
 {
 public:
-	ScheduledMidiMessage (long unsigned int time, std::vector<unsigned char> data);
+	ScheduledMidiMessage (long unsigned int time, MidiRaw data);
 	~ScheduledMidiMessage ();
 
 protected:
@@ -55,6 +55,43 @@ protected:
 
 };
 
+MidiRaw note_on_trigger (char, char) ;
+
+MidiRaw note_off_trigger (char, char) ;
+
+class MidiWaiter
+{
+public:
+	void addCommand( MidiRaw, BaseCommand * );
+	void deleteCommand( MidiRaw, BaseCommand * );
+
+	// Singleton
+	static MidiWaiter *getInstance ()
+	{
+		if ( NULL == singleton_ )
+			singleton_ =  new MidiWaiter;
+
+		return singleton_;
+	}
+
+	static void kill ()
+	{
+		if ( NULL != singleton_ )
+			{
+				delete singleton_;
+				singleton_ = NULL;
+			}
+	}
+	
+private:
+	// Constructor
+	MidiWaiter ();
+	// Destructor
+	~MidiWaiter ();
+	std::map<MidiRaw, std::vector<BaseCommand>> filters_;
+	static MidiWaiter * singleton_;
+	
+};
 
 #endif
 

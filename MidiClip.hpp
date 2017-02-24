@@ -18,7 +18,7 @@ class MidiClip : public Clip
 public:
 	MidiClip (std::string);
 	MidiClip (std::string, int);
-	MidiClip (std::string, int, std::string, int, int, int);
+	MidiClip (std::string, int, std::string, int, int, int, char);
 	~MidiClip ();
 	inline unsigned long getLength () { return length_; }
 	inline void setLength (unsigned long l) { length_ = l; }
@@ -34,7 +34,7 @@ public:
 	inline ScheduledMidiMessage * getEvent (unsigned long i) { return &events_[i]; }
 	void rewind ();
 	void tick (RtMidiOut *);
-	void appendEvent (unsigned long time, std::vector<unsigned char> * event);
+	void appendEvent (unsigned long time, MidiRaw * event);
 	
     template<class Archive>
 	void serialize(Archive & archive)
@@ -45,7 +45,8 @@ public:
 			CEREAL_NVP(name_),
 			CEREAL_NVP(launchstyle_),
 			CEREAL_NVP(stopstyle_),
-			CEREAL_NVP(loopstyle_)
+			CEREAL_NVP(loopstyle_),
+			CEREAL_NVP(armMIDIkey_)
 		);
 	}
 
@@ -54,8 +55,9 @@ public:
 	{
 		std::string filename, name;
 		int tracknum, launchstyle, stopstyle, loopstyle;
-		archive ( filename, tracknum, name, launchstyle, stopstyle, loopstyle );
-		construct ( filename, tracknum, name, launchstyle, stopstyle, loopstyle );
+		char amk;
+		archive ( filename, tracknum, name, launchstyle, stopstyle, loopstyle, amk );
+		construct ( filename, tracknum, name, launchstyle, stopstyle, loopstyle, amk );
 	}
 	
 protected:
