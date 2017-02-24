@@ -52,7 +52,7 @@ Waiter::~Waiter ()
 
 //-------------------------------------------------------
 
-
+// TODO : deplacer la fonction midiPanic dans MidiModule
 void Waiter::panic()
 {
 	midiPanic( State::getInstance()->getMidiOut() );

@@ -48,7 +48,7 @@ MidiTrack.o: MidiTrack.hpp State.hpp MidiClip.hpp Track.hpp
 Modules.o: Modules.hpp globals.h AudioTrack.hpp MidiTrack.hpp 
 Project.o: Project.hpp Clock.hpp State.hpp Modules.hpp AudioFile.hpp MidiFile.hpp globals.h Track.hpp Clock.hpp 
 Scheduled.o: Scheduled.hpp 
-State.o: State.hpp Project.hpp 
+State.o: State.hpp Project.hpp cereal/types/vector.hpp cereal/types/string.hpp 
 Track.o: Track.hpp globals.h Clip.hpp 
 #AUTODEPS
 

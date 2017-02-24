@@ -27,10 +27,11 @@ enum MidiMessageType { MMT_NOTE_OFF, MMT_NOTE_ON, MMT_AFTERTOUCH, MMT_CONTROL_CH
 class MidiMessage
 {
 public:
-	MidiMessage (std::vector<unsigned char> data);
-	~MidiMessage ();
-	inline std::vector<unsigned char> * getData () { return &data_; }
-	std::string hexData ();
+	MidiMessage( std::vector<unsigned char> data );
+	~MidiMessage();
+	inline std::vector<unsigned char> * getData() { return &data_; }
+	std::string hexData();
+	inline bool equals( std::vector<unsigned char> * const & v ) const { return data_ == *v; }
 	
 protected:
 	int type;
@@ -38,7 +39,10 @@ protected:
 	
 };
 
-
+inline bool operator==( MidiMessage const & m, std::vector<unsigned char> * const & v )
+{
+	return m.equals(v);
+}
 
 class ScheduledMidiMessage : public Scheduled, public MidiMessage
 {
