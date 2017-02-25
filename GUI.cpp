@@ -682,22 +682,27 @@ void ClipProperties (std::shared_ptr<Clip> clip)
 	mainlog->debug("ClipProperties");
 	mainlog->debug("* name");
 	ImGui::Text("%s", clip -> getName().c_str());
-	ImGui::Columns(4, NULL, false);
+	ImGui::Columns(3, NULL, false);
 	mainlog->debug("* launch");
 	ImGui::PushID("launch"); ImGui::Text("Launch"); ImGui::NextColumn();
 	if ( ImGui::Button(clip -> getLaunchStyleText()) ) clip -> nextLaunchStyle();
-	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
+	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
 	mainlog->debug("* stop");
 	ImGui::PushID("stop"); ImGui::Text("Stop"); ImGui::NextColumn();
 	if ( ImGui::Button(clip -> getStopStyleText()) ) clip -> nextStopStyle();
-	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
+	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
 	mainlog->debug("* loop");
 	ImGui::PushID("loop"); ImGui::Text("Loop"); ImGui::NextColumn();
 	if ( ImGui::Button(clip -> getLoopStyleText()) ) clip -> nextLoopStyle();
-	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
+	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
+	mainlog->debug("* armMIDIchannel");
+	ImGui::DragInt("channel", clip->getArmMIDIChannelP(), 1.0f, 1, 16);
+	ImGui::NextColumn();
+	mainlog->debug("* armMIDIkey");
+	ImGui::DragInt("key", clip->getArmMIDIKeyP(), 1.0f, 0, 127);
+	//mainlog->debug("* path");
+	//ImGui::Text("%s", clip -> getFileName().c_str());
 	ImGui::Columns(1);
-	mainlog->debug("* path");
-	ImGui::Text("%s", clip -> getFileName().c_str());
 	mainlog->debug("/ClipProperties");
 }
 

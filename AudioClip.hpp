@@ -17,7 +17,7 @@ class AudioClip : public Clip, public stk::FileWvIn
 	
 public:
 	AudioClip (std::string);
-	AudioClip (std::string, std::string, int, int, int, char, float, float, int);
+	AudioClip (std::string, std::string, int, int, int, int, float, float, int);
 	~AudioClip ();
 	unsigned long getLength ();
 	stk::StkFloat getTime ();

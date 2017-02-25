@@ -192,7 +192,7 @@ ScheduledMidiMessage::~ScheduledMidiMessage ()
 
 //------------
 
-MidiRaw note_on_trigger (char channel, char key)
+MidiRaw note_on_trigger (int channel, int key)
 {
 	MidiRaw trigger;
 	trigger.push_back((9<<4) + channel-1);
@@ -200,7 +200,7 @@ MidiRaw note_on_trigger (char channel, char key)
 	return trigger;
 }
 
-MidiRaw note_off_trigger (char channel, char key)
+MidiRaw note_off_trigger (int channel, int key)
 {
 	MidiRaw trigger;
 	trigger.push_back((8<<4) + channel-1);

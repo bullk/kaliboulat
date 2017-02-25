@@ -18,7 +18,7 @@ class MidiClip : public Clip
 public:
 	MidiClip (std::string);
 	MidiClip (std::string, int);
-	MidiClip (std::string, int, std::string, int, int, int, char);
+	MidiClip (std::string, int, std::string, int, int, int, int);
 	~MidiClip ();
 	inline unsigned long getLength () { return length_; }
 	inline void setLength (unsigned long l) { length_ = l; }

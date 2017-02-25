@@ -19,7 +19,7 @@ public:
 public:	
 	Clip();
 	Clip( std::string );
-	Clip( std::string, int, int, int, char );
+	Clip( std::string, int, int, int, int );
 	virtual ~Clip ();
 	inline DataType dataType () { return data_type_; }
 	inline ClipState getState () { return state_; }
@@ -48,6 +48,8 @@ public:
 	inline virtual const char* getLoopStyleText () { return loopText[loopstyle_]; }
 	inline virtual void setLoopStyle (int ls) { launchstyle_ = ls; }
 	inline virtual void nextLoopStyle () { loopstyle_ = (loopstyle_ + 1) % 3; }
+	inline int * getArmMIDIChannelP () { return &armMIDIchannel_; }
+	inline int * getArmMIDIKeyP () { return &armMIDIkey_; }
 	virtual unsigned long getLength() = 0;
 	virtual float getProgress() = 0;
 	//virtual int getAngle (void) = 0;
@@ -57,7 +59,7 @@ protected:
 	ClipState state_;
 	std::string name_, filename_;
 	int launchstyle_, stopstyle_, loopstyle_;
-	char armMIDIchannel_, armMIDIkey_;
+	int armMIDIchannel_, armMIDIkey_;
 	bool selected_;
 	float progress_;
 

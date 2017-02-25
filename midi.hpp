@@ -55,9 +55,9 @@ protected:
 
 };
 
-MidiRaw note_on_trigger (char, char) ;
+MidiRaw note_on_trigger (int, int) ;
 
-MidiRaw note_off_trigger (char, char) ;
+MidiRaw note_off_trigger (int, int) ;
 
 class MidiWaiter
 {

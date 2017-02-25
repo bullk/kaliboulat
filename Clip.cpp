@@ -13,7 +13,7 @@ Clip::Clip (std::string name) : state_(HALTED), name_(name), filename_(""), armM
 {
 }
 
-Clip::Clip (std::string name, int launch, int stop, int loop, char armkey) :
+Clip::Clip (std::string name, int launch, int stop, int loop, int armkey) :
 	state_(HALTED), name_(name), filename_(""),
 	launchstyle_(launch), stopstyle_(stop), loopstyle_(loop), armMIDIchannel_(1), armMIDIkey_(armkey), selected_(false)
 {
@@ -75,7 +75,11 @@ void Clip::MIDIKey( char k )
 	//interrupteur sans maintien
 	if ( k >= 0 )
 	{
-		MidiWaiter::getInstance() -> addCommand( note_on_trigger(armMIDIchannel_, armMIDIkey_), new Command<Clip*, void(Clip::*)()>(this, &Clip::armLaunch) );
-		MidiWaiter::getInstance() -> addCommand( note_off_trigger(armMIDIchannel_, armMIDIkey_), new Command<Clip*, void(Clip::*)()>(this, &Clip::armStop) );
+		MidiWaiter::getInstance() -> addCommand(
+			note_on_trigger(armMIDIchannel_, armMIDIkey_),
+			new Command<Clip*, void(Clip::*)()>(this, &Clip::armLaunch) );
+		MidiWaiter::getInstance() -> addCommand(
+			note_off_trigger(armMIDIchannel_, armMIDIkey_),
+			new Command<Clip*, void(Clip::*)()>(this, &Clip::armStop) );
 	}
 }
