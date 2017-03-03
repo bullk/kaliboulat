@@ -25,8 +25,8 @@ AudioClip::AudioClip( std::string fname ) : Clip(), FileWvIn(),
 }
 
 AudioClip::AudioClip
-	(std::string fname, std::string name, int launch, int stop, int loop, int amk, float vol, float rate, int pitch) :
-	Clip(name, launch, stop, loop, amk), FileWvIn(),
+	(std::string fname, std::string name, int launch, int stop, int loop, int amc, int amk, float vol, float rate, int pitch) :
+	Clip(name, launch, stop, loop, amc, amk), FileWvIn(),
 	volume_(vol), gui_rate_(rate), gui_pitch_(pitch)
 {
 	data_type_ = AUDIO;

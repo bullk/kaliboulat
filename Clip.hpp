@@ -4,6 +4,7 @@
 #include <string>
 #include "globals.h"
 #include "Engine.hpp"
+#include "midi.hpp"
 
 class Clip
 {
@@ -19,7 +20,7 @@ public:
 public:	
 	Clip();
 	Clip( std::string );
-	Clip( std::string, int, int, int, int );
+	Clip( std::string, int, int, int, int, int );
 	virtual ~Clip ();
 	inline DataType dataType () { return data_type_; }
 	inline ClipState getState () { return state_; }
@@ -32,7 +33,8 @@ public:
 	void armLaunch();
 	void armStop();
 	void arm ();
-	void MIDIKey(char k);
+	void setMIDIKey();
+	void delMIDIKey();
 	inline virtual std::string getFileName ()  { return filename_; }
 	inline virtual std::string getName () { return name_; }
 	inline virtual void setName (std::string s) { name_ = s; }
@@ -48,8 +50,9 @@ public:
 	inline virtual const char* getLoopStyleText () { return loopText[loopstyle_]; }
 	inline virtual void setLoopStyle (int ls) { launchstyle_ = ls; }
 	inline virtual void nextLoopStyle () { loopstyle_ = (loopstyle_ + 1) % 3; }
-	inline int * getArmMIDIChannelP () { return &armMIDIchannel_; }
-	inline int * getArmMIDIKeyP () { return &armMIDIkey_; }
+	inline int getArmMIDIChannel () { return armMIDIchannel_; }
+	inline int getArmMIDIKey () { return armMIDIkey_; }
+	void setArmMIDI( RawMidi );
 	virtual unsigned long getLength() = 0;
 	virtual float getProgress() = 0;
 	//virtual int getAngle (void) = 0;

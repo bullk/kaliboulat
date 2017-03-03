@@ -17,7 +17,7 @@ class AudioClip : public Clip, public stk::FileWvIn
 	
 public:
 	AudioClip (std::string);
-	AudioClip (std::string, std::string, int, int, int, int, float, float, int);
+	AudioClip (std::string, std::string, int, int, int, int, int, float, float, int);
 	~AudioClip ();
 	unsigned long getLength ();
 	stk::StkFloat getTime ();
@@ -41,6 +41,7 @@ public:
 			CEREAL_NVP(launchstyle_),
 			CEREAL_NVP(stopstyle_),
 			CEREAL_NVP(loopstyle_),
+			CEREAL_NVP(armMIDIchannel_),
 			CEREAL_NVP(armMIDIkey_),
 			CEREAL_NVP(volume_),
 			CEREAL_NVP(gui_rate_),
@@ -53,11 +54,11 @@ public:
 	{
 		std::string fname, name;
 		int launch, stop, loop;
-		char amk;
+		int amc, amk;
 		float volume, gui_rate;
 		int gui_pitch;
-		archive (fname, name, launch, stop, loop, amk, volume, gui_rate, gui_pitch);
-		construct (fname, name, launch, stop, loop, amk, volume, gui_rate, gui_pitch);
+		archive (fname, name, launch, stop, loop, amc, amk, volume, gui_rate, gui_pitch);
+		construct (fname, name, launch, stop, loop, amc, amk, volume, gui_rate, gui_pitch);
 	}
 	
 protected:    

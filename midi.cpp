@@ -1,5 +1,6 @@
 #include "midi.hpp"
 #include "spdlog/spdlog.h"
+#include "Clip.hpp"
 
 //----------------------------------------------------------------------
 // MIDI FUNCTIONS
@@ -11,9 +12,9 @@ void midiInit ()
 
 void midiPanic (RtMidiOut * midiout)
 {
-	MidiRaw cc121 { 0xB0, 0x79, 0x00 }; // Channel 1, all CC OFF
-	MidiRaw cc123 { 0xB0, 0x7B, 0x00 }; // Channel 1, all notes OFF
-	MidiRaw message;
+	RawMidi cc121 { 0xB0, 0x79, 0x00 }; // Channel 1, all CC OFF
+	RawMidi cc123 { 0xB0, 0x7B, 0x00 }; // Channel 1, all notes OFF
+	RawMidi message;
 	
 	for (unsigned short i=0; i<16; i++)
 	{
@@ -26,99 +27,119 @@ void midiPanic (RtMidiOut * midiout)
 	}
 }
 
-void midiCallback (double timeStamp, MidiRaw *message, void *userData)
+RawMidi key_to_trigger( RawMidi m )
 {
-	unsigned int high_digit = message->at(0) >> 4;
-	unsigned int low_digit = message->at(0) & 0xF;
-	switch ( high_digit )
+	return RawMidi( m.begin(), m.begin()+2 );
+}
+
+void midiCallback( double timeStamp, RawMidi * message, void *userData )
+{
+	auto mainlog = spdlog::get( "main" );	
+	if ( MidiWaiter::getInstance()->getPreemption() )
 	{
-		case 0x8: // note off
-			//std::cout << "channel " << low_digit +1
-				//<< " NOTE OFF " << (unsigned int)message->at(1)
-				//<< std::endl;
-			break;
-		case 0x9: // note on
-			//std::cout << "channel " << low_digit +1
-				//<< " NOTE ON " << (unsigned int)message->at(1)
-				//<< " velocity " << (unsigned int)message->at(2)
-				//<< std::endl;
-			break;
-		case 0xA: // polyphonic after touch
-			//std::cout << "channel " << low_digit +1
-				//<< " polyphonic after touch note " << (unsigned int)message->at(1)
-				//<< " pressure " << (unsigned int)message->at(2)
-				//<< std::endl;
-			break;
-		case 0xB: // control change
-			//std::cout << "channel " << low_digit +1
-				//<< " controller " << (unsigned int)message->at(1)
-				//<< " value " << (unsigned int)message->at(2)
-				//<< std::endl;
-			break;
-		case 0xC: // program change
-			//std::cout << "channel " << low_digit +1
-				//<< " program change " << (unsigned int)message->at(1)
-				//<< std::endl;
-			break;
-		case 0xD: // channel after touch
-			//std::cout << "channel " << low_digit +1
-				//<< " after touch " << (unsigned int)message->at(1)
-				//<< std::endl;
-			break;
-		case 0xE: // pitch bend
-			//std::cout << "channel " << low_digit +1
-				//<< " pitch bend " << (unsigned int)message->at(2)
-				//<< std::endl;
-			break;
-		case 0xF: // system message
-			switch ( low_digit )
-			{
-				case 0x0:
-					//std::cout << "SYSEX" << std::endl;
-					break;
-				case 0x1:
-					//std::cout << "MTC" << std::endl;
-					break;
-				case 0x2:
-					//std::cout << "Song Position" << std::endl;
-					break;
-				case 0x3:
-					//std::cout << "Song Select" << std::endl;
-					break;
-				case 0x6:
-					//std::cout << "Tune request" << std::endl;
-					break;
-				case 0x8:
-					//std::cout << "Timing clock" << std::endl;
-					break;
-				case 0x9:
-					//std::cout << "Mesure end" << std::endl;
-					break;
-				case 0xA:
-					//std::cout << "Start" << std::endl;
-					break;
-				case 0xB:
-					//std::cout << "Continue" << std::endl;
-					break;
-				case 0xC:
-					//std::cout << "Stop" << std::endl;
-					break;
-				case 0xE:
-					//std::cout << "Active sensing" << std::endl;
-					break;
-				case 0xF:
-					//std::cout << "System reset" << std::endl;
-					break;
-				default:
-					//std::cout << "WARNING : unknown MIDI data" << std::endl;
-					break;
-			}
-			break;
-		default:
-			//std::cout << "WARNING : unknown MIDI data" << std::endl;
-			break;
+		mainlog->info( "MidiWaiter : assign {}", char_vector_to_hex( *message ) );
+		MidiWaiter::getInstance()->setAssignment( *message );
 	}
-	//State::getInstance() -> midiLog (message);
+	else
+	{
+		mainlog->info( "MidiWaiter : execute {}", char_vector_to_hex( *message ) );
+		MidiWaiter::getInstance()->execute( *message );
+		unsigned int high_digit = message->at(0) >> 4;
+		unsigned int low_digit = message->at(0) & 0xF;
+		switch ( high_digit )
+		{
+			case 0x8: // note off
+				//std::cout << "channel " << low_digit +1
+					//<< " NOTE OFF " << (unsigned int)message->at(1)
+					//<< std::endl;
+				mainlog->info( "MidiWaiter : execute {}", char_vector_to_hex( key_to_trigger(*message) ) );
+				MidiWaiter::getInstance()->execute( key_to_trigger(*message) );	
+				break;
+			case 0x9: // note on
+				//std::cout << "channel " << low_digit +1
+					//<< " NOTE ON " << (unsigned int)message->at(1)
+					//<< " velocity " << (unsigned int)message->at(2)
+					//<< std::endl;
+				mainlog->info( "MidiWaiter : execute {}", char_vector_to_hex( key_to_trigger(*message) ) );
+				MidiWaiter::getInstance()->execute( key_to_trigger(*message) );	
+				break;
+			case 0xA: // polyphonic after touch
+				//std::cout << "channel " << low_digit +1
+					//<< " polyphonic after touch note " << (unsigned int)message->at(1)
+					//<< " pressure " << (unsigned int)message->at(2)
+					//<< std::endl;
+				break;
+			case 0xB: // control change
+				//std::cout << "channel " << low_digit +1
+					//<< " controller " << (unsigned int)message->at(1)
+					//<< " value " << (unsigned int)message->at(2)
+					//<< std::endl;
+				break;
+			case 0xC: // program change
+				//std::cout << "channel " << low_digit +1
+					//<< " program change " << (unsigned int)message->at(1)
+					//<< std::endl;
+				break;
+			case 0xD: // channel after touch
+				//std::cout << "channel " << low_digit +1
+					//<< " after touch " << (unsigned int)message->at(1)
+					//<< std::endl;
+				break;
+			case 0xE: // pitch bend
+				//std::cout << "channel " << low_digit +1
+					//<< " pitch bend " << (unsigned int)message->at(2)
+					//<< std::endl;
+				break;
+			case 0xF: // system message
+				switch ( low_digit )
+				{
+					case 0x0:
+						//std::cout << "SYSEX" << std::endl;
+						break;
+					case 0x1:
+						//std::cout << "MTC" << std::endl;
+						break;
+					case 0x2:
+						//std::cout << "Song Position" << std::endl;
+						break;
+					case 0x3:
+						//std::cout << "Song Select" << std::endl;
+						break;
+					case 0x6:
+						//std::cout << "Tune request" << std::endl;
+						break;
+					case 0x8:
+						//std::cout << "Timing clock" << std::endl;
+						break;
+					case 0x9:
+						//std::cout << "Mesure end" << std::endl;
+						break;
+					case 0xA:
+						//std::cout << "Start" << std::endl;
+						break;
+					case 0xB:
+						//std::cout << "Continue" << std::endl;
+						break;
+					case 0xC:
+						//std::cout << "Stop" << std::endl;
+						break;
+					case 0xE:
+						//std::cout << "Active sensing" << std::endl;
+						break;
+					case 0xF:
+						//std::cout << "System reset" << std::endl;
+						break;
+					default:
+						//std::cout << "WARNING : unknown MIDI data" << std::endl;
+						break;
+				}
+				break;
+			default:
+				//std::cout << "WARNING : unknown MIDI data" << std::endl;
+				break;
+		}
+		//State::getInstance() -> midiLog (message);
+	}
 }
 
 // MidiMessage Class
@@ -127,7 +148,7 @@ void midiCallback (double timeStamp, MidiRaw *message, void *userData)
 // Constructor 
 //-------------
 
-MidiMessage::MidiMessage (MidiRaw data) :
+MidiMessage::MidiMessage (RawMidi data) :
 	data_(data)
 {
 }
@@ -143,7 +164,7 @@ MidiMessage::~MidiMessage ()
 
 //------------
 
-std::string char_vector_to_hex (MidiRaw v)
+std::string char_vector_to_hex (RawMidi v)
 {
 	std::string s = "";
 	char buf[4];
@@ -158,7 +179,7 @@ std::string char_vector_to_hex (MidiRaw v)
 
 std::string MidiMessage::hexData ()
 {
-	return char_vector_to_hex (data_);
+	return char_vector_to_hex( data_ );
 }
 
 
@@ -168,15 +189,15 @@ std::string MidiMessage::hexData ()
 // Constructor 
 //-------------
 
-ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, MidiRaw data) :
+ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, RawMidi data) :
 	Scheduled (time), MidiMessage (data)
 {
-	auto mainlog= spdlog::get("main");	
-	mainlog->debug("ScheduledMidiMessage::ScheduledMidiMessage {} {}", time, hexData());
+	auto mainlog= spdlog::get( "main" );	
+	mainlog->debug( "ScheduledMidiMessage::ScheduledMidiMessage {} {}", time, hexData() );
 	bar_ = 0;
 	beat_ = 0;
 	tick_ = 0;
-	mainlog->debug("/ScheduledMidiMessage::ScheduledMidiMessage");
+	mainlog->debug( "/ScheduledMidiMessage::ScheduledMidiMessage" );
 }
 
 
@@ -186,25 +207,25 @@ ScheduledMidiMessage::ScheduledMidiMessage (long unsigned int time, MidiRaw data
 
 ScheduledMidiMessage::~ScheduledMidiMessage ()
 {
-	auto mainlog= spdlog::get("main");	
-	mainlog->debug("ScheduledMidiMessage::~ScheduledMidiMessage {}", hexData());
+	auto mainlog= spdlog::get( "main" );	
+	mainlog->debug( "ScheduledMidiMessage::~ScheduledMidiMessage {}", hexData() );
 }
 
 //------------
 
-MidiRaw note_on_trigger (int channel, int key)
+RawMidi note_on_trigger( int channel, int key )
 {
-	MidiRaw trigger;
-	trigger.push_back((9<<4) + channel-1);
-	trigger.push_back(key);
+	RawMidi trigger;
+	trigger.push_back( (9<<4) + channel-1 );
+	trigger.push_back( key );
 	return trigger;
 }
 
-MidiRaw note_off_trigger (int channel, int key)
+RawMidi note_off_trigger( int channel, int key )
 {
-	MidiRaw trigger;
-	trigger.push_back((8<<4) + channel-1);
-	trigger.push_back(key);
+	RawMidi trigger;
+	trigger.push_back( (8<<4) + channel-1 );
+	trigger.push_back( key );
 	return trigger;
 }
 
@@ -214,8 +235,9 @@ MidiRaw note_off_trigger (int channel, int key)
 MidiWaiter *MidiWaiter::singleton_ = NULL;
 
 // Constructor
-MidiWaiter::MidiWaiter ()
+MidiWaiter::MidiWaiter() : preemption_(false)
 {
+	assignment_ = RawMidi();
 }
 
 // Destructor
@@ -223,10 +245,77 @@ MidiWaiter::~MidiWaiter ()
 {
 }
 
-void MidiWaiter::addCommand( MidiRaw mr, BaseCommand * c )
+void MidiWaiter::addCommand( RawMidi m, BaseCommand * c )
 {
+	std::map<RawMidi, std::vector<BaseCommand *>>::iterator it;
+	it = filters_.find(m);
+	if ( it == filters_.end() )
+		filters_.emplace( m, std::vector<BaseCommand *>() );
+	filters_.at(m).push_back(c);
 }
 
-void MidiWaiter::deleteCommand( MidiRaw mr, BaseCommand * c )
+void MidiWaiter::deleteCommand( RawMidi m, Clip * clip )
 {
+	auto mainlog = spdlog::get( "main" );	
+	mainlog->debug( "MidiWaiter::deleteCommand" );
+	std::map<RawMidi, std::vector<BaseCommand *>>::iterator map_it;
+	map_it = filters_.find(m);
+	if ( map_it != filters_.end() )
+	{
+		mainlog->debug( "* found trigger {}", char_vector_to_hex(m) );
+		std::vector<BaseCommand *> comv = filters_.at(m);
+		mainlog->debug( "* command vector size {}", comv.size() );
+		std::vector<BaseCommand *>::iterator f_it;
+		for ( f_it = comv.begin(); f_it != comv.end(); f_it++ )
+			if ( (*f_it) -> isFrom( clip ) )
+			{
+				mainlog->debug( "* command object is clip {}", clip->getName() );
+				comv.erase( f_it );
+				break;
+			}
+	}
+	mainlog->debug( "/MidiWaiter::deleteCommand" );
 }
+
+bool MidiWaiter::inCommands ( RawMidi m )
+{
+	bool res = false;
+	auto mainlog = spdlog::get( "main" );	
+	mainlog->debug( "MidiWaiter::inCommands" );
+	std::map<RawMidi, std::vector<BaseCommand *>>::iterator map_it;
+	map_it = filters_.find(m);
+	if ( map_it != filters_.end() )	res = true;
+	mainlog->debug( "/MidiWaiter::inCommands" );
+	return res;
+}
+
+void MidiWaiter::execute ( RawMidi m )
+{
+	auto mainlog = spdlog::get( "main" );	
+	mainlog->debug( "MidiWaiter::execute" );
+	std::map<RawMidi, std::vector<BaseCommand *>>::iterator map_it;
+	map_it = filters_.find(m);
+	if ( map_it != filters_.end() )
+	{
+		std::vector<BaseCommand *> comv = filters_.at(m);
+		std::vector<BaseCommand *>::iterator f_it;
+		for ( f_it = comv.begin(); f_it != comv.end(); f_it++ )
+			( *f_it ) -> execute();
+	}
+	mainlog->debug( "/MidiWaiter::execute" );
+}
+
+
+void MidiWaiter::setAssignment( RawMidi m )
+{
+	assignment_ = m;
+	release();
+}
+
+RawMidi MidiWaiter::getAssignment()
+{
+	RawMidi m = assignment_;
+	assignment_ = RawMidi();
+	return m;
+}
+

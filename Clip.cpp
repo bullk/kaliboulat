@@ -13,10 +13,12 @@ Clip::Clip (std::string name) : state_(HALTED), name_(name), filename_(""), armM
 {
 }
 
-Clip::Clip (std::string name, int launch, int stop, int loop, int armkey) :
+Clip::Clip (std::string name, int launch, int stop, int loop, int amc, int amk) :
 	state_(HALTED), name_(name), filename_(""),
-	launchstyle_(launch), stopstyle_(stop), loopstyle_(loop), armMIDIchannel_(1), armMIDIkey_(armkey), selected_(false)
+	launchstyle_(launch), stopstyle_(stop), loopstyle_(loop),
+	armMIDIchannel_(amc), armMIDIkey_(amk), selected_(false)
 {
+	setMIDIKey();
 }
 
 //------------
@@ -70,16 +72,34 @@ void Clip::arm()
 	else armLaunch();
 }
 
-void Clip::MIDIKey( char k )
+void Clip::setMIDIKey()
 {
 	//interrupteur sans maintien
-	if ( k >= 0 )
+	MidiWaiter::getInstance() -> addCommand(
+		note_on_trigger(armMIDIchannel_, armMIDIkey_),
+		new Command<Clip*, void(Clip::*)()>(this, &Clip::armLaunch) );
+	MidiWaiter::getInstance() -> addCommand(
+		note_off_trigger(armMIDIchannel_, armMIDIkey_),
+		new Command<Clip*, void(Clip::*)()>(this, &Clip::armStop) );
+}
+
+void Clip::delMIDIKey()
+{
+	auto mainlog= spdlog::get( "main" );	
+	mainlog->debug( "Clip::delMIDIKey" );
+	MidiWaiter::getInstance() -> deleteCommand ( note_on_trigger(armMIDIchannel_, armMIDIkey_), this );
+	MidiWaiter::getInstance() -> deleteCommand ( note_off_trigger(armMIDIchannel_, armMIDIkey_), this );
+	armMIDIkey_ = -1;
+	mainlog->debug( "/Clip::delMIDIKey" );
+}
+
+void Clip::setArmMIDI( RawMidi m )
+{
+	if ( ( m.at(0) >> 4 ) == 0x9 )
 	{
-		MidiWaiter::getInstance() -> addCommand(
-			note_on_trigger(armMIDIchannel_, armMIDIkey_),
-			new Command<Clip*, void(Clip::*)()>(this, &Clip::armLaunch) );
-		MidiWaiter::getInstance() -> addCommand(
-			note_off_trigger(armMIDIchannel_, armMIDIkey_),
-			new Command<Clip*, void(Clip::*)()>(this, &Clip::armStop) );
+		if (armMIDIkey_ >= 0) delMIDIKey();
+		armMIDIchannel_ = ( m.at(0) & 0xF ) + 1;
+		armMIDIkey_ = m.at(1);
+		setMIDIKey();
 	}
 }

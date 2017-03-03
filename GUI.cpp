@@ -353,14 +353,14 @@ void mainMenu ()
 	
 	if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::Text("      Kaliboulat / Fullbox Project\n\n    Alien sequencer by BullK Studio\nCoded by Olivier Cadiou aka Al Kali Boul\n");
+		ImGui::Text("      Kaliboulat / Fullbox Project\n\n    Versatile looper by BullK Studio\nCoded by Olivier Cadiou aka Al Kali Boul\n");
 		ImGui::Columns(3, NULL, false); ImGui::NextColumn();
 		if (ImGui::Button("Close", ImVec2(80,0))) 
 		{
 			ImGui::CloseCurrentPopup();
 			about_open = false;
 		}
-		ImGui::NextColumn(); ImGui::NextColumn(); ImGui::Columns(1);
+		ImGui::Columns(1);
 		ImGui::EndPopup();
 	}	
 }
@@ -462,13 +462,14 @@ void ControlPanel (void (*title_func)())
 	StopButton();
 	
 	ImGui::NextColumn ();
+	ImGui::DragInt( "BPM", clock->getTempoP(), 1.0f, 20, 480);
+	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
+
+	ImGui::NextColumn ();
 	
 	ImGui::Checkbox ("Ressources panel", &ressources_panel);
 	ImGui::Checkbox ("Clip panel", &clip_panel);
 	
-	ImGui::NextColumn ();
-	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
-
 	//ImGui::NextColumn ();
 	//ImGui::Text("width1 : %d", width1); ImGui::SameLine (); ImGui::Text("width4 : %d", width4);
 	//ImGui::Text("width2 : %d", width2); ImGui::SameLine (); ImGui::Text("width5 : %d", width5);
@@ -678,12 +679,23 @@ void displayAudioClipDetails (std::shared_ptr<AudioClip> clip)
 
 void ClipProperties (std::shared_ptr<Clip> clip)
 {
-	auto mainlog= spdlog::get("main");	
-	mainlog->debug("ClipProperties");
-	mainlog->debug("* name");
-	ImGui::Text("%s", clip -> getName().c_str());
+	static bool assign_midi_key = false;
+	auto mainlog= spdlog::get( "main" );	
+	mainlog->debug( "ClipProperties" );
+	mainlog->debug( "* name" );
+	ImGui::Text( "%s", clip -> getName().c_str() );
+	if ( ImGui::Button( "MIDI control" ) )
+	{
+		MidiWaiter::getInstance()->preempt();
+		assign_midi_key=true;
+	}
+	ImGui::SameLine();
+	if ( clip->getArmMIDIKey() > 0 )
+		ImGui::Text( "ch %d | key %d", clip->getArmMIDIChannel(), clip->getArmMIDIKey() );
+	else
+		ImGui::Text( "none" );
 	ImGui::Columns(3, NULL, false);
-	mainlog->debug("* launch");
+	mainlog->debug( "* launch" );
 	ImGui::PushID("launch"); ImGui::Text("Launch"); ImGui::NextColumn();
 	if ( ImGui::Button(clip -> getLaunchStyleText()) ) clip -> nextLaunchStyle();
 	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
@@ -695,14 +707,43 @@ void ClipProperties (std::shared_ptr<Clip> clip)
 	ImGui::PushID("loop"); ImGui::Text("Loop"); ImGui::NextColumn();
 	if ( ImGui::Button(clip -> getLoopStyleText()) ) clip -> nextLoopStyle();
 	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
-	mainlog->debug("* armMIDIchannel");
-	ImGui::DragInt("channel", clip->getArmMIDIChannelP(), 1.0f, 1, 16);
-	ImGui::NextColumn();
-	mainlog->debug("* armMIDIkey");
-	ImGui::DragInt("key", clip->getArmMIDIKeyP(), 1.0f, 0, 127);
-	//mainlog->debug("* path");
-	//ImGui::Text("%s", clip -> getFileName().c_str());
 	ImGui::Columns(1);
+
+	if ( assign_midi_key ) ImGui::OpenPopup( "MIDI key assignment" );
+	if ( ImGui::BeginPopupModal( "MIDI key assignment", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
+	{
+		ImGui::Text( "Please send a MIDI key that will control the clip\n" );
+		ImGui::Columns( 2, NULL, false );
+		if ( clip->getArmMIDIKey() < 0 )
+		{
+			ImGui::PushStyleColor( ImGuiCol_Button, ImColor::HSV( 2/7.0f, 0.0f, 0.6f ) );
+			ImGui::PushStyleColor( ImGuiCol_ButtonHovered, ImColor::HSV( 2/7.0f, 0.0f, 0.6f ) );
+			ImGui::PushStyleColor( ImGuiCol_ButtonActive, ImColor::HSV( 2/7.0f, 0.0f, 0.6f ) );
+			ImGui::Button( "Delete", ImVec2(80,0) );
+			ImGui::PopStyleColor(3);
+		}
+		else if ( ImGui::Button( "Delete", ImVec2(80,0) ) )
+		{
+			clip->delMIDIKey();
+			ImGui::CloseCurrentPopup();
+			assign_midi_key = false;
+		}
+		ImGui::NextColumn();
+		if ( ImGui::Button( "Close", ImVec2(80,0) ) ) 
+		{
+			ImGui::CloseCurrentPopup();
+			assign_midi_key = false;
+		}
+		ImGui::Columns(1);
+		if ( MidiWaiter::getInstance()->assignmentSize() )
+		{
+			clip->setArmMIDI( MidiWaiter::getInstance()->getAssignment() );
+			ImGui::CloseCurrentPopup();
+			assign_midi_key = false;
+		}
+		ImGui::EndPopup();
+	}
+	
 	mainlog->debug("/ClipProperties");
 }
 
@@ -711,22 +752,23 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 	auto mainlog= spdlog::get("main");
 	ImGui::BeginChild ("Ressources", ImVec2(width1-3,0), true);
 	if ( ImGui::Button("Files") ) ui.context = Screen::RESSOURCES;
-	ImGui::SameLine();
 	
 	if ( State::getInstance()->getClip() )
 	{
 		if ( State::getInstance()->getClip()->dataType() == AUDIO )
 		{
-			if ( ImGui::Button("Audio") ) ui.context = Screen::AUDIOCLIP;
 			ImGui::SameLine();
+			if ( ImGui::Button("Audio") ) ui.context = Screen::AUDIOCLIP;
 		}
 	
 		if ( State::getInstance()->getClip()->dataType() == MIDI )
 		{
+			ImGui::SameLine();
 			if ( ImGui::Button("MIDI") ) ui.context = Screen::MIDICLIP;
-			ImGui::Separator();
 		}
 	}
+
+	ImGui::Separator();
 	
 	switch (ui.context)
 	{
@@ -775,10 +817,10 @@ void ProjectScreen (std::shared_ptr<Project> project)
 	mainMenu ();
 	ControlPanel (ProjectTitle);
 	ImGui::BeginChild ("MIDI input log", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-	//std::vector<MidiRaw *> * midilog = State::getInstance()->getMidiLog();
+	//std::vector<RawMidi *> * midilog = State::getInstance()->getMidiLog();
 	//for ( unsigned int i=0; i<midilog->size(); i++ )
 	//{
-		//MidiRaw * m = midilog -> at(i);
+		//RawMidi * m = midilog -> at(i);
 		//ImGui::Text("MIDI IN :");
 		//for ( std::vector<unsigned char>::iterator c=m->begin(); c != m->end(); c++ )
 		//{

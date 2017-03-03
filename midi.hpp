@@ -9,12 +9,12 @@
 #include "Scheduled.hpp"
 #include "Engine.hpp"
 
-typedef std::vector<unsigned char> MidiRaw;
+typedef std::vector<unsigned char> RawMidi;
 
 void midiInit ();
 void midiPanic (RtMidiOut * midiout);
-void midiCallback (double timeStamp, MidiRaw *message, void *userData);
-std::string char_vector_to_hex (MidiRaw v);
+void midiCallback (double timeStamp, RawMidi *message, void *userData);
+std::string char_vector_to_hex (RawMidi v);
 
 // MIDI message types filtered by status byte, sorted by categories (events, channel mode, system common, realtime)
 // source : https://www.midi.org/specifications/item/table-1-summary-of-midi-message
@@ -28,18 +28,18 @@ enum MidiMessageType { MMT_NOTE_OFF, MMT_NOTE_ON, MMT_AFTERTOUCH, MMT_CONTROL_CH
 class MidiMessage
 {
 public:
-	MidiMessage( MidiRaw data );
+	MidiMessage( RawMidi data );
 	~MidiMessage();
-	inline MidiRaw * getData() { return &data_; }
+	inline RawMidi * getData() { return &data_; }
 	std::string hexData();
-	inline bool equals( MidiRaw * const & v ) const { return data_ == *v; }
+	inline bool equals( RawMidi * const & v ) const { return data_ == *v; }
 	
 protected:
 	int type;
-	MidiRaw data_;
+	RawMidi data_;
 };
 
-inline bool operator==( MidiMessage const & m, MidiRaw * const & v )
+inline bool operator==( MidiMessage const & m, RawMidi * const & v )
 {
 	return m.equals(v);
 }
@@ -47,7 +47,7 @@ inline bool operator==( MidiMessage const & m, MidiRaw * const & v )
 class ScheduledMidiMessage : public Scheduled, public MidiMessage
 {
 public:
-	ScheduledMidiMessage (long unsigned int time, MidiRaw data);
+	ScheduledMidiMessage (long unsigned int time, RawMidi data);
 	~ScheduledMidiMessage ();
 
 protected:
@@ -55,15 +55,23 @@ protected:
 
 };
 
-MidiRaw note_on_trigger (int, int) ;
+RawMidi note_on_trigger( int, int );
 
-MidiRaw note_off_trigger (int, int) ;
+RawMidi note_off_trigger( int, int );
 
 class MidiWaiter
 {
 public:
-	void addCommand( MidiRaw, BaseCommand * );
-	void deleteCommand( MidiRaw, BaseCommand * );
+	void addCommand( RawMidi, BaseCommand * );
+	void deleteCommand( RawMidi, Clip * );
+	bool inCommands ( RawMidi m );
+	void execute ( RawMidi m );
+	inline void preempt() { preemption_ = true; }
+	inline void release() { preemption_ = false; }
+	inline bool getPreemption() { return preemption_; }
+	inline unsigned int assignmentSize() { return assignment_.size(); }
+	RawMidi getAssignment();
+	void setAssignment( RawMidi m );
 
 	// Singleton
 	static MidiWaiter *getInstance ()
@@ -88,8 +96,10 @@ private:
 	MidiWaiter ();
 	// Destructor
 	~MidiWaiter ();
-	std::map<MidiRaw, std::vector<BaseCommand>> filters_;
+	std::map<RawMidi, std::vector<BaseCommand *>> filters_;
 	static MidiWaiter * singleton_;
+	bool preemption_;
+	RawMidi assignment_;
 	
 };
 

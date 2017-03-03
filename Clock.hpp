@@ -33,6 +33,7 @@ public:
 	inline bool getState () { return state_; }
 	inline bool atZero () { return ( delta_ == 0 ); }
 	inline bool isStarted () { return state_; }
+	inline int * getTempoP() { return &tempo_; }
 	inline unsigned int getHour () { return hour_; }
 	inline unsigned int getMinute () { return minute_; }
 	inline unsigned int getSecond () { return second_; }

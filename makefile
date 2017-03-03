@@ -35,14 +35,14 @@ Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
 AudioClip.o: AudioClip.hpp State.hpp Clip.hpp 
 AudioFile.o: AudioFile.hpp Engine.hpp 
 AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp 
-Clip.o: Clip.hpp midi.hpp globals.h Engine.hpp 
+Clip.o: Clip.hpp midi.hpp globals.h Engine.hpp midi.hpp 
 Clock.o: Clock.hpp Engine.hpp 
 Engine.o: Engine.hpp State.hpp midi.hpp 
 GUI.o: GUI.hpp State.hpp MidiFile.hpp MidiClip.hpp AudioFile.hpp AudioClip.hpp Listener.hpp imgui/imgui.h imgui/imgui_impl_sdl.h globals.h Engine.hpp 
-Kaliboulat.o: midi.hpp Clock.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp 
+Kaliboulat.o: midi.hpp Clock.hpp State.hpp Modules.hpp Listener.hpp GUI.hpp globals.h Clock.hpp AudioTrack.hpp MidiTrack.hpp MidiFile.hpp Project.hpp Modules.hpp GUI.hpp 
 Listener.o: Listener.hpp 
 MidiClip.o: MidiClip.hpp midi.hpp State.hpp MidiFile.hpp Clip.hpp midi.hpp 
-midi.o: midi.hpp spdlog/spdlog.h Scheduled.hpp Engine.hpp 
+midi.o: midi.hpp spdlog/spdlog.h Clip.hpp Scheduled.hpp Engine.hpp 
 MidiFile.o: MidiFile.hpp MidiClip.hpp Engine.hpp 
 MidiTrack.o: MidiTrack.hpp State.hpp MidiClip.hpp Track.hpp 
 Modules.o: Modules.hpp globals.h AudioTrack.hpp MidiTrack.hpp 

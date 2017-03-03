@@ -40,6 +40,7 @@ class BaseCommand
 {
 	public:
 		virtual void execute() = 0;
+		virtual bool isFrom( void * ) =0;
 };
 
 
@@ -53,6 +54,7 @@ class Command : public BaseCommand
 		method_ = method;
 	}
 	void execute ()	{ (object_->*method_)(); }
+	bool isFrom ( void * o ) { return ( o == object_ ); }
 	protected:
 		O object_;
 		M method_;
