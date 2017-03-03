@@ -8,16 +8,21 @@ Clock::Clock ()
 	tempo_ = 120;
 	ticks_per_beat_ = 960;
 	beats_per_bar_ = 4;
-	tick_duration_ = 60.0f / (tempo_ * ticks_per_beat_);
-	rewind ();
+	metrics();
+	rewind();
 }
 
 Clock::~Clock ()
 {}
 
-void Clock::start ()
+void Clock::metrics()
 {
-	if (not(state_))
+	tick_duration_ = 60.0f / (tempo_ * ticks_per_beat_);
+}
+
+void Clock::start()
+{
+	if ( not(state_) )
 	{
 		startTime_ = startTime_ + (std::chrono::system_clock::now() - pauseTime_);
 		pauseTime_ = startTime_;
@@ -25,7 +30,7 @@ void Clock::start ()
 	}
 }
 
-void Clock::pause ()
+void Clock::pause()
 {
 	if (state_)
 	{

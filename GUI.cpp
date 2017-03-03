@@ -437,7 +437,8 @@ void ControlPanel (void (*title_func)())
 	
 	// Clock
 	Clock * clock = State::getInstance() -> getProject() -> getClock();
-	ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d", clock->getHour(), clock->getMinute(), clock->getSecond());
+	ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d",
+		clock->getHour(), clock->getMinute(), clock->getSecond());
 	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
 
 	// MIDI Clock
@@ -463,6 +464,7 @@ void ControlPanel (void (*title_func)())
 	
 	ImGui::NextColumn ();
 	ImGui::DragInt( "BPM", clock->getTempoP(), 1.0f, 20, 480);
+	if ( ImGui::IsItemHovered() ) clock->metrics();
 	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
 
 	ImGui::NextColumn ();
