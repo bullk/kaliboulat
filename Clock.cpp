@@ -69,30 +69,30 @@ unsigned int Clock::update ()
 	unsigned int midi_ticks = 0;
 	if (state_) {
 		auto mainlog = spdlog::get( "main" );
-		mainlog->info( "tempo_ = {}", tempo_ );
+		mainlog->debug( "tempo_ = {}", tempo_ );
 		tick_duration_ = metric_grain_ / tempo_;
-		mainlog->info( "tick_duration_ = {}", tick_duration_);
+		mainlog->debug( "tick_duration_ = {}", tick_duration_);
 		float tdus = 1000000 * tick_duration_;
-		mainlog->info( "tdus = {}", tdus );
+		mainlog->debug( "tdus = {}", tdus );
 		unsigned int ticks_delta = 0;
 		
 		now_ = std::chrono::system_clock::now();
-		//mainlog->info( "now_ = {}", now_ );
+		//mainlog->debug( "now_ = {}", now_ );
 		//time_elastic_ = std::chrono::duration_cast<std::chrono::microseconds> (now_ - start_time_).count();
 		time_delta_ = std::chrono::duration_cast<std::chrono::microseconds> (now_ - previous_time_).count() + time_dust_;
-		mainlog->info( "time_delta_ = {}", time_delta_ );
+		mainlog->debug( "time_delta_ = {}", time_delta_ );
 		//ticks_delta = now_ticks_ - previous_ticks_;
 		ticks_delta = (unsigned int) (time_delta_ / tdus );
-		mainlog->info( "ticks_delta = {}", ticks_delta );
+		mainlog->debug( "ticks_delta = {}", ticks_delta );
 		float x = ticks_delta * tdus;
-		mainlog->info( "x = {}", x );
+		mainlog->debug( "x = {}", x );
 		time_dust_ = time_delta_ - x;
-		mainlog->info( "time_dust_ = {}", time_dust_ );
-		//mainlog->info( " = {}",  );
+		mainlog->debug( "time_dust_ = {}", time_dust_ );
+		//mainlog->debug( " = {}",  );
 		
 		// h:m:s
 		elapsed_time_ += (long long unsigned int) x;
-		mainlog->info( "elapsed_time_ = {}", elapsed_time_ );
+		mainlog->debug( "elapsed_time_ = {}", elapsed_time_ );
 		int tot_s = (int) (elapsed_time_ / 1000000);
 		int tot_m = tot_s / 60;
 		hour_ = tot_m / 60;
@@ -103,7 +103,7 @@ unsigned int Clock::update ()
 		unsigned int previous_bar = bar_;
 		unsigned int previous_beat = beat_;
 		elapsed_ticks += ticks_delta;
-		mainlog->info( "elapsed_ticks = {}", elapsed_ticks );
+		mainlog->debug( "elapsed_ticks = {}", elapsed_ticks );
 		//now_ticks_ = (long unsigned int) (time_delta_ / (1000000 * tick_duration_));
 		unsigned int nbeats = (unsigned int)(elapsed_ticks / ticks_per_beat_);
 		tick_ = (unsigned int) (elapsed_ticks % ticks_per_beat_);
