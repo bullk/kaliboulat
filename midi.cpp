@@ -35,17 +35,20 @@ RawMidi key_to_trigger( RawMidi m )
 void midiCallback( double timeStamp, RawMidi * message, void *userData )
 {
 	auto mainlog = spdlog::get( "main" );	
+	unsigned int high_digit = message->at(0) >> 4;
+	unsigned int low_digit = message->at(0) & 0xF;
 	if ( MidiWaiter::getInstance()->getPreemption() )
 	{
-		mainlog->info( "MidiWaiter : assign {}", char_vector_to_hex( *message ) );
-		MidiWaiter::getInstance()->setAssignment( *message );
+		if (( high_digit >> 1 ) == 4)
+		{
+			mainlog->info( "MidiWaiter : assign {}", char_vector_to_hex( *message ) );
+			MidiWaiter::getInstance()->setAssignment( *message );
+		}
 	}
 	else
 	{
 		mainlog->info( "MidiWaiter : execute {}", char_vector_to_hex( *message ) );
 		MidiWaiter::getInstance()->execute( *message );
-		unsigned int high_digit = message->at(0) >> 4;
-		unsigned int low_digit = message->at(0) & 0xF;
 		switch ( high_digit )
 		{
 			case 0x8: // note off
