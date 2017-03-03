@@ -17,16 +17,18 @@ Clock::~Clock ()
 
 void Clock::metrics()
 {
-	tick_duration_ = 60.0f / (tempo_ * ticks_per_beat_);
+	metric_grain_ = 60.0f / ticks_per_beat_;
 }
 
 void Clock::start()
 {
 	if ( not(state_) )
 	{
-		startTime_ = startTime_ + (std::chrono::system_clock::now() - pauseTime_);
-		pauseTime_ = startTime_;
+		previous_time_ = std::chrono::system_clock::now();
+		start_time_ = start_time_ + ( previous_time_ - pause_time_);
+		pause_time_ = start_time_;
 		state_ = true;
+		
 	}
 }
 
@@ -34,7 +36,7 @@ void Clock::pause()
 {
 	if (state_)
 	{
-		pauseTime_ = std::chrono::system_clock::now();
+		pause_time_ = std::chrono::system_clock::now();
 		state_ = false;
 	}
 }
@@ -53,32 +55,44 @@ void Clock::rewind ()
 	hour_ = 0;
 	minute_ = 0;
 	second_ = 0;
+	elapsed_time_ = 0;
 	previous_ticks_ = 0;
 	now_ticks_ = 0;
-	delta_ = 0;
+	time_delta_ = 0;
+	time_dust_ = 0;
 }
 	
 unsigned int Clock::update ()
 {
 	unsigned int midi_ticks = 0;
 	if (state_) {
-		
-		unsigned int previous_bar = bar_;
-		unsigned int previous_beat = beat_;
+		tick_duration_ = metric_grain_ / tempo_;
+		float tdus = 1000000 * tick_duration_;
+		unsigned int ticks_delta = 0;
 		
 		now_ = std::chrono::system_clock::now();
-		delta_ = std::chrono::duration_cast<std::chrono::microseconds> (now_ - startTime_).count();
+		//time_elastic_ = std::chrono::duration_cast<std::chrono::microseconds> (now_ - start_time_).count();
+		time_delta_ = std::chrono::duration_cast<std::chrono::microseconds> (now_ - previous_time_).count() + time_dust_;
+		//ticks_delta = now_ticks_ - previous_ticks_;
+		ticks_delta = (unsigned int) (time_delta_ / tdus );
+		float x = ticks_delta * tdus;
+		time_dust_ = (time_delta_ - x);
+		
 		// h:m:s
-		int tot_s = delta_ / 1000000;
+		elapsed_time_ += (long long unsigned int) x;
+		int tot_s = elapsed_time_ / 1000000;
 		int tot_m = tot_s / 60;
 		hour_ = tot_m / 60;
 		minute_ = tot_m % 60;
 		second_ = tot_s % 60;
 
 		// MIDI (bar_, beat_, tick_)
-		now_ticks_ = (long unsigned int) (delta_ / (1000000 * tick_duration_));
-		unsigned int nbeats = now_ticks_ / ticks_per_beat_;
-		tick_ = now_ticks_ % ticks_per_beat_;
+		unsigned int previous_bar = bar_;
+		unsigned int previous_beat = beat_;
+		elapsed_ticks += ticks_delta;
+		//now_ticks_ = (long unsigned int) (time_delta_ / (1000000 * tick_duration_));
+		unsigned int nbeats = elapsed_ticks / ticks_per_beat_;
+		tick_ = elapsed_ticks % ticks_per_beat_;
 		beat_ = 1 + nbeats % beats_per_bar_;
 		if ( previous_beat != beat_ ) Waiter::getInstance () -> beat ();
 		bar_ = 1 + nbeats / beats_per_bar_;
@@ -87,12 +101,12 @@ unsigned int Clock::update ()
 		// how many MIDI ticks ?
 		if (now_ticks_ < previous_ticks_)
 			previous_ticks_ = now_ticks_;
-		unsigned int ticks_delta = now_ticks_ - previous_ticks_;
 		if ( (previous_ticks_ == 0) and (ticks_delta == 0) ) midi_ticks = 1;
 		if ( ticks_delta > 0 ) midi_ticks = ticks_delta;
 
 		// MIDI Clock update
 		previous_ticks_ = now_ticks_;
+		previous_time_ = now_;
 
 		// DEBUG
 		//char bbt[13];

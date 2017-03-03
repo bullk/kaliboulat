@@ -81,7 +81,7 @@ void MidiClip::getEventsFromSource( bool rename )
 	MidiFile source( uri );
 	
 	std::vector<unsigned char> * event = new std::vector<unsigned char> ();
-	unsigned long delta_time, abs_time;
+	unsigned long time_delta_time, abs_time;
 
 	if ( rename )
 	{
@@ -103,10 +103,10 @@ void MidiClip::getEventsFromSource( bool rename )
 	mainlog->info( "parsing events" );
 	abs_time=0;
 	mainlog->info( "getting first event" );
-	delta_time = source.getNextEvent( event, tracknum_ );
+	time_delta_time = source.getNextEvent( event, tracknum_ );
 	while ( event -> size () > 0 )
 	{
-		abs_time += delta_time;
+		abs_time += time_delta_time;
 		switch ( event -> at(0) )
 		{
 		case 0xFF:
@@ -132,7 +132,7 @@ void MidiClip::getEventsFromSource( bool rename )
 		appendEvent( abs_time, event );
 		mainlog->info( "." );
 		mainlog->info( "getting next event" );
-		delta_time = source.getNextEvent( event, tracknum_ );
+		time_delta_time = source.getNextEvent( event, tracknum_ );
 	}
 	mainlog->info( "/parsing events" );
 	

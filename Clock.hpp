@@ -11,14 +11,14 @@ class Clock
 
 private:
 	bool state_;
-	std::chrono::time_point<std::chrono::system_clock> startTime_;
-	std::chrono::time_point<std::chrono::system_clock> pauseTime_;
+	std::chrono::time_point<std::chrono::system_clock> start_time_;
+	std::chrono::time_point<std::chrono::system_clock> pause_time_;
 	std::chrono::time_point<std::chrono::system_clock> now_;
-	std::chrono::time_point<std::chrono::system_clock> previousTime_;
-	long long unsigned int delta_, elapsedTime_;
+	std::chrono::time_point<std::chrono::system_clock> previous_time_;
+	long long unsigned int elapsed_time_;
 	int tempo_;
 	unsigned int ticks_per_beat_, beats_per_bar_;
-	float tick_duration_;
+	float metric_grain_, tick_duration_, time_delta_, time_dust_;
 	unsigned int bar_, beat_, tick_;
 	unsigned int hour_, minute_, second_;
 	long unsigned int previous_ticks_, now_ticks_, elapsed_ticks;
@@ -33,7 +33,7 @@ public:
 	void rewind();
 	unsigned int update();
 	inline bool getState() { return state_; }
-	inline bool atZero() { return ( delta_ == 0 ); }
+	inline bool atZero() { return ( time_delta_ == 0 ); }
 	inline bool isStarted() { return state_; }
 	inline int * getTempoP() { return &tempo_; }
 	inline unsigned int getHour() { return hour_; }
