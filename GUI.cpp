@@ -464,7 +464,7 @@ void ControlPanel (void (*title_func)())
 	
 	ImGui::NextColumn ();
 	ImGui::DragInt( "BPM", clock->getTempoP(), 1.0f, 20, 480);
-	if ( ImGui::IsItemHovered() ) clock->metrics();
+	//if ( ImGui::IsItemHovered() ) clock->metrics();
 	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
 
 	ImGui::NextColumn ();
