@@ -76,7 +76,52 @@ void GUI_Close()
 	SDL_Quit();
 }
 
+
+//====== OLDIES =====
+
+//void clipPlayButton (Clip * clip)
+//{
+	//if ( clip -> isPlaying () )
+	//{
+		//ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
+		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
+		//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
+		//if (ImGui::Button("STOP")) clip -> stop ();
+		//ImGui::PopStyleColor(3);
+	//}
+	//else
+	//{
+		//ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
+		//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+		//if (ImGui::Button("PLAY")) clip -> play ();
+		//ImGui::PopStyleColor(3);
+	//}
+//}
+
+//bool ChooseButton () 
+//{
+	//ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.4f, 0.4f));
+	//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
+	//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
+	//bool res = ImGui::Button("CHOOSE");
+	//ImGui::PopStyleColor(3);
+	//return res;
+//}
+
+//bool HearButton ()
+//{
+	//ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(4/7.0f, 0.4f, 0.4f));
+	//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(4/7.0f, 0.6f, 0.6f));
+	//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(4/7.0f, 0.8f, 0.8f));
+	//bool res = ImGui::Button("HEAR");
+	//ImGui::PopStyleColor(3);
+	//return res;
+//}
+
+
 //======================================================================
+
 
 void BeginScreen ()
 {
@@ -439,14 +484,14 @@ void ControlPanel (void (*title_func)())
 	Clock * clock = State::getInstance() -> getProject() -> getClock();
 	ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d",
 		clock->getHour(), clock->getMinute(), clock->getSecond());
-	//ImGui::SameLine (); ImGui::TextColored (ImColor(127,127,127), "%d", mcDelta);
 
 	// MIDI Clock
 	ImGui::SameLine ();
-	ImGui::TextColored (ImColor(0,255,255), "%02d:%02d:%03d", clock->getBar(), clock->getBeat(), clock->getTick());
+	ImGui::TextColored( ImColor(0,255,255), "%02d:%02d:%03d",
+		clock->getBar(), clock->getBeat(), clock->getTick() );
 
 	// CTRL PRESSED
-	if ( State::getInstance() -> getProject() -> ctrlPressed () )
+	if ( State::getInstance()->getProject()->ctrlPressed() )
 	{
 		ImGui::SameLine ();
 		ImGui::TextColored (ImColor(192,64,64), "CTRL");
@@ -463,7 +508,9 @@ void ControlPanel (void (*title_func)())
 	StopButton();
 	
 	ImGui::NextColumn ();
+	ImGui::PushItemWidth( 70 );
 	ImGui::DragInt( "BPM", clock->getTempoP(), 1.0f, 20, 480);
+	ImGui::PopItemWidth();
 	//if ( ImGui::IsItemHovered() ) clock->metrics();
 	if ( ImGui::Button ( "! PANIC !" ) ) Waiter::getInstance()->panic();
 
@@ -481,26 +528,6 @@ void ControlPanel (void (*title_func)())
 
 	ImGui::PopStyleVar ();
 	ImGui::EndChild ();
-}
-
-void clipPlayButton (Clip * clip)
-{
-	if ( clip -> isPlaying () )
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("STOP")) clip -> stop ();
-		ImGui::PopStyleColor(3);
-	}
-	else
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		if (ImGui::Button("PLAY")) clip -> play ();
-		ImGui::PopStyleColor(3);
-	}
 }
 
 void displayAudioFiles (std::shared_ptr<Project> project)
@@ -586,26 +613,6 @@ void displayMidiFiles (std::shared_ptr<Project> project)
 		ImGui::Columns(1);
 	}
 	mainlog->debug("/displayMidiFiles");
-}
-
-bool ChooseButton () 
-{
-	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.4f, 0.4f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-	bool res = ImGui::Button("CHOOSE");
-	ImGui::PopStyleColor(3);
-	return res;
-}
-
-bool HearButton ()
-{
-	ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(4/7.0f, 0.4f, 0.4f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(4/7.0f, 0.6f, 0.6f));
-	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(4/7.0f, 0.8f, 0.8f));
-	bool res = ImGui::Button("HEAR");
-	ImGui::PopStyleColor(3);
-	return res;
 }
 
 static void DragClipOverlay (bool* p_open)
