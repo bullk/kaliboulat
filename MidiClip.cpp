@@ -76,7 +76,7 @@ void MidiClip::rewind ()
 void MidiClip::getEventsFromSource( bool rename )
 {
 	auto mainlog= spdlog::get( "main" );	
-	mainlog->info( "MidiClip::getEventsFromSource" );
+	mainlog->debug( "MidiClip::getEventsFromSource" );
 	std::string uri = State::getProject()->getMidiDir() + "/" + filename_;
 	MidiFile source( uri );
 	
@@ -100,9 +100,9 @@ void MidiClip::getEventsFromSource( bool rename )
 	divscale_ = State::getProject()->getClock()->getTicksPerBeat() / division_;
 	source.rewindTrack( tracknum_ );
 
-	mainlog->info( "parsing events" );
+	mainlog->debug( "parsing events" );
 	abs_time=0;
-	mainlog->info( "getting first event" );
+	mainlog->debug( "getting first event" );
 	time_delta_time = source.getNextEvent( event, tracknum_ );
 	while ( event -> size () > 0 )
 	{
@@ -110,7 +110,7 @@ void MidiClip::getEventsFromSource( bool rename )
 		switch ( event -> at(0) )
 		{
 		case 0xFF:
-			mainlog->info( "time {} : SMF meta : {} {}", abs_time, char_vector_to_hex( *event ) );
+			mainlog->debug( "time {} : SMF meta : {} {}", abs_time, char_vector_to_hex( *event ) );
 			switch ( event -> at(1) )
 			{
 			case 0x03:
@@ -121,26 +121,26 @@ void MidiClip::getEventsFromSource( bool rename )
 					unsigned int strend = event->at(2) + 3;
 					for ( unsigned int i=3; i < strend; i++ )
 						name_ += (char) event -> at(i);
-					mainlog->info( "time {} : setting clip name to {}", abs_time, name_ );
+					mainlog->debug( "time {} : setting clip name to {}", abs_time, name_ );
 				}
 				break;
 			}
 			}
 			break;
 		}
-		mainlog->info( "time {} : event {}", abs_time, event -> at(0) );
+		mainlog->debug( "time {} : event {}", abs_time, event -> at(0) );
 		appendEvent( abs_time, event );
-		mainlog->info( "." );
-		mainlog->info( "getting next event" );
+		mainlog->debug( "." );
+		mainlog->debug( "getting next event" );
 		time_delta_time = source.getNextEvent( event, tracknum_ );
 	}
-	mainlog->info( "/parsing events" );
+	mainlog->debug( "/parsing events" );
 	
 	setLength ( abs_time );
 	//if ( abs_time > length_ ) length_ = abs_time;
 					
 	delete event;
-	mainlog->info( "/MidiClip::getEventsFromSource" );
+	mainlog->debug( "/MidiClip::getEventsFromSource" );
 	
 }
 
