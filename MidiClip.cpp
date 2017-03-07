@@ -154,7 +154,10 @@ void MidiClip::tick( RtMidiOut * midiout )
 			//std::cout << time_ << " : " << index_ << " : " << events_ -> at (index_) -> hexData () << std::endl;
 			midiout -> sendMessage( events_[index_].getData() );
 			if ( index_ < events_.size() ) index_++;
-			if ( index_ == events_.size() ) rewind();
+			if ( index_ == events_.size() ) {
+				if ( loopstyle_ == ONESHOT ) stop();
+				else rewind();
+			}
 		}
 	}
 	clock_time_++;

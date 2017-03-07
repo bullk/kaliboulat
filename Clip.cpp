@@ -29,6 +29,13 @@ Clip::~Clip ()
 {
 }
 
+void Clip::stop()
+{
+	state_ = HALTED;
+	rewind();
+}
+
+
 void Clip::armLaunch()
 {
 	switch ( launchstyle_ )

@@ -19,6 +19,7 @@ public:
 	AudioClip (std::string);
 	AudioClip (std::string, std::string, int, int, int, int, int, float, float, int);
 	~AudioClip ();
+	inline void rewind() { reset(); }
 	unsigned long getLength ();
 	stk::StkFloat getTime ();
 	float getProgress();

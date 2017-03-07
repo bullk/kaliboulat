@@ -12,10 +12,10 @@ public:
 	enum ClipState { HALTED, ARMED, PLAYING, RECORDING };
 	enum LaunchStyle { LAUNCH_BAR, LAUNCH_BEAT, LAUNCH_FREE, LAUNCH_RESYNC };
 	enum StopStyle { STOP_BAR, STOP_BEAT, STOP_FREE };
-	enum LoopStyle { ONESHOT, MANY, FOREVER };
+	enum LoopStyle { ONESHOT, FOREVER };
 	const char * launchText[4] = { "BAR", "BEAT", "FREE", "RESYNC" };
 	const char * stopText[3] = { "BAR", "BEAT", "FREE" };
-	const char * loopText[3] = { "ONESHOT", "MANY", "FOREVER" };
+	const char * loopText[2] = { "ONESHOT", "FOREVER" };
 	
 public:	
 	Clip();
@@ -29,7 +29,8 @@ public:
 	inline void unselect () { selected_ = false; }
 	inline bool isSelected () { return selected_; }
 	inline void play () { state_ = PLAYING; }
-	inline void stop () { state_ = HALTED; }
+	virtual void rewind() = 0;
+	void stop();
 	void armLaunch();
 	void armStop();
 	void arm ();
@@ -49,7 +50,7 @@ public:
 	inline virtual int getLoopStyle () { return loopstyle_; }
 	inline virtual const char* getLoopStyleText () { return loopText[loopstyle_]; }
 	inline virtual void setLoopStyle (int ls) { launchstyle_ = ls; }
-	inline virtual void nextLoopStyle () { loopstyle_ = (loopstyle_ + 1) % 3; }
+	inline virtual void nextLoopStyle () { loopstyle_ = (loopstyle_ + 1) % 2; }
 	inline int getArmMIDIChannel () { return armMIDIchannel_; }
 	inline int getArmMIDIKey () { return armMIDIkey_; }
 	void setArmMIDI( RawMidi );
