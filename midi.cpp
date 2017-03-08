@@ -240,12 +240,14 @@ MidiWaiter *MidiWaiter::singleton_ = NULL;
 // Constructor
 MidiWaiter::MidiWaiter() : preemption_(false)
 {
+	spdlog::get("main")->info("creating MidiWaiter");
 	assignment_ = RawMidi();
 }
 
 // Destructor
 MidiWaiter::~MidiWaiter ()
 {
+	spdlog::get("main")->info("killing MidiWaiter");
 }
 
 void MidiWaiter::addCommand( RawMidi m, BaseCommand * c )

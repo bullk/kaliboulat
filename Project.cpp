@@ -30,6 +30,7 @@ DIR * testandcreatedir (std::string s)
 
 Project::Project (std::string str)
 {
+	spdlog::get("main")->info("creating Project {}", str);
 	name_ = str;
 	dir_ = user_dir ();
 	testandcreatedir (dir_);
@@ -47,6 +48,7 @@ Project::Project (std::string str)
 
 Project::~Project ()
 {
+	spdlog::get("main")->info("destroying Project {}", name_);
 	while (tracks_.size())
 		tracks_.pop_back();
 	for (unsigned int i=0; i < audiofiles_ -> size(); i++)

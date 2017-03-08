@@ -3,6 +3,7 @@
 #include "midi.hpp"
 #include "State.hpp"
 #include "MidiFile.hpp"
+#include "Clock.hpp"
 //#include <unistd.h> // sleep
 
 

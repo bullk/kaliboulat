@@ -7,7 +7,7 @@ Clock::Clock ()
 {
 	state_ = false;
 	tempo_ = 120;
-	ticks_per_beat_ = 960;
+	ticks_per_beat_ = 120;
 	beats_per_bar_ = 4;
 	metrics();
 	rewind();
@@ -19,6 +19,7 @@ Clock::~Clock ()
 void Clock::metrics()
 {
 	metric_grain_ = 60.0f / ticks_per_beat_;
+	spdlog::get( "main" )->info("metric grain : {}", metric_grain_);
 }
 
 void Clock::start()
@@ -29,7 +30,6 @@ void Clock::start()
 		start_time_ = start_time_ + ( previous_time_ - pause_time_);
 		pause_time_ = start_time_;
 		state_ = true;
-		
 	}
 }
 
@@ -64,6 +64,13 @@ void Clock::rewind ()
 	time_dust_ = 0;
 }
 	
+void Clock::setTicksPerBeat( unsigned int tpb )
+{
+	ticks_per_beat_ = tpb;
+	metrics();
+	rewind();
+}
+
 unsigned int Clock::update ()
 {
 	unsigned int midi_ticks = 0;
@@ -82,7 +89,7 @@ unsigned int Clock::update ()
 		time_delta_ = std::chrono::duration_cast<std::chrono::microseconds> (now_ - previous_time_).count() + time_dust_;
 		mainlog->debug( "time_delta_ = {}", time_delta_ );
 		//ticks_delta = now_ticks_ - previous_ticks_;
-		ticks_delta = (unsigned int) (time_delta_ / tdus );
+		ticks_delta = (unsigned int) ( time_delta_ / tdus );
 		mainlog->debug( "ticks_delta = {}", ticks_delta );
 		float x = ticks_delta * tdus;
 		mainlog->debug( "x = {}", x );

@@ -20,19 +20,23 @@ std::vector<std::string> * State::midifiles_ = NULL;
 // Constructor
 State::State () : onoff_(true)
 {
+	spdlog::get("main")->info("creating State");
 	//audiodirs_ = new std::vector<std::string>;
 	projectlist_ = new std::vector<std::string>;
 	audiofiles_ = new std::vector<std::string>;
 	midifiles_ = new std::vector<std::string>;
 	loadConfiguration();
+	scanAudioFiles();
+	scanMidiFiles();
 }
 
 // Destructor
 State::~State ()
 {
+	spdlog::get("main")->info("killing State");
 	track_ = NULL;
 	clip_ = NULL;
-	//delete project_;
+	project_ = NULL;
 }
 
 std::string State::getConfigurationFileName()
@@ -44,6 +48,8 @@ std::string State::getConfigurationFileName()
 
 void State::loadConfiguration()
 {
+	auto mainlog= spdlog::get( "main" );
+	mainlog->debug( "State::saveConfiguration" );
     std::ifstream is( getConfigurationFileName() );
     if ( is.is_open() )
     {
@@ -55,24 +61,24 @@ void State::loadConfiguration()
 		audiodirs_.push_back( std::string( getenv( "HOME" ) ) );
 		mididirs_.push_back( std::string( getenv( "HOME" ) ) );
 	}
-	saveConfiguration();
+	mainlog->debug( "/State::saveConfiguration" );
 }
 
 void State::saveConfiguration()
 {
 	auto mainlog= spdlog::get( "main" );
-	mainlog->info( "State::saveConfiguration" );
-	mainlog->info( "* audiodirs_ contains {} element(s)", audiodirs_.size() );
-	mainlog->info( "* {}", audiodirs_.at(0) );
-	mainlog->info( "* mididirs_ contains {} element(s)", mididirs_.size() );
-	mainlog->info( "* {}", mididirs_.at(0) );
-	mainlog->info( "* get stream" );
+	mainlog->debug( "State::saveConfiguration" );
+	mainlog->debug( "* audiodirs_ contains {} element(s)", audiodirs_.size() );
+	mainlog->debug( "* {}", audiodirs_.at(0) );
+	mainlog->debug( "* mididirs_ contains {} element(s)", mididirs_.size() );
+	mainlog->debug( "* {}", mididirs_.at(0) );
+	mainlog->debug( "* get stream" );
     std::ofstream os( getConfigurationFileName() );
-	mainlog->info( "* create archive" );
+	mainlog->debug( "* create archive" );
     cereal::XMLOutputArchive archive( os );
-	mainlog->info( "* serialize" );
+	mainlog->debug( "* serialize" );
     serialize( archive ); 
-	mainlog->info( "/State::saveConfiguration" );
+	mainlog->debug( "/State::saveConfiguration" );
 }
 
 RtMidiOut * State::getMidiOut()
@@ -107,12 +113,11 @@ int State::scanProjects ()
 
 int State::scanAudioFilesCallback( const char *fpath, const struct stat *sb, int typeflag )
 {
-	auto mainlog = spdlog::get( "main" );
 	char * localpath = strdup( fpath );
 	if ( typeflag == FTW_F ) {
 		if ( fnmatch( "*.wav", localpath, FNM_CASEFOLD ) == 0 ) {
 			audiofiles_ -> push_back( localpath );
-			mainlog->info( "found {}", localpath );
+			spdlog::get( "main" )->debug( "found {}", localpath );
 		}
 	}
 	return 0;
@@ -120,11 +125,10 @@ int State::scanAudioFilesCallback( const char *fpath, const struct stat *sb, int
 
 int State::scanAudioFiles ()
 {
-	auto mainlog = spdlog::get( "main" );
 	audiofiles_->clear();
 	for ( unsigned int i=0; i< audiodirs_.size(); i++ )
 	{
-		mainlog->info( "scanning {}", audiodirs_[i].c_str() );
+		spdlog::get( "main" )->info( "scanning {}", audiodirs_[i].c_str() );
 		ftw( audiodirs_[i].c_str(), scanAudioFilesCallback, 16 );
 	}
 	return 0;
@@ -132,12 +136,11 @@ int State::scanAudioFiles ()
 
 int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int typeflag)
 {
-	auto mainlog = spdlog::get("main");
-	char * localpath = strdup (fpath);
-	if (typeflag == FTW_F) {
-		if (fnmatch("*.mid", localpath, FNM_CASEFOLD) == 0) {
+	char * localpath = strdup( fpath );
+	if ( typeflag == FTW_F ) {
+		if ( fnmatch( "*.mid", localpath, FNM_CASEFOLD ) == 0 ) {
 			midifiles_ -> push_back(localpath);
-			mainlog->info("found {}", localpath);
+			spdlog::get( "main" )->debug( "found {}", localpath );
 		}
 	}
 	return 0;
@@ -145,11 +148,10 @@ int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int 
 
 int State::scanMidiFiles ()
 {
-	auto mainlog = spdlog::get("main");
 	midifiles_->clear();
 	for ( unsigned int i=0; i< mididirs_.size(); i++ )
 	{
-		mainlog->info("scanning {}", mididirs_[i].c_str());
+		spdlog::get( "main" )->info("scanning {}", mididirs_[i].c_str());
 		ftw(mididirs_[i].c_str(), scanMidiFilesCallback, 16);
 	}
 	return 0;

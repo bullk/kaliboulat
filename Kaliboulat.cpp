@@ -125,18 +125,12 @@ int main( int argc, char* args[] )
 
 	auto mainlog= spdlog::get("main");	
 	mainlog->info("----- engine init -----");
-	mainlog->info("creating Waiter");
 	Waiter * waiter = Waiter::getInstance ();
-	mainlog->info("creating State");
 	State * state = State::getInstance ();
-	State::getInstance()->scanAudioFiles ();
-	State::getInstance()->scanMidiFiles ();
-	//State::scanMidiFiles ();
-	mainlog->info("creating Listener");
 	Listener * listener = Listener::getInstance ();
 
-	mainlog->info("----- project init -----");
 	// INIT PROJECT
+	mainlog->info("----- project init -----");
 	waiter->newProject(".newproject");
 	state->shared();
 	
@@ -205,7 +199,6 @@ int main( int argc, char* args[] )
 	
 	//mainlog->info("...MIDI module");
 	//midiInit ();
-	mainlog->info("creating MidiWaiter");
 	MidiWaiter * midi_waiter = MidiWaiter::getInstance();
 	
 	mainlog->info("----- GUI init -----");
@@ -219,13 +212,12 @@ int main( int argc, char* args[] )
 	mainlog->info("----- starting main loop -----");
 	unsigned int midi_ticks = 0;
 	
-	while ( state -> isOn () )
+	while ( state->isOn () )
 	{
 		// Clock update
-		if ( State::getProject() -> getClock () -> isStarted () ) 
+		if ( State::getProject()->getClock()->isStarted() ) 
 		{
-			midi_ticks = State::getProject() -> getClock () -> update ();
-			// MIDI flow
+			midi_ticks = State::getProject()->getClock()->update ();
 			for (unsigned int i=0; i<midi_ticks; i++)
 				Waiter::getInstance() -> tick();
 		}
@@ -235,8 +227,10 @@ int main( int argc, char* args[] )
 		
 		// GUI
 		#ifdef WITH_GUI
-			GUI_Main (State::getProject());
+			GUI_Main();
 		#endif
+		//usleep(500000 / State::getProject()->getClock()->getTicksPerBeat());
+		sleep(0);
 	}
 	
 	state->shared();
@@ -261,7 +255,6 @@ int main( int argc, char* args[] )
 	//mainlog->info("deleting project");
 	//delete project;
 	//waiter -> closeProject();
-	mainlog->info("killing MidiWaiter");
 	midi_waiter -> kill ();
 	mainlog->info("deleting RtMidiIn");
 	delete midiin;
@@ -270,12 +263,10 @@ int main( int argc, char* args[] )
 	mainlog->info("deleting RtAudio");
 	delete dac;
 	//delete diApp;
-	mainlog->info("killing Listener");
 	listener -> kill ();
-	mainlog->info("killing State");
 	state -> kill ();
-	mainlog->info("killing Waiter");
 	waiter -> kill ();
+	sleep(1);
 	mainlog->info("Done");
 	
 	//spdlog::drop_all();

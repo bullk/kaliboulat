@@ -31,7 +31,6 @@ public:
 	void pause();
 	void stop();
 	void rewind();
-	unsigned int update();
 	inline bool getState() { return state_; }
 	inline bool atZero() { return ( time_delta_ == 0 ); }
 	inline bool isStarted() { return state_; }
@@ -43,7 +42,8 @@ public:
 	inline unsigned int getBeat() { return beat_; }
 	inline unsigned int getTick() { return tick_; }
 	inline unsigned int getTicksPerBeat() { return ticks_per_beat_; }
-	inline void setTicksPerBeat( unsigned int tpb ) { ticks_per_beat_ = tpb; }
+	void setTicksPerBeat( unsigned int tpb );
+	unsigned int update();
 
 };
 
