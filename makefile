@@ -1,6 +1,9 @@
 CC = g++
 #CFLAGS = -Wall -Os -D__LITTLE_ENDIAN__ -I.
-CFLAGS = -Wall -O1 -D__LITTLE_ENDIAN__ -I.
+#CFLAGS = -Wall -O0 -g -D__LITTLE_ENDIAN__ -I.
+#CFLAGS = -Wall -O1 -D__LITTLE_ENDIAN__ -I.
+CFLAGS = -Wall -O2 -D__LITTLE_ENDIAN__ -I.
+#CFLAGS = -Wall -O3 -D__LITTLE_ENDIAN__ -I.
 CFLAGS += -std=c++0x
 #CFLAGS += -std=c++11
 JACKFLAGS = -D__UNIX_JACK__
@@ -17,17 +20,18 @@ OBJS = $(EXT_OBJS) $(MAIN_OBJS) $(GUI_OBJS) Kaliboulat.o
 SUFFIXES = .cpp .o
 .SUFFIXES: $(SUFFIXES) .
 
-new: Kaliboulat-rtmidi2.0.1
-old: Kaliboulat-rtmidi1.0.15
+new: Kaliboulat
+#new: Kaliboulat-rtmidi2.0.1
+#old: Kaliboulat-rtmidi1.0.15
 
-Kaliboulat-rtmidi2.0.1: $(OBJS) globals.h
+Kaliboulat: $(OBJS) globals.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(JACKFLAGS) -o $@ $(OBJS) $(LDLIBS) $(JACKLIBS)
 
-Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(ALSAFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
+#Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
+#	$(CC) $(CFLAGS) $(LDFLAGS) $(ALSAFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
 
 #tests: MidiClip.o tests.o globals.h
-	#$(CC) $(CFLAGS) $(LDFLAGS) $(JACKFLAGS) -o $@ MidiClip.o tests.o $(LDLIBS) $(JACKLIBS)
+#	$(CC) $(CFLAGS) $(LDFLAGS) $(JACKFLAGS) -o $@ MidiClip.o tests.o $(LDLIBS) $(JACKLIBS)
 #
 #tests.o: MidiClip.hpp
 	

@@ -11,7 +11,6 @@
 
 #include "globals.h"
 #include "Track.hpp"
-#include "Clock.hpp"
 #include <cereal/archives/xml.hpp>
 
 //void SplitFilename (const std::string& str)
@@ -21,6 +20,7 @@
   //std::cout << " file: " << str.substr(found+1) << '\n';
 //}
 
+class Clock;
 class AudioModule;
 class MidiModule;
 class AudioFile;

@@ -38,11 +38,13 @@ Waiter *Waiter::singleton_ = NULL;
 // Constructor
 Waiter::Waiter ()
 {
+	spdlog::get("main")->info("creating Waiter");
 }
 
 // Destructor
 Waiter::~Waiter ()
 {
+	spdlog::get("main")->info("killing Waiter");
 	//while ( !main_.empty() ) main_.pop();
 	//while ( !tick_.empty() ) tick_.pop();
 	//while ( !beat_.empty() ) beat_.pop();
@@ -139,8 +141,8 @@ void Waiter::saveProject()
 
 //void Waiter::closeProject ()
 //{
-	//saveProject ();
-    //State::setProject (NULL);
+	//saveProject();
+    //State::setProject( NULL );
 //}
 
 void copyFile( const char * name_in, const char * name_out )

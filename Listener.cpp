@@ -1,4 +1,5 @@
 #include "Listener.hpp"
+#include "spdlog/spdlog.h"
 
 // Initialisation du singleton à NULL
 Listener *Listener::singleton_ = NULL;
@@ -8,12 +9,14 @@ bool Listener::onoff_ = false;
 // Constructor
 Listener::Listener ()
 {
+	spdlog::get("main")->info("creating Listener");
 	volume_ = 1.0f;
 }
 
 // Destructor
 Listener::~Listener ()
 {
+	spdlog::get("main")->info("killing Listener");
 	delete audiofile_;
 }
 

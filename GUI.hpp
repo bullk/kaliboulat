@@ -43,7 +43,7 @@ class GUI
 
 int GUI_Init();
 void GUI_Close();
-void GUI_Main(std::shared_ptr<Project> project);
+void GUI_Main();
 
 
 #endif

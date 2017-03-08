@@ -48,8 +48,10 @@ int GUI_Init ()
 
 	// Setup window
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	//SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	//SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 0);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	SDL_DisplayMode current;
@@ -489,6 +491,7 @@ void ControlPanel (void (*title_func)())
 	ImGui::SameLine ();
 	ImGui::TextColored( ImColor(0,255,255), "%02d:%02d:%03d",
 		clock->getBar(), clock->getBeat(), clock->getTick() );
+	ImGui::SameLine (); ImGui::Text( "%d", clock->getTicksPerBeat() );
 
 	// CTRL PRESSED
 	if ( State::getInstance()->getProject()->ctrlPressed() )
@@ -642,7 +645,7 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 	ImGui::Text("size : %lu events", clip -> getSize());
 	ImGui::Text("division value : %d ticks/beat", clip -> getDivision());
 	ImGui::Text("length : %lu ticks", clip -> getLength());
-	ImGui::Text("time : %lu", clip -> getTime());
+	//ImGui::Text("time : %lu", clip -> getTime());
 	ImGui::Separator();
 	ImGui::Text("time (BBT)  "); ImGui::SameLine();
 	ImGui::Text("Status  "); ImGui::SameLine();
@@ -1094,8 +1097,9 @@ void OrgasampleScreen (std::shared_ptr<Project> project)
 //======================================================================
 
 
-void GUI_Main(std::shared_ptr<Project> project)
+void GUI_Main()
 {
+	std::shared_ptr<Project> project = State::getProject();
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
