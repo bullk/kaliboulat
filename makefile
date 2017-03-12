@@ -20,12 +20,15 @@ OBJS = $(EXT_OBJS) $(MAIN_OBJS) $(GUI_OBJS) Kaliboulat.o
 SUFFIXES = .cpp .o
 .SUFFIXES: $(SUFFIXES) .
 
-new: Kaliboulat
+all: Kaliboulat wavrepair
 #new: Kaliboulat-rtmidi2.0.1
 #old: Kaliboulat-rtmidi1.0.15
 
 Kaliboulat: $(OBJS) globals.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(JACKFLAGS) -o $@ $(OBJS) $(LDLIBS) $(JACKLIBS)
+
+wavrepair: wavrepair.cpp
+	$(CC) $(CFLAGS) -I/usr/include/stk $@.cpp -o $@ -lstk
 
 #Kaliboulat-rtmidi1.0.15: $(OBJS) globals.h
 #	$(CC) $(CFLAGS) $(LDFLAGS) $(ALSAFLAGS) -o $@ $(OBJS) $(LDLIBS) $(ALSALIBS)
