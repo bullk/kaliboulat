@@ -4,50 +4,62 @@
 #include <stk/FileWvIn.h>
 #include <stk/FileWvOut.h>
 
-#define FILEIN "/home/bullk/test_06.wav"
+using namespace std;
+using namespace stk;
 
-int main( int argc, char* args[] )
+int main( int argc, char* argv[] )
 {
-	stk::FileWvIn filewvin = stk::FileWvIn( FILEIN, false, true );
+	cout << "*** Arguments ***" << endl;
+	for ( int a = 0; a < argc; a++ )
+		cout <<  a << " : " << argv[a] << endl;
+	if ( argc == 1 ) return 1;
+	string ifname = string( argv[1] );
+	FileWvIn filewvin = FileWvIn( ifname, false, true );
+	//size_t pos = ifname.rfind("/");
+	//string dirname = ifname.substr(0, pos);
+	size_t extpos = ifname.rfind(".wav");
+	string basename = ifname.substr(0, extpos);
 	for ( unsigned int i=0; i<filewvin.channelsOut(); i++ )
 	{
-		std::string fout = FILEIN + std::string("-") + std::to_string(i);
-		stk::FileWvOut filewvout = stk::FileWvOut( fout );
-		std::cout << "channel " << i << std::endl;
-		std::vector<stk::StkFloat> data;
+		string ofname = basename +  "-" + to_string(i) + ".wav";
+		FileWvOut filewvout = FileWvOut( ofname );
+		cout << "channel " << i << endl;
+		vector<StkFloat> data;
+		unsigned int sn = 0;
 		int mod = 0;
 		float delta = 0.0f;
 		float max = 0.0f;
 		float corrected;
 		filewvin.reset();
-		stk::StkFloat previous;
-		stk::StkFloat value = filewvin.tick(i);
+		StkFloat previous;
+		StkFloat value = filewvin.tick(i);
 		//~ filewvout.tick( previous );
 		while ( not( filewvin.isFinished() ) )
 		{
-			//~ std::cout << "value : " << value << std::endl;
+			//~ cout << "value : " << value << endl;
 			corrected = value + mod;
 			data.push_back( corrected );
-			if ( std::abs(corrected) > max ) max = std::abs(corrected);
+			if ( abs( corrected ) > max ) max = abs( corrected );
 			previous = value;
+			sn++;
 			value = filewvin.tick(i);
 			delta = value - previous;
-			if ( delta > 1 )
+			if ( delta > 1.7 )
 			{
 				if ( mod == 0 ) mod = -2;
 				else mod = 0;
-				std::cout << "delta : " << delta << std::endl;
+				cout << sn <<  " | value : " << value << " | delta : " << delta << endl;
 			}
-			else if ( delta < -1 )
+			else if ( delta < -1.7 )
 			{
 				if ( mod == 0 ) mod = 2;
 				else mod = 0;
-				std::cout << "delta : " << delta << std::endl;
+				cout << sn <<  " | value : " << value << " | delta : " << delta << endl;
 			}
 			
 		}
-		std::cout << "maximum amp : " << max << std::endl;
-		for ( std::vector<stk::StkFloat>::iterator f=data.begin(); f != data.end(); f++ )
+		cout << "maximum amp : " << max << endl;
+		for ( vector<StkFloat>::iterator f=data.begin(); f != data.end(); f++ )
 			filewvout.tick( *f / max );
 		filewvout.closeFile();
 	}

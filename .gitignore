@@ -10,6 +10,7 @@ Kaliboulat-rtmidi2.0.1
 *.log
 CMakeLists.txt
 imgui.ini
+wavrepair
 
 user/
 
