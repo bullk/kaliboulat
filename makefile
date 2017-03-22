@@ -1,8 +1,8 @@
 CC = g++
 #CFLAGS = -Wall -Os -D__LITTLE_ENDIAN__ -I.
 #CFLAGS = -Wall -O0 -g -D__LITTLE_ENDIAN__ -I.
-#CFLAGS = -Wall -O1 -D__LITTLE_ENDIAN__ -I.
-CFLAGS = -Wall -O2 -D__LITTLE_ENDIAN__ -I.
+CFLAGS = -Wall -O1 -D__LITTLE_ENDIAN__ -I.
+#CFLAGS = -Wall -O2 -D__LITTLE_ENDIAN__ -I.
 #CFLAGS = -Wall -O3 -D__LITTLE_ENDIAN__ -I.
 CFLAGS += -std=c++0x
 #CFLAGS += -std=c++11

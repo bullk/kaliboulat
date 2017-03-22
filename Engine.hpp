@@ -89,7 +89,8 @@ class Waiter
 		void saveProject ();
 		void importAudioFile (std::string);
 		void importMidiFile (std::string);
-		void selectClip (std::shared_ptr<Clip>);
+		void selectClip( std::shared_ptr<Clip> );
+		void deleteClip( std::shared_ptr<Clip> );
 		//void closeProject ();
 		
 		// Singleton

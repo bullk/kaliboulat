@@ -52,7 +52,8 @@ public:
 	inline std::shared_ptr<Track> getTrack () { return track_; }
 	inline void setTrack (std::shared_ptr<Track> track) { track_ = track; }
 	inline std::shared_ptr<Clip> getClip () { return clip_; }
-	void setClip (std::shared_ptr<Clip> clip) { clip_ = clip; }
+	inline void setClip (std::shared_ptr<Clip> clip) { clip_ = clip; }
+	inline void unsetClip() { clip_ = NULL; }
 	static int scanProjects ();
 	int scanAudioFiles ();
 	int scanMidiFiles ();

@@ -6,6 +6,8 @@
 #include "Engine.hpp"
 #include "midi.hpp"
 
+class Track;
+
 class Clip
 {
 public:	
@@ -24,6 +26,8 @@ public:
 	virtual ~Clip ();
 	inline DataType dataType () { return data_type_; }
 	inline ClipState getState () { return state_; }
+	inline Track * getParent() { return parent_; }
+	inline void setParent(Track * t) { parent_ = t; }
 	inline bool isPlaying () { return (state_ == PLAYING); }
 	inline void select () { selected_ = true; }
 	inline void unselect () { selected_ = false; }
@@ -61,6 +65,7 @@ public:
 protected:
 	DataType data_type_;
 	ClipState state_;
+	Track * parent_;
 	std::string name_, filename_;
 	int launchstyle_, stopstyle_, loopstyle_;
 	int armMIDIchannel_, armMIDIkey_;

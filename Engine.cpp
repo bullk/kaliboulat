@@ -191,3 +191,16 @@ void Waiter::selectClip (std::shared_ptr<Clip> clip)
 	State::getInstance() -> setClip( clip );
 	mainlog->debug("/Waiter::selectClip");
 }
+
+void Waiter::deleteClip( std::shared_ptr<Clip> clip )
+{
+	auto mainlog= spdlog::get("main");	
+	mainlog->debug("Waiter::deleteClip");
+	mainlog->debug("* unsetClip");
+	State::getInstance() -> unsetClip();
+	//if ( State::getInstance() -> getClip() )
+		//State::getInstance() -> getClip() -> unselect();
+	//mainlog->debug("* select");
+	//clip -> select();
+	mainlog->debug("/Waiter::deleteClip");
+}

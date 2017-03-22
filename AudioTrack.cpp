@@ -37,8 +37,7 @@ void AudioTrack::addClip (std::string path, int tn)
 	mainlog->debug("AudioTrack::addClip");
 	std::shared_ptr<AudioClip> clip (new AudioClip(path));
 	addClip ( clip );
-	mainlog->debug("* select clip");
-	Waiter::getInstance() -> selectClip( std::static_pointer_cast<Clip>( clip ) );
+	//Waiter::getInstance() -> selectClip( std::static_pointer_cast<Clip>( clip ) );
 	mainlog->debug("/AudioTrack::addClip");
 }
 
@@ -50,6 +49,8 @@ void AudioTrack::addClip (std::shared_ptr<Clip> clip)
 void AudioTrack::addClip (std::shared_ptr<AudioClip> clip)
 {
 	clipset_.push_back( clip );
+	clip -> setParent( this );
+	Waiter::getInstance() -> selectClip( clip );
 }
 
 void AudioTrack::deleteClip (unsigned int i)

@@ -898,16 +898,18 @@ void ConsoleClip ( std::shared_ptr<Clip> clip, int id, float hue, float val )
 	{
 		if ( ImGui::IsMouseClicked (0) )
 			SelectConsoleClip( clip );
-		//else if ( ImGui::IsMouseClicked (1) ) 
-			//ImGui::OpenPopup( "popup-midiclip" );
+		else if ( ImGui::IsMouseClicked (1) )
+			ImGui::OpenPopup( "popup-midiclip" );
 	}
-	//if ( ImGui::BeginPopup( "popup-midiclip" ) )
-	//{
-		//if ( ImGui::Selectable( "delete this clip" ) )
-		//{
-		//}
-		//ImGui::EndPopup();
-	//}
+	ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 5, 5 ) );
+	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 5, 5 ) );
+	if ( ImGui::BeginPopup( "popup-midiclip" ) )
+	{
+		if ( ImGui::Selectable( "delete this clip" ) )
+			clip -> getParent() -> deleteClip( id );
+		ImGui::EndPopup();
+	}
+	ImGui::PopStyleVar(2);
 	
 	ImGui::EndChild();
 	ImGui::PopStyleVar(3);
