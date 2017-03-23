@@ -2,7 +2,7 @@
 #define INC_TRACK_H
 
 #include <string>
-#include "globals.h"
+//#include "globals.hpp"
 #include "Clip.hpp"
 
 

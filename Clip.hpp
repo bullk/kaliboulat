@@ -2,8 +2,7 @@
 #define INC_CLIP_H
 
 #include <string>
-#include "globals.h"
-#include "Engine.hpp"
+#include "globals.hpp"
 #include "midi.hpp"
 
 class Track;

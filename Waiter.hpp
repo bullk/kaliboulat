@@ -1,40 +1,11 @@
-#ifndef INC_ENGINE_H
-#define INC_ENGINE_H
+#ifndef INC_WAITER_H
+#define INC_WAITER_H
 
 #include <iostream> // cout, endl
 #include <queue>
 #include <memory>
 
 class Clip;
-
-inline std::string user_dir()
-{
-	return std::string(getenv ("HOME")) + "/Documents/Kaliboulat";
-}
-
-std::string name_from_path (std::string);
-
-
-enum DataType { NONE, AUDIO, MIDI, OSC, COM };
-
-
-class RessourceFile
-{
-public:
-	RessourceFile (DataType dt);
-	RessourceFile (DataType dt, std::string path);
-	virtual ~RessourceFile ();
-	inline DataType dataType () { return data_type_; }
-	inline std::string getPath () { return path_; }
-	void setPath (std::string path);
-	inline std::string getName () { return name_; }
-	inline void setName (std::string name) { name_ = name; }
-	
-protected:
-	DataType data_type_;
-	std::string path_, name_;
-};
-
 
 class BaseCommand
 {

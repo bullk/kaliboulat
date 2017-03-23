@@ -12,6 +12,7 @@
 #include "midi.hpp"
 #include "Clock.hpp"
 #include "State.hpp"
+#include "Project.hpp"
 #include "Modules.hpp"
 #include "Listener.hpp"
 
@@ -43,13 +44,13 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
-		if ( State::getProject() -> getClock() -> isStarted() ) 
+		if ( State::getInstance()->getProject() -> getClock() -> isStarted() ) 
 		{
-			for ( unsigned int j = 0; j < State::getProject()->nTracks(); j++ )
+			for ( unsigned int j = 0; j < State::getInstance()->getProject()->nTracks(); j++ )
 			{
-				if ( State::getProject() -> getTrack (j) -> dataType () == AUDIO )
+				if ( State::getInstance()->getProject() -> getTrack (j) -> dataType () == AUDIO )
 				{
-					std::shared_ptr<AudioTrack> daTrack = std::static_pointer_cast<AudioTrack>(State::getProject() -> getTrack (j));
+					std::shared_ptr<AudioTrack> daTrack = std::static_pointer_cast<AudioTrack>(State::getInstance()->getProject() -> getTrack (j));
 					if ( daTrack -> isPlaying () )
 						*samples += daTrack -> tick () * *(daTrack -> getVolume ());
 				}
@@ -215,9 +216,9 @@ int main( int argc, char* args[] )
 	while ( state->isOn () )
 	{
 		// Clock update
-		if ( State::getProject()->getClock()->isStarted() ) 
+		if ( State::getInstance()->getProject()->getClock()->isStarted() ) 
 		{
-			midi_ticks = State::getProject()->getClock()->update ();
+			midi_ticks = State::getInstance()->getProject()->getClock()->update ();
 			for (unsigned int i=0; i<midi_ticks; i++)
 				Waiter::getInstance() -> tick();
 		}

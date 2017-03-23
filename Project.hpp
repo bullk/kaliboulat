@@ -9,7 +9,6 @@
     #include <sys/types.h>
 #endif 
 
-#include "globals.h"
 #include "Track.hpp"
 #include <cereal/archives/xml.hpp>
 
@@ -49,9 +48,9 @@ public:
 	inline unsigned int nTracks () { return tracks_.size (); }
 	inline std::shared_ptr<Track> getTrack (unsigned int i) { return tracks_[i]; }
 	void addAudioFile (std::string s);
-	inline std::vector<AudioFile *> * getAudioFiles () { return audiofiles_; }
+	inline std::vector<AudioFile *> * getAudioFiles () { return &audiofiles_; }
 	void addMidiFile (std::string s);
-	inline std::vector<MidiFile *> * getMidiFiles () { return midifiles_; }
+	inline std::vector<MidiFile *> * getMidiFiles () { return &midifiles_; }
 	inline bool ctrlPressed () { return ctrl_; }
 	inline void ctrlDown () { ctrl_ = true; }
 	inline void ctrlUp () { ctrl_ = false; }
@@ -73,8 +72,8 @@ protected:
 	AudioModule * audio_;
 	MidiModule * midi_;
 	std::vector<std::shared_ptr<Track>> tracks_;
-	std::vector<AudioFile *> * audiofiles_;
-	std::vector<MidiFile *> * midifiles_;
+	std::vector<AudioFile *> audiofiles_;
+	std::vector<MidiFile *> midifiles_;
 	bool saved_;
 	bool ctrl_; // à passer dans State
 	

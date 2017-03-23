@@ -2,36 +2,13 @@
 #include <cereal/types/memory.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/archives/xml.hpp>
+#include "spdlog/spdlog.h"
 
-#include "Engine.hpp"
+#include "Waiter.hpp"
+#include "Project.hpp"
 #include "State.hpp"
 #include "Clock.hpp"
 #include "midi.hpp"
-
-std::string name_from_path (std::string path)
-{
-	int p = path.rfind("/") + 1;
-	return path.substr(p, path.length()-p);
-}
-
-RessourceFile::RessourceFile (DataType dt) : data_type_(dt)
-{
-}
-
-RessourceFile::RessourceFile (DataType dt, std::string path) : data_type_(dt), path_(path)
-{
-	name_ = name_from_path (path_);
-}
-
-RessourceFile::~RessourceFile ()
-{
-}
-
-void RessourceFile::setPath (std::string path)
-{
-	path_ = path;
-	name_ = name_from_path (path_);
-}
 
 // Initialisation du singleton à NULL
 Waiter *Waiter::singleton_ = NULL;
@@ -63,17 +40,17 @@ void Waiter::panic()
 
 void Waiter::start ()
 {
-	State::getProject() -> getClock() -> start();
+	State::getInstance()->getProject() -> getClock() -> start();
 }
 		
 void Waiter::pause ()
 {
-	State::getProject() -> getClock() -> pause();
+	State::getInstance()->getProject() -> getClock() -> pause();
 }
 		
 void Waiter::stop ()
 {
-	State::getProject() -> getClock() -> stop();
+	State::getInstance()->getProject() -> getClock() -> stop();
 	panic();
 }
 		
@@ -97,7 +74,7 @@ void Waiter::beat ()
 
 void Waiter::tick ()
 {
-	State::getProject() -> tick();
+	State::getInstance()->getProject() -> tick();
 	while ( !tick_.empty() )
 	{
 		tick_.front() -> execute();
@@ -119,24 +96,24 @@ void Waiter::newProject( std::string name )
 	//sauvegarder le projet courant
 	//closeProject ();
 	std::shared_ptr<Project> project (new Project (name) );
-	State::setProject( project );
+	State::getInstance()->setProject( project );
 }
 
 void Waiter::loadProject( std::string name )
 {
 	//closeProject ();
 	newProject( name );
-    std::ifstream is( State::getProject()->getFile() );
+    std::ifstream is( State::getInstance()->getProject()->getFile() );
     cereal::XMLInputArchive archive( is );
-    State::getProject()->serialize( archive ); 
+    State::getInstance()->getProject()->serialize( archive ); 
     //archive(State::getProject()); 
 }
 
 void Waiter::saveProject()
 {
-    std::ofstream os( State::getProject()->getFile() );
+    std::ofstream os( State::getInstance()->getProject()->getFile() );
     cereal::XMLOutputArchive archive( os );
-    State::getProject()->serialize( archive );
+    State::getInstance()->getProject()->serialize( archive );
     //archive(State::getProject()); 
 }
 
@@ -165,17 +142,17 @@ void copyFile( const char * name_in, const char * name_out )
 void Waiter::importAudioFile( std::string name_in )
 {
 	std::string filename = name_from_path( name_in );
-	std::string name_out = State::getProject() -> getAudioDir() + "/" + filename;
+	std::string name_out = State::getInstance()->getProject() -> getAudioDir() + "/" + filename;
 	copyFile( name_in.c_str(), name_out.c_str() );
-	State::getProject() -> addAudioFile( name_out );
+	State::getInstance()->getProject() -> addAudioFile( name_out );
 }
 
 void Waiter::importMidiFile( std::string name_in )
 {
 	std::string filename = name_from_path( name_in );
-	std::string name_out = State::getProject() -> getMidiDir() + "/" + filename;
+	std::string name_out = State::getInstance()->getProject() -> getMidiDir() + "/" + filename;
 	copyFile( name_in.c_str(), name_out.c_str() );
-	State::getProject() -> addMidiFile( name_out );
+	State::getInstance()->getProject() -> addMidiFile( name_out );
 }
 
 void Waiter::selectClip (std::shared_ptr<Clip> clip)

@@ -1,11 +1,13 @@
 #include "MidiClip.hpp"
 #include <RtMidi.h>
 #include "midi.hpp"
+#include "Project.hpp"
 #include "State.hpp"
 #include "MidiFile.hpp"
 #include "Clock.hpp"
 //#include <unistd.h> // sleep
 
+//class MidiFile;
 
 //-------------
 // Constructor 
@@ -78,7 +80,7 @@ void MidiClip::getEventsFromSource( bool rename )
 {
 	auto mainlog= spdlog::get( "main" );	
 	mainlog->debug( "MidiClip::getEventsFromSource" );
-	std::string uri = State::getProject()->getMidiDir() + "/" + filename_;
+	std::string uri = State::getInstance()->getProject()->getMidiDir() + "/" + filename_;
 	MidiFile source( uri );
 	
 	std::vector<unsigned char> * event = new std::vector<unsigned char> ();
@@ -94,11 +96,11 @@ void MidiClip::getEventsFromSource( bool rename )
 	}
 	
 	setDivision( source.getDivision() );
-	if ( State::getProject()->getClock()->getTicksPerBeat() % division_ != 0 )
-		State::getProject()->getClock()->setTicksPerBeat(
-			ppcm( State::getProject()->getClock()->getTicksPerBeat(), division_ )
+	if ( State::getInstance()->getProject()->getClock()->getTicksPerBeat() % division_ != 0 )
+		State::getInstance()->getProject()->getClock()->setTicksPerBeat(
+			ppcm( State::getInstance()->getProject()->getClock()->getTicksPerBeat(), division_ )
 		);
-	divscale_ = State::getProject()->getClock()->getTicksPerBeat() / division_;
+	divscale_ = State::getInstance()->getProject()->getClock()->getTicksPerBeat() / division_;
 	source.rewindTrack( tracknum_ );
 
 	mainlog->debug( "parsing events" );

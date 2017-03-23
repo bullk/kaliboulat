@@ -3,6 +3,7 @@
 
 #include "GUI.hpp"
 #include "State.hpp"
+#include "Project.hpp"
 #include "MidiFile.hpp"
 #include "MidiClip.hpp"
 #include "AudioFile.hpp"
@@ -170,7 +171,7 @@ void EndScreen ()
 
 void mainMenu ()
 {
-	std::shared_ptr<Project> project = State::getProject();
+	std::shared_ptr<Project> project = State::getInstance()->getProject();
 	static bool about_open = false;
 	static bool new_project = false;
 	static bool open_project = false;
@@ -188,7 +189,7 @@ void mainMenu ()
 			if (ImGui::MenuItem("New", "Ctrl+N", false, menu_mask)) new_project = true;
 			if (ImGui::MenuItem("Open", "Ctrl+O", false, menu_mask))
 			{
-				State::scanProjects();
+				State::getInstance()->scanProjects();
 				open_project = true;
 			}
 			if (ImGui::MenuItem("Save", "Ctrl+S", false, menu_mask))
@@ -260,14 +261,14 @@ void mainMenu ()
         ImGui::Text("Choose a project and open it\n or close this window\n");
         ImGui::Separator();
 		static unsigned int selected = 0;
-		for (unsigned int i=0; i<State::getProjectList()->size(); i++)
-			if ( ImGui::Selectable(State::getProjectList()->at(i).c_str(), (i==selected)) )
+		for (unsigned int i=0; i<State::getInstance()->getProjectList()->size(); i++)
+			if ( ImGui::Selectable(State::getInstance()->getProjectList()->at(i).c_str(), (i==selected)) )
 				selected = i;
         ImGui::Separator();
 		ImGui::Columns(2, NULL, false);
 		if (ImGui::Button("Open", ImVec2(80,0))) 
 		{
-			Waiter::getInstance() -> loadProject(State::getProjectList()->at(selected));
+			Waiter::getInstance() -> loadProject(State::getInstance()->getProjectList()->at(selected));
 			ImGui::CloseCurrentPopup();
 			open_project = false;
 		}
@@ -286,11 +287,11 @@ void mainMenu ()
         ImGui::Separator();
 		//ftw(getenv("HOME"), browseCallback, 16);
         
-		static std::vector<bool> selected (State::getAudioFiles()->size(), false);
-        ImGui::Text("%lu files found", State::getAudioFiles()->size());
+		static std::vector<bool> selected (State::getInstance()->getAudioFiles()->size(), false);
+        ImGui::Text("%lu files found", State::getInstance()->getAudioFiles()->size());
 		ImGui::BeginChild("wav files", ImVec2(800,600), true);
 		for (unsigned int i=0; i<selected.size(); i++)
-			if ( ImGui::Selectable(State::getAudioFiles()->at(i).c_str(), selected[i]) )
+			if ( ImGui::Selectable(State::getInstance()->getAudioFiles()->at(i).c_str(), selected[i]) )
 				selected[i] = !selected[i];
 		ImGui::EndChild();
         ImGui::Separator();
@@ -299,17 +300,17 @@ void mainMenu ()
 		{
 			for (unsigned int i=0; i<selected.size(); i++)
 				if ( selected[i] )
-					Waiter::getInstance()->importAudioFile ( State::getAudioFiles()->at(i) );
+					Waiter::getInstance()->importAudioFile ( State::getInstance()->getAudioFiles()->at(i) );
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
-			selected.assign(State::getAudioFiles()->size(), false);
+			selected.assign(State::getInstance()->getAudioFiles()->size(), false);
 		}
 		ImGui::NextColumn();
 		if (ImGui::Button("Close", ImVec2(80,0))) 
 		{
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
-			selected.assign(State::getAudioFiles()->size(), false);
+			selected.assign(State::getInstance()->getAudioFiles()->size(), false);
 		}
 		ImGui::EndPopup();
 	}
@@ -319,11 +320,11 @@ void mainMenu ()
         ImGui::Text("Select some files and confirm\n or close this window\n");
         ImGui::Separator();
         
-		static std::vector<bool> selected (State::getMidiFiles()->size(), false);
-        ImGui::Text("%lu files found", State::getMidiFiles()->size());
+		static std::vector<bool> selected (State::getInstance()->getMidiFiles()->size(), false);
+        ImGui::Text("%lu files found", State::getInstance()->getMidiFiles()->size());
 		ImGui::BeginChild("mid files", ImVec2(800,600), true);
 		for (unsigned int i=0; i<selected.size(); i++)
-			if ( ImGui::Selectable(State::getMidiFiles()->at(i).c_str(), selected[i]) )
+			if ( ImGui::Selectable(State::getInstance()->getMidiFiles()->at(i).c_str(), selected[i]) )
 				selected[i] = !selected[i];
 		ImGui::EndChild();
         ImGui::Separator();
@@ -332,10 +333,10 @@ void mainMenu ()
 		{
 			for (unsigned int i=0; i<selected.size(); i++)
 				if ( selected[i] )
-					Waiter::getInstance()->importMidiFile ( State::getMidiFiles()->at(i) );
+					Waiter::getInstance()->importMidiFile ( State::getInstance()->getMidiFiles()->at(i) );
 			ImGui::CloseCurrentPopup();
 			import_midi_files = false;
-			selected.assign(State::getMidiFiles()->size(), false);
+			selected.assign(State::getInstance()->getMidiFiles()->size(), false);
 		}
 		ImGui::NextColumn();
 		if (ImGui::Button("Close", ImVec2(80,0))) 
@@ -1102,7 +1103,7 @@ void OrgasampleScreen (std::shared_ptr<Project> project)
 
 void GUI_Main()
 {
-	std::shared_ptr<Project> project = State::getProject();
+	std::shared_ptr<Project> project = State::getInstance()->getProject();
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{

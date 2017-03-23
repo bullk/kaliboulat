@@ -1,5 +1,3 @@
-#include "State.hpp"
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,24 +5,29 @@
 #include <fnmatch.h>
 #include <libgen.h>
 #include <fstream>
+#include "spdlog/spdlog.h"
+
+#include "globals.hpp"
+#include "State.hpp"
+
 
 // Initialisation du singleton à NULL
 State * State::singleton_ = NULL;
-std::shared_ptr<Project> State::project_ = NULL;
-std::shared_ptr<Track> State::track_ = NULL;
-std::shared_ptr<Clip> State::clip_ = NULL;
-std::vector<std::string> * State::projectlist_ = NULL;
-std::vector<std::string> * State::audiofiles_ = NULL;
-std::vector<std::string> * State::midifiles_ = NULL;
+std::vector<std::string> State::projectlist_ = {};
+std::vector<std::string> State::audiofiles_ = {};
+std::vector<std::string> State::midifiles_ = {};
 
 // Constructor
 State::State () : onoff_(true)
 {
 	spdlog::get("main")->info("creating State");
 	//audiodirs_ = new std::vector<std::string>;
-	projectlist_ = new std::vector<std::string>;
-	audiofiles_ = new std::vector<std::string>;
-	midifiles_ = new std::vector<std::string>;
+	//projectlist_ = new std::vector<std::string>;
+	//audiofiles_ = new std::vector<std::string>;
+	//midifiles_ = new std::vector<std::string>;
+	std::shared_ptr<Project> project_ = NULL;
+	std::shared_ptr<Track> track_ = NULL;
+	std::shared_ptr<Clip> clip_ = NULL;
 	loadConfiguration();
 	scanAudioFiles();
 	scanMidiFiles();
@@ -81,6 +84,18 @@ void State::saveConfiguration()
 	mainlog->debug( "/State::saveConfiguration" );
 }
 
+void State::setProject( std::shared_ptr<Project> project )
+{
+	//delete project_;
+	project_ = project;
+}
+
+void State::shared ()
+{
+	auto mainlog= spdlog::get("main");
+	mainlog->info("Project shared_ptr count : {}", project_.use_count());
+}
+
 RtMidiOut * State::getMidiOut()
 {
 	return midiout_;
@@ -98,7 +113,7 @@ int State::scanProjectsCallback( const char *fpath, const struct stat *sb, int t
 	if ( typeflag == FTW_F ) {
 		if ( fnmatch( "*.kal", localpath, FNM_CASEFOLD ) == 0 ) {
 			std::string str = std::string( basename( localpath ) );
-			projectlist_ -> push_back( str.substr( 0, str.length()-4 ) );
+			projectlist_.push_back( str.substr( 0, str.length()-4 ) );
 		}
 	}
 	return 0;
@@ -106,8 +121,9 @@ int State::scanProjectsCallback( const char *fpath, const struct stat *sb, int t
 
 int State::scanProjects ()
 {
-	projectlist_->clear();
+	projectlist_.clear();
 	ftw( user_dir().c_str(), scanProjectsCallback, 16 );
+	std::sort( projectlist_.begin(), projectlist_.end() );
 	return 0;
 }
 
@@ -116,7 +132,7 @@ int State::scanAudioFilesCallback( const char *fpath, const struct stat *sb, int
 	char * localpath = strdup( fpath );
 	if ( typeflag == FTW_F ) {
 		if ( fnmatch( "*.wav", localpath, FNM_CASEFOLD ) == 0 ) {
-			audiofiles_ -> push_back( localpath );
+			audiofiles_.push_back( localpath );
 			spdlog::get( "main" )->debug( "found {}", localpath );
 		}
 	}
@@ -125,12 +141,13 @@ int State::scanAudioFilesCallback( const char *fpath, const struct stat *sb, int
 
 int State::scanAudioFiles ()
 {
-	audiofiles_->clear();
+	audiofiles_.clear();
 	for ( unsigned int i=0; i< audiodirs_.size(); i++ )
 	{
 		spdlog::get( "main" )->info( "scanning {}", audiodirs_[i].c_str() );
 		ftw( audiodirs_[i].c_str(), scanAudioFilesCallback, 16 );
 	}
+	std::sort( audiofiles_.begin(), audiofiles_.end() );
 	return 0;
 }
 
@@ -139,7 +156,7 @@ int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int 
 	char * localpath = strdup( fpath );
 	if ( typeflag == FTW_F ) {
 		if ( fnmatch( "*.mid", localpath, FNM_CASEFOLD ) == 0 ) {
-			midifiles_ -> push_back(localpath);
+			midifiles_.push_back(localpath);
 			spdlog::get( "main" )->debug( "found {}", localpath );
 		}
 	}
@@ -148,12 +165,13 @@ int State::scanMidiFilesCallback (const char *fpath, const struct stat *sb, int 
 
 int State::scanMidiFiles ()
 {
-	midifiles_->clear();
+	midifiles_.clear();
 	for ( unsigned int i=0; i< mididirs_.size(); i++ )
 	{
 		spdlog::get( "main" )->info("scanning {}", mididirs_[i].c_str());
 		ftw(mididirs_[i].c_str(), scanMidiFilesCallback, 16);
 	}
+	std::sort( midifiles_.begin(), midifiles_.end() );
 	return 0;
 }
 

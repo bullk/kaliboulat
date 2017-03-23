@@ -7,7 +7,7 @@
 //#include <memory>
 #include <RtMidi.h>
 #include "Scheduled.hpp"
-#include "Engine.hpp"
+#include "Waiter.hpp"
 
 typedef std::vector<unsigned char> RawMidi;
 

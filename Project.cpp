@@ -39,8 +39,8 @@ Project::Project (std::string str)
 	clock_ = new Clock ();
 	audio_ = new AudioModule ();
 	midi_ = new MidiModule ();
-	audiofiles_ = new std::vector<AudioFile *>;
-	midifiles_ = new std::vector<MidiFile *>;
+	//audiofiles_ = new std::vector<AudioFile>;
+	//midifiles_ = new std::vector<MidiFile>;
 	updateRessources ();
 	saved_ = false;
 	ctrl_ = false; // à passer dans State
@@ -51,10 +51,8 @@ Project::~Project ()
 	spdlog::get("main")->info("destroying Project {}", name_);
 	while (tracks_.size())
 		tracks_.pop_back();
-	for (unsigned int i=0; i < audiofiles_ -> size(); i++)
-		delete audiofiles_ -> at (i);
-	delete audiofiles_;
-	delete midifiles_;
+	//for (unsigned int i=0; i < audiofiles_.size(); i++)
+		//delete audiofiles_.at(i);
 	delete audio_;
 	delete midi_;
 	delete clock_;
@@ -75,12 +73,12 @@ void Project::tick ()
 
 void Project::addAudioFile (std::string s)
 {
-	audiofiles_ -> push_back(new AudioFile (s.c_str()));
+	audiofiles_.push_back( new AudioFile( s.c_str() ) );
 }
 
 void Project::addMidiFile (std::string s)
 {
-	midifiles_ -> push_back(new MidiFile (s.c_str()));
+	midifiles_.push_back( new MidiFile( s.c_str() ) );
 }
 
 //TODO : factoriser
@@ -90,19 +88,22 @@ void Project::updateRessources ()
 	struct dirent* daFile = NULL;
 	testandcreatedir (dir_);
 	
-	DIR * audiodir = testandcreatedir (getAudioDir());
-	while ((daFile = readdir(audiodir)) != NULL)
+	DIR * audiodir = testandcreatedir( getAudioDir() );
+	while ( ( daFile = readdir( audiodir ) ) != NULL )
 		if ( daFile -> d_type == DT_REG )
 		{
 			std::string str = daFile -> d_name;
-			std::size_t found = str.find_last_of(".");
-			if ( (str.substr(found+1) == "wav") or (str.substr(found+1) == "WAV") )
+			std::size_t found = str.find_last_of( "." );
+			if ( ( str.substr( found+1 ) == "wav" ) or ( str.substr( found+1 ) == "WAV" ) )
 			{
-				audiofiles_ -> push_back(new AudioFile(getAudioDir() + "/" +str));
+				audiofiles_.push_back( new AudioFile( getAudioDir() + "/" + str ) );
 				mainlog->info("Audio ressource : {}", str);
 			}
 		}
-	closedir (audiodir);
+	closedir( audiodir );
+	//for ( std::vector<AudioFile*>::iterator it=audiofiles_.begin(); it<audiofiles_.end(); it++ )
+		//mainlog->info("Path : {}", (*it)->getPath());
+
 	
 	DIR * mididir = testandcreatedir (getMidiDir());
 	daFile = NULL;
@@ -113,12 +114,11 @@ void Project::updateRessources ()
 			std::size_t found = str.find_last_of(".");
 			if ( (str.substr(found+1) == "mid") or (str.substr(found+1) == "MID") )
 			{
-				midifiles_ -> push_back(new MidiFile(getMidiDir() + "/" +str));
+				midifiles_.push_back( new MidiFile( getMidiDir() + "/" + str ) );
 				mainlog->info("MIDI ressource : {}", str);
 			}
 		}
 	closedir (mididir);
-
 }
 
 void Project::addAudioTrack ( std::string s )

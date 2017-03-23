@@ -7,8 +7,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_sdl.h"
 
-#include "globals.h"
-#include "Engine.hpp"
+#include "globals.hpp"
 
 #define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
 

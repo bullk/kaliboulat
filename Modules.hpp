@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "globals.h"
+//#include "globals.hpp"
 #include "AudioTrack.hpp"
 #include "MidiTrack.hpp"
 
