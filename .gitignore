@@ -12,6 +12,4 @@ CMakeLists.txt
 imgui.ini
 wavrepair
 
-user/
-
 #GUI.*

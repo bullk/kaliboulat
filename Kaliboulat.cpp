@@ -14,8 +14,8 @@
 #include "Clock.hpp"
 #include "State.hpp"
 #include "Project.hpp"
-#include "Modules.hpp"
 #include "Listener.hpp"
+#include "AudioTrack.hpp"
 
 #ifdef WITH_GUI
 #include "GUI.hpp"
@@ -145,62 +145,7 @@ int main( int argc, char* args[] )
 	#endif
 	audioInit (dac);
 
-	// MIDI INIT
-	mainlog->info("----- MIDI init -----");
-	RtMidiOut * midiout = NULL;
-	RtMidiIn * midiin = NULL;
-	try { 
-	#ifdef __UNIX_JACK__
-		mainlog->info("creating RtMidiOut with JACK");
-		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDIOUT_MODULE_NAME);
-		midiin = new RtMidiIn (RtMidi::UNIX_JACK, MIDIIN_MODULE_NAME);
-	#else
-		mainlog->info("creating RtMidiOut without JACK !!!");
-		midiout = new RtMidiOut (MIDI_MODULE_NAME);
-		midiin = new RtMidiIn (MIDI_MODULE_NAME);
-	#endif
-	}
-	catch ( RtMidiError &error ) 
-	{
-		error.printMessage ();
-		exit ( EXIT_FAILURE );
-	}
-	
-	State::getInstance()->setMidiOut( midiout );
-	
-	midiin->setCallback (midiCallback);
-	midiin->ignoreTypes( false, true, true );
-	//unsigned int nPorts = midiout->getPortCount (); // Check available ports.
-	//if ( nPorts == 0 )
-		//std::cout << "No ports available !" << std::endl;
-	//else
-	//{
-		//for ( unsigned int i=0; i < nPorts; i++ )
-			//std::cout << "MIDI port " << i << "->" << midiout->getPortName (i) << std::endl;
-		//midiout->openPort (); // Open first available port.
-	//}
-	mainlog->info("opening virtual MIDI out port");
-	try { 
-		midiout->openVirtualPort ();
-	}
-	catch ( RtMidiError &error ) 
-	{
-		error.printMessage();
-		exit( EXIT_FAILURE );
-	}
-	
-	mainlog->info("opening virtual MIDI in port");
-	try { 
-		midiin->openVirtualPort ();
-	}
-	catch ( RtMidiError &error ) 
-	{
-		error.printMessage();
-		exit( EXIT_FAILURE );
-	}
-	
-	//mainlog->info("...MIDI module");
-	//midiInit ();
+	midi_init();
 	MidiWaiter * midi_waiter = MidiWaiter::getInstance();
 	
 	mainlog->info("----- GUI init -----");
@@ -242,14 +187,14 @@ int main( int argc, char* args[] )
 		GUI_Close ();
 	#endif
 	
-	midiPanic (midiout);
+	midiPanic( State::getInstance()->getMidiOut() );
 
 	mainlog->info("closing MidiOut port");
-	midiout->closePort ();
+	State::getInstance()->getMidiOut()->closePort();
 	mainlog->info("closing MidiIn port");
-	midiin->closePort ();
+	State::getInstance()->getMidiIn()->closePort();
 	mainlog->info("canceling MidiIn callback");
-	midiin->cancelCallback ();
+	State::getInstance()->getMidiIn()->cancelCallback ();
 	mainlog->info("closing Audio ports");
 	audioClose (dac);
 
@@ -258,10 +203,6 @@ int main( int argc, char* args[] )
 	//delete project;
 	//waiter->closeProject();
 	midi_waiter->kill ();
-	mainlog->info("deleting RtMidiIn");
-	delete midiin;
-	mainlog->info("deleting RtMidiOut");
-	delete midiout;
 	mainlog->info("deleting RtAudio");
 	delete dac;
 	//delete diApp;

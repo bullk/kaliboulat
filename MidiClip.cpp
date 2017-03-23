@@ -1,10 +1,12 @@
-#include "MidiClip.hpp"
 #include <RtMidi.h>
+#include "spdlog/spdlog.h"
+
+#include "Clock.hpp"
 #include "midi.hpp"
+#include "MidiClip.hpp"
+#include "MidiFile.hpp"
 #include "Project.hpp"
 #include "State.hpp"
-#include "MidiFile.hpp"
-#include "Clock.hpp"
 //#include <unistd.h> // sleep
 
 //class MidiFile;

@@ -19,6 +19,7 @@ private:
 	// Destructor
 	~State ();
 	RtMidiOut * midiout_;
+	RtMidiIn * midiin_;
 	bool onoff_;
 	static State * singleton_;
 	static std::shared_ptr<Project> project_;
@@ -36,8 +37,10 @@ private:
 	void loadConfiguration();
 
 public:
-	RtMidiOut * getMidiOut();
-	void setMidiOut( RtMidiOut * midiout );
+	inline RtMidiIn * getMidiIn() { return midiin_; }
+	inline RtMidiOut * getMidiOut() { return midiout_; }
+	inline void setMidiIn( RtMidiIn * mi ) { midiin_ = mi; }
+	inline void setMidiOut( RtMidiOut * mo ) { midiout_ = mo; }
 	inline bool isOn () { return onoff_; }
 	inline void halt () { onoff_ = false; }
 	void saveConfiguration();

@@ -1,15 +1,63 @@
 #include "spdlog/spdlog.h"
 #include "midi.hpp"
+#include "State.hpp"
 #include "Clip.hpp"
 
 //----------------------------------------------------------------------
 // MIDI FUNCTIONS
 //----------------------------------------------------------------------
 
-void midiInit ()
+void midi_init()
 {
-}
+	auto mainlog= spdlog::get("main");	
+	mainlog->info("----- MIDI init -----");
+	RtMidiOut * midiout = NULL;
+	RtMidiIn * midiin = NULL;
+	try { 
+	#ifdef __UNIX_JACK__
+		mainlog->info("creating RtMidiOut with JACK");
+		midiout = new RtMidiOut (RtMidi::UNIX_JACK, MIDIOUT_MODULE_NAME);
+		midiin = new RtMidiIn (RtMidi::UNIX_JACK, MIDIIN_MODULE_NAME);
+	#else
+		mainlog->info("creating RtMidiOut without JACK !!!");
+		midiout = new RtMidiOut (MIDI_MODULE_NAME);
+		midiin = new RtMidiIn (MIDI_MODULE_NAME);
+	#endif
+	}
+	catch ( RtMidiError &error ) 
+	{
+		error.printMessage ();
+		exit ( EXIT_FAILURE );
+	}
 
+	State::getInstance()->setMidiIn( midiin );
+	State::getInstance()->setMidiOut( midiout );
+		
+	midiin->setCallback (midiCallback);
+	midiin->ignoreTypes( false, true, true );
+	
+	mainlog->info( "opening virtual MIDI out port" );
+	try { 
+		midiout->openVirtualPort ( "thru" );
+	}
+	catch ( RtMidiError &error ) 
+	{
+		error.printMessage();
+		exit( EXIT_FAILURE );
+	}
+
+	mainlog->info( "opening virtual MIDI in port" );
+	try { 
+		midiin->openVirtualPort ( "control" );
+	}
+	catch ( RtMidiError &error ) 
+	{
+		error.printMessage();
+		exit( EXIT_FAILURE );
+	}
+
+}
+	
 void midiPanic (RtMidiOut * midiout)
 {
 	RawMidi cc121 { 0xB0, 0x79, 0x00 }; // Channel 1, all CC OFF

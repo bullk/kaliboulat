@@ -1,6 +1,9 @@
+#include <stdlib.h>
+
+#include "spdlog/spdlog.h"
+
 #include "MidiFile.hpp"
 #include "MidiClip.hpp"
-#include <stdlib.h>
 //#include "midi.hpp"
 
 //-------------

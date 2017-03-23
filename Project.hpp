@@ -20,8 +20,6 @@
 //}
 
 class Clock;
-class AudioModule;
-class MidiModule;
 class AudioFile;
 class MidiFile;
 
@@ -32,13 +30,10 @@ public:
 	Project (std::string str);
 	~Project ();
 	void updateRessources ();
-	//void importAll ();
 	inline std::string getName () { return name_; }
 	inline std::string getFile () { return file_; }
-	Clock * getClock ();
+	inline Clock * getClock () { return clock_; }
 	void tick ();
-	AudioModule * getAudio ();
-	MidiModule * getMIDI ();
 	inline std::string getAudioDir () { return dir_ + "/Audio"; }
 	inline std::string getMidiDir () { return dir_ + "/MIDI"; }
 	void addAudioTrack (std::string s);
@@ -69,8 +64,6 @@ protected:
 	std::string dir_;
 	std::string file_;
 	Clock * clock_;
-	AudioModule * audio_;
-	MidiModule * midi_;
 	std::vector<std::shared_ptr<Track>> tracks_;
 	std::vector<AudioFile *> audiofiles_;
 	std::vector<MidiFile *> midifiles_;
@@ -79,9 +72,6 @@ protected:
 	
 };
 
-inline Clock * Project::getClock () { return clock_; }
-inline AudioModule * Project::getAudio () { return audio_; }
-inline MidiModule * Project::getMIDI () { return midi_; }
 
 
 #endif

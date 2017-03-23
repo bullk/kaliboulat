@@ -2,12 +2,15 @@
 #include <algorithm>
 #include <dirent.h>
 
+#include "spdlog/spdlog.h"
+
 #include "Project.hpp"
 #include "Clock.hpp"
 #include "State.hpp"
-#include "Modules.hpp"
 #include "AudioFile.hpp"
+#include "AudioTrack.hpp"
 #include "MidiFile.hpp"
+#include "MidiTrack.hpp"
 
 DIR * testandcreatedir (std::string s)
 {
@@ -37,10 +40,6 @@ Project::Project (std::string str)
 	dir_ += "/" + str;
 	file_ = dir_ + "/" + name_ + FILE_EXT;
 	clock_ = new Clock ();
-	audio_ = new AudioModule ();
-	midi_ = new MidiModule ();
-	//audiofiles_ = new std::vector<AudioFile>;
-	//midifiles_ = new std::vector<MidiFile>;
 	updateRessources ();
 	saved_ = false;
 	ctrl_ = false; // à passer dans State
@@ -51,10 +50,10 @@ Project::~Project ()
 	spdlog::get("main")->info("destroying Project {}", name_);
 	while (tracks_.size())
 		tracks_.pop_back();
-	//for (unsigned int i=0; i < audiofiles_.size(); i++)
-		//delete audiofiles_.at(i);
-	delete audio_;
-	delete midi_;
+	for (unsigned int i=0; i < audiofiles_.size(); i++)
+		delete audiofiles_.at(i);
+	for (unsigned int i=0; i < midifiles_.size(); i++)
+		delete midifiles_.at(i);
 	delete clock_;
 }
 

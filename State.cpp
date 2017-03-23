@@ -32,10 +32,15 @@ State::State () : onoff_(true)
 // Destructor
 State::~State ()
 {
-	spdlog::get("main")->info("killing State");
+	auto mainlog= spdlog::get( "main" );
+	mainlog->info("killing State");
 	track_ = NULL;
 	clip_ = NULL;
 	project_ = NULL;
+	mainlog->info("deleting RtMidiIn");
+	delete midiin_;
+	mainlog->info("deleting RtMidiOut");
+	delete midiout_;
 }
 
 std::string State::getConfigurationFileName()
@@ -90,16 +95,6 @@ void State::shared ()
 {
 	auto mainlog= spdlog::get("main");
 	mainlog->info("Project shared_ptr count : {}", project_.use_count());
-}
-
-RtMidiOut * State::getMidiOut()
-{
-	return midiout_;
-}
-
-void State::setMidiOut( RtMidiOut * midiout )
-{
-	midiout_ = midiout;
 }
 
 

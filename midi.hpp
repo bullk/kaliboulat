@@ -11,7 +11,7 @@
 
 typedef std::vector<unsigned char> RawMidi;
 
-void midiInit ();
+void midi_init();
 void midiPanic (RtMidiOut * midiout);
 void midiCallback (double timeStamp, RawMidi *message, void *userData);
 std::string char_vector_to_hex (RawMidi v);
