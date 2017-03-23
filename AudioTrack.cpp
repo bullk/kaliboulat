@@ -1,4 +1,6 @@
 //#include <stdlib.h>
+#include "spdlog/spdlog.h"
+
 #include "AudioTrack.hpp"
 
 
@@ -14,6 +16,8 @@ AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f
 AudioTrack::AudioTrack (std::string s, float h, float v, std::vector<std::shared_ptr<AudioClip>> cs) :
 	Track (AUDIO, "Audio", s, h), volume_(v), clipset_(cs)
 {
+	for ( std::vector<std::shared_ptr<AudioClip>>::iterator it=clipset_.begin(); it<clipset_.end(); it++ )
+		(*it)->setParent( this );
 }
 
 //------------
@@ -37,7 +41,6 @@ void AudioTrack::addClip (std::string path, int tn)
 	mainlog->debug("AudioTrack::addClip");
 	std::shared_ptr<AudioClip> clip (new AudioClip(path));
 	addClip ( clip );
-	//Waiter::getInstance() -> selectClip( std::static_pointer_cast<Clip>( clip ) );
 	mainlog->debug("/AudioTrack::addClip");
 }
 

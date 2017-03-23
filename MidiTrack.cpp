@@ -14,6 +14,8 @@ MidiTrack::MidiTrack( std::string name ) : Track( MIDI, "MIDI", name )
 MidiTrack::MidiTrack( std::string s, float h, std::vector<std::shared_ptr<MidiClip>> cs ) :
 	Track( MIDI, "Midi", s, h ), clipset_( cs )
 {
+	for ( std::vector<std::shared_ptr<MidiClip>>::iterator it=clipset_.begin(); it<clipset_.end(); it++ )
+		(*it)->setParent( this );
 }
 
 //------------
