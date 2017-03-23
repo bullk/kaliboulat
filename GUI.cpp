@@ -1,5 +1,6 @@
 #include <typeinfo>
 //#include <unistd.h> // sleep
+#include "spdlog/spdlog.h"
 
 #include "GUI.hpp"
 #include "State.hpp"

@@ -1,4 +1,4 @@
-#include "globals.hpp"
+#include "spdlog/spdlog.h"
 #include "Clock.hpp"
 #include "Waiter.hpp"
 
@@ -19,7 +19,7 @@ Clock::~Clock ()
 void Clock::metrics()
 {
 	metric_grain_ = 60.0f / ticks_per_beat_;
-	spdlog::get( "main" )->info("metric grain : {}", metric_grain_);
+	spdlog::get( "main" )->info( "metric grain : {}", metric_grain_ );
 }
 
 void Clock::start()

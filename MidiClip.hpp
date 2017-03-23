@@ -10,7 +10,6 @@
 #include <cereal/types/polymorphic.hpp>
 
 class RtMidiOut;
-//class ScheduledMidiMessage;
 
 class MidiClip : public Clip
 {

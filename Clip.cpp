@@ -1,3 +1,5 @@
+#include "spdlog/spdlog.h"
+
 #include "Clip.hpp"
 #include "midi.hpp"
 

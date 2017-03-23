@@ -8,6 +8,7 @@
 //#include <RtError.h>
 #include <RtAudio.h>
 #include <RtMidi.h>
+#include "spdlog/spdlog.h"
 
 #include "midi.hpp"
 #include "Clock.hpp"

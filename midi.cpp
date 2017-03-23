@@ -1,5 +1,5 @@
-#include "midi.hpp"
 #include "spdlog/spdlog.h"
+#include "midi.hpp"
 #include "Clip.hpp"
 
 //----------------------------------------------------------------------
