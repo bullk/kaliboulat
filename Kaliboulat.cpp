@@ -44,19 +44,19 @@ int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 	for ( unsigned int i=0; i<nBufferFrames; i++ )
 	{
 		*samples = 0;
-		if ( State::getInstance()->getProject() -> getClock() -> isStarted() ) 
+		if ( State::getProject()->getClock()->isStarted() ) 
 		{
-			for ( unsigned int j = 0; j < State::getInstance()->getProject()->nTracks(); j++ )
+			for ( unsigned int j = 0; j < State::getProject()->nTracks(); j++ )
 			{
-				if ( State::getInstance()->getProject() -> getTrack (j) -> dataType () == AUDIO )
+				if ( State::getProject()->getTrack (j)->dataType () == AUDIO )
 				{
-					std::shared_ptr<AudioTrack> daTrack = std::static_pointer_cast<AudioTrack>(State::getInstance()->getProject() -> getTrack (j));
-					if ( daTrack -> isPlaying () )
-						*samples += daTrack -> tick () * *(daTrack -> getVolume ());
+					std::shared_ptr<AudioTrack> daTrack = std::static_pointer_cast<AudioTrack>(State::getProject()->getTrack (j));
+					if ( daTrack->isPlaying () )
+						*samples += daTrack->tick () * *(daTrack->getVolume ());
 				}
 			}
 		}
-		*samples += Listener::getInstance() -> tick();
+		*samples += Listener::getInstance()->tick();
 		samples++;
 	}
 	return 0;
@@ -71,11 +71,11 @@ void audioInit (RtAudio * dac)
 	
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
 	RtAudio::StreamParameters input_parameters;
-	input_parameters.deviceId = dac -> getDefaultInputDevice ();
+	input_parameters.deviceId = dac->getDefaultInputDevice ();
 	input_parameters.nChannels = AUDIO_INPUTS;
 	
 	RtAudio::StreamParameters output_parameters;
-	output_parameters.deviceId = dac -> getDefaultOutputDevice ();
+	output_parameters.deviceId = dac->getDefaultOutputDevice ();
 	output_parameters.nChannels = AUDIO_OUTPUTS;
 	
 	RtAudioFormat format = ( sizeof (StkFloat) == 8 ) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
@@ -169,18 +169,18 @@ int main( int argc, char* args[] )
 	
 	midiin->setCallback (midiCallback);
 	midiin->ignoreTypes( false, true, true );
-	//unsigned int nPorts = midiout -> getPortCount (); // Check available ports.
+	//unsigned int nPorts = midiout->getPortCount (); // Check available ports.
 	//if ( nPorts == 0 )
 		//std::cout << "No ports available !" << std::endl;
 	//else
 	//{
 		//for ( unsigned int i=0; i < nPorts; i++ )
-			//std::cout << "MIDI port " << i << " -> " << midiout -> getPortName (i) << std::endl;
-		//midiout -> openPort (); // Open first available port.
+			//std::cout << "MIDI port " << i << "->" << midiout->getPortName (i) << std::endl;
+		//midiout->openPort (); // Open first available port.
 	//}
 	mainlog->info("opening virtual MIDI out port");
 	try { 
-		midiout -> openVirtualPort ();
+		midiout->openVirtualPort ();
 	}
 	catch ( RtMidiError &error ) 
 	{
@@ -190,7 +190,7 @@ int main( int argc, char* args[] )
 	
 	mainlog->info("opening virtual MIDI in port");
 	try { 
-		midiin -> openVirtualPort ();
+		midiin->openVirtualPort ();
 	}
 	catch ( RtMidiError &error ) 
 	{
@@ -216,15 +216,15 @@ int main( int argc, char* args[] )
 	while ( state->isOn () )
 	{
 		// Clock update
-		if ( State::getInstance()->getProject()->getClock()->isStarted() ) 
+		if ( State::getProject()->getClock()->isStarted() ) 
 		{
-			midi_ticks = State::getInstance()->getProject()->getClock()->update ();
+			midi_ticks = State::getProject()->getClock()->update ();
 			for (unsigned int i=0; i<midi_ticks; i++)
-				Waiter::getInstance() -> tick();
+				Waiter::getInstance()->tick();
 		}
 		
 		// Waiters
-		waiter -> main ();
+		waiter->main ();
 		
 		// GUI
 		#ifdef WITH_GUI
@@ -244,19 +244,19 @@ int main( int argc, char* args[] )
 	midiPanic (midiout);
 
 	mainlog->info("closing MidiOut port");
-	midiout -> closePort ();
+	midiout->closePort ();
 	mainlog->info("closing MidiIn port");
-	midiin -> closePort ();
+	midiin->closePort ();
 	mainlog->info("canceling MidiIn callback");
-	midiin -> cancelCallback ();
+	midiin->cancelCallback ();
 	mainlog->info("closing Audio ports");
 	audioClose (dac);
 
 	//QUI SE CHARGE DE DETRUIRE LE PROJET ?
 	//mainlog->info("deleting project");
 	//delete project;
-	//waiter -> closeProject();
-	midi_waiter -> kill ();
+	//waiter->closeProject();
+	midi_waiter->kill ();
 	mainlog->info("deleting RtMidiIn");
 	delete midiin;
 	mainlog->info("deleting RtMidiOut");
@@ -264,9 +264,9 @@ int main( int argc, char* args[] )
 	mainlog->info("deleting RtAudio");
 	delete dac;
 	//delete diApp;
-	listener -> kill ();
-	state -> kill ();
-	waiter -> kill ();
+	listener->kill ();
+	state->kill ();
+	waiter->kill ();
 	sleep(1);
 	mainlog->info("Done");
 	

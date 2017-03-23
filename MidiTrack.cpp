@@ -48,8 +48,8 @@ void MidiTrack::addClip( std::shared_ptr<Clip> clip )
 void MidiTrack::addClip( std::shared_ptr<MidiClip> clip )
 {
 	clipset_.push_back( clip );
-	clip -> setParent( this );
-	Waiter::getInstance() -> selectClip( clip );
+	clip->setParent( this );
+	Waiter::getInstance()->selectClip( clip );
 }
 
 void MidiTrack::deleteClip( unsigned int i )
@@ -63,12 +63,12 @@ void MidiTrack::tick()
 {
 	for ( unsigned int i = 0; i < clipset_.size(); i++ )
 		if ( clipset_.at(i)->getState() == Clip::PLAYING )
-			clipset_.at(i)->tick( State::getInstance() -> getMidiOut() );
+			clipset_.at(i)->tick( State::getInstance()->getMidiOut() );
 }
 
 void MidiTrack::stopAll()
 {
 	for ( unsigned int i = 0; i < clipset_.size(); i++ )
-		clipset_.at(i) -> stop();
+		clipset_.at(i)->stop();
 }
 		

@@ -16,18 +16,14 @@ State * State::singleton_ = NULL;
 std::vector<std::string> State::projectlist_ = {};
 std::vector<std::string> State::audiofiles_ = {};
 std::vector<std::string> State::midifiles_ = {};
+std::shared_ptr<Project> State::project_ = NULL;
+std::shared_ptr<Track> State::track_ = NULL;
+std::shared_ptr<Clip> State::clip_ = NULL;
 
 // Constructor
 State::State () : onoff_(true)
 {
 	spdlog::get("main")->info("creating State");
-	//audiodirs_ = new std::vector<std::string>;
-	//projectlist_ = new std::vector<std::string>;
-	//audiofiles_ = new std::vector<std::string>;
-	//midifiles_ = new std::vector<std::string>;
-	std::shared_ptr<Project> project_ = NULL;
-	std::shared_ptr<Track> track_ = NULL;
-	std::shared_ptr<Clip> clip_ = NULL;
 	loadConfiguration();
 	scanAudioFiles();
 	scanMidiFiles();

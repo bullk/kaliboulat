@@ -80,7 +80,7 @@ void MidiClip::getEventsFromSource( bool rename )
 {
 	auto mainlog= spdlog::get( "main" );	
 	mainlog->debug( "MidiClip::getEventsFromSource" );
-	std::string uri = State::getInstance()->getProject()->getMidiDir() + "/" + filename_;
+	std::string uri = State::getProject()->getMidiDir() + "/" + filename_;
 	MidiFile source( uri );
 	
 	std::vector<unsigned char> * event = new std::vector<unsigned char> ();
@@ -96,25 +96,25 @@ void MidiClip::getEventsFromSource( bool rename )
 	}
 	
 	setDivision( source.getDivision() );
-	if ( State::getInstance()->getProject()->getClock()->getTicksPerBeat() % division_ != 0 )
-		State::getInstance()->getProject()->getClock()->setTicksPerBeat(
-			ppcm( State::getInstance()->getProject()->getClock()->getTicksPerBeat(), division_ )
+	if ( State::getProject()->getClock()->getTicksPerBeat() % division_ != 0 )
+		State::getProject()->getClock()->setTicksPerBeat(
+			ppcm( State::getProject()->getClock()->getTicksPerBeat(), division_ )
 		);
-	divscale_ = State::getInstance()->getProject()->getClock()->getTicksPerBeat() / division_;
+	divscale_ = State::getProject()->getClock()->getTicksPerBeat() / division_;
 	source.rewindTrack( tracknum_ );
 
 	mainlog->debug( "parsing events" );
 	abs_time=0;
 	mainlog->debug( "getting first event" );
 	time_delta_time = source.getNextEvent( event, tracknum_ );
-	while ( event -> size () > 0 )
+	while ( event->size () > 0 )
 	{
 		abs_time += time_delta_time;
-		switch ( event -> at(0) )
+		switch ( event->at(0) )
 		{
 		case 0xFF:
 			mainlog->debug( "time {} : SMF meta : {} {}", abs_time, char_vector_to_hex( *event ) );
-			switch ( event -> at(1) )
+			switch ( event->at(1) )
 			{
 			case 0x03:
 			{
@@ -123,7 +123,7 @@ void MidiClip::getEventsFromSource( bool rename )
 					name_ = "";
 					unsigned int strend = event->at(2) + 3;
 					for ( unsigned int i=3; i < strend; i++ )
-						name_ += (char) event -> at(i);
+						name_ += (char) event->at(i);
 					mainlog->debug( "time {} : setting clip name to {}", abs_time, name_ );
 				}
 				break;
@@ -131,7 +131,7 @@ void MidiClip::getEventsFromSource( bool rename )
 			}
 			break;
 		}
-		mainlog->debug( "time {} : event {}", abs_time, event -> at(0) );
+		mainlog->debug( "time {} : event {}", abs_time, event->at(0) );
 		appendEvent( abs_time, event );
 		mainlog->debug( "." );
 		mainlog->debug( "getting next event" );
@@ -154,8 +154,8 @@ void MidiClip::tick( RtMidiOut * midiout )
 		time_ = clock_time_ / divscale_;
 		while ( events_[index_].getTime() == time_ )
 		{
-			//std::cout << time_ << " : " << index_ << " : " << events_ -> at (index_) -> hexData () << std::endl;
-			midiout -> sendMessage( events_[index_].getData() );
+			//std::cout << time_ << " : " << index_ << " : " << events_->at (index_)->hexData () << std::endl;
+			midiout->sendMessage( events_[index_].getData() );
 			if ( index_ < events_.size() ) index_++;
 			if ( index_ == events_.size() ) {
 				if ( loopstyle_ == ONESHOT ) stop();

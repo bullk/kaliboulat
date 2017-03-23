@@ -20,10 +20,10 @@ void midiPanic (RtMidiOut * midiout)
 	{
 		message = cc123;
 		message[0] += i;
-		midiout -> sendMessage(&message);
+		midiout->sendMessage(&message);
 		message = cc121;
 		message[0] += i;
-		midiout -> sendMessage(&message);
+		midiout->sendMessage(&message);
 	}
 }
 
@@ -141,7 +141,7 @@ void midiCallback( double timeStamp, RawMidi * message, void *userData )
 				//std::cout << "WARNING : unknown MIDI data" << std::endl;
 				break;
 		}
-		//State::getInstance() -> midiLog (message);
+		//State::getInstance()->midiLog (message);
 	}
 }
 
@@ -272,7 +272,7 @@ void MidiWaiter::deleteCommand( RawMidi m, Clip * clip )
 		mainlog->debug( "* command vector size {}", comv.size() );
 		std::vector<BaseCommand *>::iterator f_it;
 		for ( f_it = comv.begin(); f_it != comv.end(); f_it++ )
-			if ( (*f_it) -> isFrom( clip ) )
+			if ( (*f_it)->isFrom( clip ) )
 			{
 				mainlog->debug( "* command object is clip {}", clip->getName() );
 				comv.erase( f_it );
@@ -305,7 +305,7 @@ void MidiWaiter::execute ( RawMidi m )
 		std::vector<BaseCommand *> comv = filters_.at(m);
 		std::vector<BaseCommand *>::iterator f_it;
 		for ( f_it = comv.begin(); f_it != comv.end(); f_it++ )
-			( *f_it ) -> execute();
+			( *f_it )->execute();
 	}
 	mainlog->debug( "/MidiWaiter::execute" );
 }

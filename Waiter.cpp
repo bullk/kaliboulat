@@ -40,17 +40,17 @@ void Waiter::panic()
 
 void Waiter::start ()
 {
-	State::getInstance()->getProject() -> getClock() -> start();
+	State::getProject()->getClock()->start();
 }
 		
 void Waiter::pause ()
 {
-	State::getInstance()->getProject() -> getClock() -> pause();
+	State::getProject()->getClock()->pause();
 }
 		
 void Waiter::stop ()
 {
-	State::getInstance()->getProject() -> getClock() -> stop();
+	State::getProject()->getClock()->stop();
 	panic();
 }
 		
@@ -58,7 +58,7 @@ void Waiter::bar ()
 {
 	while ( !bar_.empty() )
 	{
-		bar_.front() -> execute ();
+		bar_.front()->execute ();
 		bar_.pop();
 	}
 }
@@ -67,17 +67,17 @@ void Waiter::beat ()
 {
 	while ( !beat_.empty() )
 	{
-		beat_.front() -> execute ();
+		beat_.front()->execute ();
 		beat_.pop();
 	}
 }
 
 void Waiter::tick ()
 {
-	State::getInstance()->getProject() -> tick();
+	State::getProject()->tick();
 	while ( !tick_.empty() )
 	{
-		tick_.front() -> execute();
+		tick_.front()->execute();
 		tick_.pop();
 	}
 }
@@ -86,7 +86,7 @@ void Waiter::main ()
 {
 	while ( !main_.empty() )
 	{
-		main_.front() -> execute ();
+		main_.front()->execute ();
 		main_.pop();
 	}
 }
@@ -103,17 +103,17 @@ void Waiter::loadProject( std::string name )
 {
 	//closeProject ();
 	newProject( name );
-    std::ifstream is( State::getInstance()->getProject()->getFile() );
+    std::ifstream is( State::getProject()->getFile() );
     cereal::XMLInputArchive archive( is );
-    State::getInstance()->getProject()->serialize( archive ); 
+    State::getProject()->serialize( archive ); 
     //archive(State::getProject()); 
 }
 
 void Waiter::saveProject()
 {
-    std::ofstream os( State::getInstance()->getProject()->getFile() );
+    std::ofstream os( State::getProject()->getFile() );
     cereal::XMLOutputArchive archive( os );
-    State::getInstance()->getProject()->serialize( archive );
+    State::getProject()->serialize( archive );
     //archive(State::getProject()); 
 }
 
@@ -142,17 +142,17 @@ void copyFile( const char * name_in, const char * name_out )
 void Waiter::importAudioFile( std::string name_in )
 {
 	std::string filename = name_from_path( name_in );
-	std::string name_out = State::getInstance()->getProject() -> getAudioDir() + "/" + filename;
+	std::string name_out = State::getProject()->getAudioDir() + "/" + filename;
 	copyFile( name_in.c_str(), name_out.c_str() );
-	State::getInstance()->getProject() -> addAudioFile( name_out );
+	State::getProject()->addAudioFile( name_out );
 }
 
 void Waiter::importMidiFile( std::string name_in )
 {
 	std::string filename = name_from_path( name_in );
-	std::string name_out = State::getInstance()->getProject() -> getMidiDir() + "/" + filename;
+	std::string name_out = State::getProject()->getMidiDir() + "/" + filename;
 	copyFile( name_in.c_str(), name_out.c_str() );
-	State::getInstance()->getProject() -> addMidiFile( name_out );
+	State::getProject()->addMidiFile( name_out );
 }
 
 void Waiter::selectClip (std::shared_ptr<Clip> clip)
@@ -160,12 +160,12 @@ void Waiter::selectClip (std::shared_ptr<Clip> clip)
 	auto mainlog= spdlog::get("main");	
 	mainlog->debug("Waiter::selectClip");
 	mainlog->debug("* unselect");
-	if ( State::getInstance() -> getClip() )
-		State::getInstance() -> getClip() -> unselect();
+	if ( State::getClip() )
+		State::getClip()->unselect();
 	mainlog->debug("* select");
-	clip -> select();
+	clip->select();
 	mainlog->debug("* setClip");
-	State::getInstance() -> setClip( clip );
+	State::getInstance()->setClip( clip );
 	mainlog->debug("/Waiter::selectClip");
 }
 
@@ -174,10 +174,10 @@ void Waiter::deleteClip( std::shared_ptr<Clip> clip )
 	auto mainlog= spdlog::get("main");	
 	mainlog->debug("Waiter::deleteClip");
 	mainlog->debug("* unsetClip");
-	State::getInstance() -> unsetClip();
-	//if ( State::getInstance() -> getClip() )
-		//State::getInstance() -> getClip() -> unselect();
+	State::getInstance()->unsetClip();
+	//if ( State::getClip() )
+		//State::getClip()->unselect();
 	//mainlog->debug("* select");
-	//clip -> select();
+	//clip->select();
 	mainlog->debug("/Waiter::deleteClip");
 }

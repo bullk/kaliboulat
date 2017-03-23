@@ -85,12 +85,12 @@ void GUI_Close()
 
 //void clipPlayButton (Clip * clip)
 //{
-	//if ( clip -> isPlaying () )
+	//if ( clip->isPlaying () )
 	//{
 		//ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(1/7.0f, 0.6f, 0.6f));
 		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 		//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
-		//if (ImGui::Button("STOP")) clip -> stop ();
+		//if (ImGui::Button("STOP")) clip->stop ();
 		//ImGui::PopStyleColor(3);
 	//}
 	//else
@@ -98,7 +98,7 @@ void GUI_Close()
 		//ImGui::PushStyleColor(ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.6f, 0.6f));
 		//ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 		//ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
-		//if (ImGui::Button("PLAY")) clip -> play ();
+		//if (ImGui::Button("PLAY")) clip->play ();
 		//ImGui::PopStyleColor(3);
 	//}
 //}
@@ -171,7 +171,7 @@ void EndScreen ()
 
 void mainMenu ()
 {
-	std::shared_ptr<Project> project = State::getInstance()->getProject();
+	std::shared_ptr<Project> project = State::getProject();
 	static bool about_open = false;
 	static bool new_project = false;
 	static bool open_project = false;
@@ -180,7 +180,7 @@ void mainMenu ()
 	static bool import_audio_files = false;
 	static bool import_midi_files = false;
 	static bool options = false;
-	bool menu_mask = not(project -> getClock() -> getState());
+	bool menu_mask = not(project->getClock()->getState());
 	
 	if (ImGui::BeginMenuBar())
 	{
@@ -196,7 +196,7 @@ void mainMenu ()
 				Waiter::getInstance()->saveProject();
 			if (ImGui::MenuItem("Save As..", NULL, false, menu_mask)) {}
 			ImGui::Separator();
-			if (ImGui::MenuItem("Quit", "Alt+F4")) State::getInstance() -> halt();
+			if (ImGui::MenuItem("Quit", "Alt+F4")) State::getInstance()->halt();
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Import"))
@@ -219,8 +219,8 @@ void mainMenu ()
 		}
 		if (ImGui::BeginMenu("New"))
 		{
-			//if (ImGui::MenuItem("Audio Track", "", false, menu_mask)) project -> addAudioTrack ( "AudioTrack" );
-			//if (ImGui::MenuItem("MIDI Track", "", false, menu_mask)) project -> addMidiTrack ( "MidiTrack" );
+			//if (ImGui::MenuItem("Audio Track", "", false, menu_mask)) project->addAudioTrack ( "AudioTrack" );
+			//if (ImGui::MenuItem("MIDI Track", "", false, menu_mask)) project->addMidiTrack ( "MidiTrack" );
 			if (ImGui::MenuItem("Audio Track", "", false, menu_mask)) new_audio_track = true;
 			if (ImGui::MenuItem("MIDI Track", "", false, menu_mask)) new_midi_track = true;
 			ImGui::EndMenu();
@@ -249,7 +249,7 @@ void mainMenu ()
 		ImGui::SetKeyboardFocusHere ();
 		if ( ImGui::InputText ("project name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
-			Waiter::getInstance() -> newProject(std::string(buf));
+			Waiter::getInstance()->newProject(std::string(buf));
 			ImGui::CloseCurrentPopup ();
 			new_project = false;
 		}
@@ -261,14 +261,14 @@ void mainMenu ()
         ImGui::Text("Choose a project and open it\n or close this window\n");
         ImGui::Separator();
 		static unsigned int selected = 0;
-		for (unsigned int i=0; i<State::getInstance()->getProjectList()->size(); i++)
-			if ( ImGui::Selectable(State::getInstance()->getProjectList()->at(i).c_str(), (i==selected)) )
+		for (unsigned int i=0; i<State::getProjectList()->size(); i++)
+			if ( ImGui::Selectable(State::getProjectList()->at(i).c_str(), (i==selected)) )
 				selected = i;
         ImGui::Separator();
 		ImGui::Columns(2, NULL, false);
 		if (ImGui::Button("Open", ImVec2(80,0))) 
 		{
-			Waiter::getInstance() -> loadProject(State::getInstance()->getProjectList()->at(selected));
+			Waiter::getInstance()->loadProject(State::getProjectList()->at(selected));
 			ImGui::CloseCurrentPopup();
 			open_project = false;
 		}
@@ -287,11 +287,11 @@ void mainMenu ()
         ImGui::Separator();
 		//ftw(getenv("HOME"), browseCallback, 16);
         
-		static std::vector<bool> selected (State::getInstance()->getAudioFiles()->size(), false);
-        ImGui::Text("%lu files found", State::getInstance()->getAudioFiles()->size());
+		static std::vector<bool> selected (State::getAudioFiles()->size(), false);
+        ImGui::Text("%lu files found", State::getAudioFiles()->size());
 		ImGui::BeginChild("wav files", ImVec2(800,600), true);
 		for (unsigned int i=0; i<selected.size(); i++)
-			if ( ImGui::Selectable(State::getInstance()->getAudioFiles()->at(i).c_str(), selected[i]) )
+			if ( ImGui::Selectable(State::getAudioFiles()->at(i).c_str(), selected[i]) )
 				selected[i] = !selected[i];
 		ImGui::EndChild();
         ImGui::Separator();
@@ -300,17 +300,17 @@ void mainMenu ()
 		{
 			for (unsigned int i=0; i<selected.size(); i++)
 				if ( selected[i] )
-					Waiter::getInstance()->importAudioFile ( State::getInstance()->getAudioFiles()->at(i) );
+					Waiter::getInstance()->importAudioFile ( State::getAudioFiles()->at(i) );
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
-			selected.assign(State::getInstance()->getAudioFiles()->size(), false);
+			selected.assign(State::getAudioFiles()->size(), false);
 		}
 		ImGui::NextColumn();
 		if (ImGui::Button("Close", ImVec2(80,0))) 
 		{
 			ImGui::CloseCurrentPopup();
 			import_audio_files = false;
-			selected.assign(State::getInstance()->getAudioFiles()->size(), false);
+			selected.assign(State::getAudioFiles()->size(), false);
 		}
 		ImGui::EndPopup();
 	}
@@ -320,11 +320,11 @@ void mainMenu ()
         ImGui::Text("Select some files and confirm\n or close this window\n");
         ImGui::Separator();
         
-		static std::vector<bool> selected (State::getInstance()->getMidiFiles()->size(), false);
-        ImGui::Text("%lu files found", State::getInstance()->getMidiFiles()->size());
+		static std::vector<bool> selected (State::getMidiFiles()->size(), false);
+        ImGui::Text("%lu files found", State::getMidiFiles()->size());
 		ImGui::BeginChild("mid files", ImVec2(800,600), true);
 		for (unsigned int i=0; i<selected.size(); i++)
-			if ( ImGui::Selectable(State::getInstance()->getMidiFiles()->at(i).c_str(), selected[i]) )
+			if ( ImGui::Selectable(State::getMidiFiles()->at(i).c_str(), selected[i]) )
 				selected[i] = !selected[i];
 		ImGui::EndChild();
         ImGui::Separator();
@@ -333,10 +333,10 @@ void mainMenu ()
 		{
 			for (unsigned int i=0; i<selected.size(); i++)
 				if ( selected[i] )
-					Waiter::getInstance()->importMidiFile ( State::getInstance()->getMidiFiles()->at(i) );
+					Waiter::getInstance()->importMidiFile ( State::getMidiFiles()->at(i) );
 			ImGui::CloseCurrentPopup();
 			import_midi_files = false;
-			selected.assign(State::getInstance()->getMidiFiles()->size(), false);
+			selected.assign(State::getMidiFiles()->size(), false);
 		}
 		ImGui::NextColumn();
 		if (ImGui::Button("Close", ImVec2(80,0))) 
@@ -354,7 +354,7 @@ void mainMenu ()
 		ImGui::SetKeyboardFocusHere ();
 		if ( ImGui::InputText ("audio track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
-			project -> addAudioTrack (buf);
+			project->addAudioTrack (buf);
 			ImGui::CloseCurrentPopup ();
 			new_audio_track = false;
 		}
@@ -373,7 +373,7 @@ void mainMenu ()
 		ImGui::SetKeyboardFocusHere ();
 		if ( ImGui::InputText ("MIDI track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 		{
-			project -> addMidiTrack (buf);
+			project->addMidiTrack (buf);
 			ImGui::CloseCurrentPopup ();
 			new_midi_track = false;
 		}
@@ -386,7 +386,7 @@ void mainMenu ()
 		ImGui::Columns(3, NULL, false);
 		if (ImGui::Button("Save", ImVec2(80,0))) 
 		{
-			State::getInstance() -> saveConfiguration();
+			State::getInstance()->saveConfiguration();
 			ImGui::CloseCurrentPopup();
 			options = false;
 		}
@@ -417,7 +417,7 @@ void mainMenu ()
 void PlayButton ()
 {
 	// PLAY button
-	if ( State::getInstance() -> getProject() -> getClock() -> getState () )
+	if ( State::getProject()->getClock()->getState () )
 	{
 		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
@@ -429,14 +429,14 @@ void PlayButton ()
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(2/7.0f, 0.8f, 0.8f));
 	}
-	if (ImGui::Button ("PLAY")) State::getInstance() -> getProject() -> getClock() -> start();
+	if (ImGui::Button ("PLAY")) State::getProject()->getClock()->start();
 	ImGui::PopStyleColor(3); 
 }
 
 void PauseButton ()
 {
 	// PAUSE button
-	if ( !State::getInstance() -> getProject() -> getClock() -> getState () )
+	if ( !State::getProject()->getClock()->getState () )
 	{
 		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
@@ -448,14 +448,14 @@ void PauseButton ()
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(1/7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(1/7.0f, 0.8f, 0.8f));
 	}
-	if (ImGui::Button ("PAUSE")) State::getInstance() -> getProject() -> getClock() -> pause();
+	if (ImGui::Button ("PAUSE")) State::getProject()->getClock()->pause();
 	ImGui::PopStyleColor(3); 
 }
 
 void StopButton ()
 {
 	// STOP button
-	if ( State::getInstance() -> getProject() -> getClock() -> atZero () )
+	if ( State::getProject()->getClock()->atZero () )
 	{
 		ImGui::PushStyleColor (ImGuiCol_Button, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(2/7.0f, 0.0f, 0.6f));
@@ -467,7 +467,7 @@ void StopButton ()
 		ImGui::PushStyleColor (ImGuiCol_ButtonHovered, ImColor::HSV(0/7.0f, 0.7f, 0.7f));
 		ImGui::PushStyleColor (ImGuiCol_ButtonActive, ImColor::HSV(0/7.0f, 0.8f, 0.8f));
 	}
-	if (ImGui::Button ("STOP")) State::getInstance() -> getProject() -> getClock() -> stop();
+	if (ImGui::Button ("STOP")) State::getProject()->getClock()->stop();
 	ImGui::PopStyleColor (3);
 }
 
@@ -485,7 +485,7 @@ void ControlPanel (void (*title_func)())
 	ImGui::NextColumn ();
 	
 	// Clock
-	Clock * clock = State::getInstance() -> getProject() -> getClock();
+	Clock * clock = State::getProject()->getClock();
 	ImGui::TextColored (ImColor(255,255,0), "%02d:%02d:%02d",
 		clock->getHour(), clock->getMinute(), clock->getSecond());
 
@@ -496,14 +496,14 @@ void ControlPanel (void (*title_func)())
 	ImGui::SameLine (); ImGui::Text( "%d", clock->getTicksPerBeat() );
 
 	// CTRL PRESSED
-	if ( State::getInstance()->getProject()->ctrlPressed() )
+	if ( State::getProject()->ctrlPressed() )
 	{
 		ImGui::SameLine ();
 		ImGui::TextColored (ImColor(192,64,64), "CTRL");
 	}
 	
 	//TODO : Intégrer les images de boutons
-	//if ( State::getInstance() -> getProject() -> getClock() -> getState () )
+	//if ( State::getProject()->getClock()->getState () )
 	ImGui::PushStyleVar (ImGuiStyleVar_ItemSpacing, ImVec2(6, 6));
 
 	PlayButton ();
@@ -542,20 +542,20 @@ void displayAudioFiles (std::shared_ptr<Project> project)
 	ImGui::SetNextTreeNodeOpen(audio_tree_open);
 	if (ImGui::CollapsingHeader("Audio Files"))
 	{
-		vector<AudioFile *> * list = project -> getAudioFiles ();
-		for ( unsigned int i=0; i < list -> size(); i++ )
+		vector<AudioFile *> * list = project->getAudioFiles ();
+		for ( unsigned int i=0; i < list->size(); i++ )
 		{
-			AudioFile * file = list -> at(i);
-			if ( ImGui::Selectable (file -> getName().c_str()) )
-				Listener::openFile (file -> getPath());
+			AudioFile * file = list->at(i);
+			if ( ImGui::Selectable (file->getName().c_str()) )
+				Listener::openFile (file->getPath());
 			
 			if ( ImGui::IsItemActive() )
 			{
 				if ( ImGui::IsMouseDragging() )
 				{
 					action_drag_clip = true;
-					ui.dragged_clip = { AUDIO, file -> getPath(), 0 };
-					//ui.dragged_clip = std::make_shared<AudioClip> (file -> getPath());
+					ui.dragged_clip = { AUDIO, file->getPath(), 0 };
+					//ui.dragged_clip = std::make_shared<AudioClip> (file->getPath());
 				}
 				else
 				{
@@ -571,8 +571,8 @@ void displayMidiFileHeader (MidiFile * midifile)
 {
 	ImGui::Text("format %d | %d tracks | %d ticks / beat",
 		midifile->getFileFormat(),
-		midifile -> getNumberOfTracks(),
-		midifile -> getDivision());
+		midifile->getNumberOfTracks(),
+		midifile->getDivision());
 }
 
 void displayMidiFileTrack (MidiFile * file, int tn)
@@ -583,7 +583,7 @@ void displayMidiFileTrack (MidiFile * file, int tn)
 		if ( ImGui::IsMouseDragging() )
 		{
 			action_drag_clip = true;
-			ui.dragged_clip = { MIDI, file -> getPath(), tn };
+			ui.dragged_clip = { MIDI, file->getPath(), tn };
 			//ui.dragged_clip = track;
 		}
 		else
@@ -603,14 +603,14 @@ void displayMidiFiles (std::shared_ptr<Project> project)
 	ImGui::SetNextTreeNodeOpen(midi_tree_open);
 	if (ImGui::CollapsingHeader("MIDI Files"))
 	{
-		for ( unsigned int i=0; i < project -> getMidiFiles () -> size(); i++ )
+		for ( unsigned int i=0; i < project->getMidiFiles ()->size(); i++ )
 		{
-			MidiFile * midifile = project -> getMidiFiles () -> at(i);
+			MidiFile * midifile = project->getMidiFiles ()->at(i);
 			mainlog->debug("MIDI file Treenode");
-			if ( ImGui::TreeNode(midifile -> getName().c_str()) )
+			if ( ImGui::TreeNode(midifile->getName().c_str()) )
 			{
 				displayMidiFileHeader (midifile);
-				for ( unsigned int j=0; j < midifile -> getNumberOfTracks(); j++ )
+				for ( unsigned int j=0; j < midifile->getNumberOfTracks(); j++ )
 					displayMidiFileTrack (midifile, j);
 				ImGui::TreePop();
 			}
@@ -642,12 +642,12 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 	mainlog->debug("displayMidiClipDetails");
 	//unsigned short beats_per_bar = 4;
 	ImGui::PushItemWidth(100);
-	//ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
-	//ImGui::Text("Location : %s", clip -> getFileName().c_str());
-	ImGui::Text("size : %lu events", clip -> getSize());
-	ImGui::Text("division value : %d ticks/beat", clip -> getDivision());
-	ImGui::Text("length : %lu ticks", clip -> getLength());
-	//ImGui::Text("time : %lu", clip -> getTime());
+	//ImGui::TextColored(ImColor(255,255,0), "%s", clip->getName().c_str());
+	//ImGui::Text("Location : %s", clip->getFileName().c_str());
+	ImGui::Text("size : %lu events", clip->getSize());
+	ImGui::Text("division value : %d ticks/beat", clip->getDivision());
+	ImGui::Text("length : %lu ticks", clip->getLength());
+	//ImGui::Text("time : %lu", clip->getTime());
 	ImGui::Separator();
 	ImGui::Text("time (BBT)  "); ImGui::SameLine();
 	ImGui::Text("Status  "); ImGui::SameLine();
@@ -655,23 +655,23 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 	ImGui::Separator();
 
 	//ScheduledMidiMessage * event = NULL;
-	//for (unsigned long i=0; i < clip -> getSize(); i++)
+	//for (unsigned long i=0; i < clip->getSize(); i++)
 	//{
-		//event = clip -> getEvent(i);
-		//int nbeats = event -> getTime() / clip -> getDivision();
-		//int tick = event -> getTime() % clip -> getDivision();
+		//event = clip->getEvent(i);
+		//int nbeats = event->getTime() / clip->getDivision();
+		//int tick = event->getTime() % clip->getDivision();
 		//int beat = 1 + nbeats % beats_per_bar;
 		//int bar = 1 + nbeats / beats_per_bar;
 		
-		//bool selected = ( clip -> getIndex () == i );
+		//bool selected = ( clip->getIndex () == i );
 		//char bbt[13];
 		//sprintf (bbt, "%02d:%02d:%03d   ", bar, beat, tick);
 		//ImGui::Selectable(bbt, selected); ImGui::SameLine();
-		//ImGui::Text("%x      ", event -> getData() -> at (0)); ImGui::SameLine();
-		//for (unsigned int j=1; j < event -> getData() -> size(); j++)
+		//ImGui::Text("%x      ", event->getData()->at (0)); ImGui::SameLine();
+		//for (unsigned int j=1; j < event->getData()->size(); j++)
 		//{
 			//if (j>1) ImGui::SameLine();
-			//ImGui::Text("%x", event -> getData() -> at (j));
+			//ImGui::Text("%x", event->getData()->at (j));
 		//}
 	//}
 	ImGui::Separator();
@@ -680,15 +680,15 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 void displayAudioClipDetails (std::shared_ptr<AudioClip> clip)
 {
 	ImGui::PushItemWidth(100);
-	//ImGui::TextColored(ImColor(255,255,0), "%s", clip -> getName().c_str());
-	//ImGui::Text("Location : %s", clip -> getFileName().c_str());
+	//ImGui::TextColored(ImColor(255,255,0), "%s", clip->getName().c_str());
+	//ImGui::Text("Location : %s", clip->getFileName().c_str());
 	ImGui::Separator();
-	ImGui::SliderFloat("volume", clip -> getVolume(), 0.0f, 1.0f, "%.3f");
-	ImGui::SliderFloat("rate", clip -> getGUIRateP(), 0.125f, 8.0f, "%.3f"); clip -> updateRate();
-	ImGui::SliderInt("pitch", clip -> getGUIPitchP(), -12, 12); clip -> updatePitch();
+	ImGui::SliderFloat("volume", clip->getVolume(), 0.0f, 1.0f, "%.3f");
+	ImGui::SliderFloat("rate", clip->getGUIRateP(), 0.125f, 8.0f, "%.3f"); clip->updateRate();
+	ImGui::SliderInt("pitch", clip->getGUIPitchP(), -12, 12); clip->updatePitch();
 	ImGui::PopItemWidth();
-	//ImGui::PlotLines("DATA", clip -> getGUIData(), IM_ARRAYSIZE(clip -> getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
-	//ImGui::Text("size %d", IM_ARRAYSIZE(clip -> getGUIData()));
+	//ImGui::PlotLines("DATA", clip->getGUIData(), IM_ARRAYSIZE(clip->getGUIData()), 0, NULL, -1.0f, 1.0f, ImVec2(0,80));
+	//ImGui::Text("size %d", IM_ARRAYSIZE(clip->getGUIData()));
 }
 
 void ClipProperties (std::shared_ptr<Clip> clip)
@@ -697,7 +697,7 @@ void ClipProperties (std::shared_ptr<Clip> clip)
 	auto mainlog= spdlog::get( "main" );	
 	mainlog->debug( "ClipProperties" );
 	mainlog->debug( "* name" );
-	ImGui::Text( "%s", clip -> getName().c_str() );
+	ImGui::Text( "%s", clip->getName().c_str() );
 	if ( ImGui::Button( "MIDI control" ) )
 	{
 		MidiWaiter::getInstance()->preempt();
@@ -711,15 +711,15 @@ void ClipProperties (std::shared_ptr<Clip> clip)
 	ImGui::Columns(3, NULL, false);
 	mainlog->debug( "* launch" );
 	ImGui::PushID("launch"); ImGui::Text("Launch"); ImGui::NextColumn();
-	if ( ImGui::Button(clip -> getLaunchStyleText()) ) clip -> nextLaunchStyle();
+	if ( ImGui::Button(clip->getLaunchStyleText()) ) clip->nextLaunchStyle();
 	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
 	mainlog->debug("* stop");
 	ImGui::PushID("stop"); ImGui::Text("Stop"); ImGui::NextColumn();
-	if ( ImGui::Button(clip -> getStopStyleText()) ) clip -> nextStopStyle();
+	if ( ImGui::Button(clip->getStopStyleText()) ) clip->nextStopStyle();
 	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
 	mainlog->debug("* loop");
 	ImGui::PushID("loop"); ImGui::Text("Loop"); ImGui::NextColumn();
-	if ( ImGui::Button(clip -> getLoopStyleText()) ) clip -> nextLoopStyle();
+	if ( ImGui::Button(clip->getLoopStyleText()) ) clip->nextLoopStyle();
 	ImGui::NextColumn(); ImGui::NextColumn(); ImGui::PopID();
 	ImGui::Columns(1);
 
@@ -767,15 +767,15 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 	ImGui::BeginChild ("Ressources", ImVec2(width1-3,0), true);
 	if ( ImGui::Button("Files") ) ui.context = Screen::RESSOURCES;
 	
-	if ( State::getInstance()->getClip() )
+	if ( State::getClip() )
 	{
-		if ( State::getInstance()->getClip()->dataType() == AUDIO )
+		if ( State::getClip()->dataType() == AUDIO )
 		{
 			ImGui::SameLine();
 			if ( ImGui::Button("Audio") ) ui.context = Screen::AUDIOCLIP;
 		}
 	
-		if ( State::getInstance()->getClip()->dataType() == MIDI )
+		if ( State::getClip()->dataType() == MIDI )
 		{
 			ImGui::SameLine();
 			if ( ImGui::Button("MIDI") ) ui.context = Screen::MIDICLIP;
@@ -793,20 +793,20 @@ void RessourcesPanel (std::shared_ptr<Project> project)
 			displayMidiFiles (project);
 			break;
 		case Screen::AUDIOCLIP:
-			if ( State::getInstance()->getClip()->dataType() == AUDIO )
+			if ( State::getClip()->dataType() == AUDIO )
 			{
-				ClipProperties (State::getInstance() -> getClip());
+				ClipProperties (State::getClip());
 				mainlog->debug("static_pointer_cast <AudioClip>");
-				std::shared_ptr<AudioClip> clip = std::static_pointer_cast<AudioClip>(State::getInstance() -> getClip());
+				std::shared_ptr<AudioClip> clip = std::static_pointer_cast<AudioClip>(State::getClip());
 				displayAudioClipDetails (clip);
 			}
 			break;
 		case Screen::MIDICLIP:
-			if ( State::getInstance()->getClip()->dataType() == MIDI )
+			if ( State::getClip()->dataType() == MIDI )
 			{
-				ClipProperties (State::getInstance() -> getClip());
+				ClipProperties (State::getClip());
 				mainlog->debug("static_pointer_cast <MidiClip>");
-				std::shared_ptr<MidiClip> clip = std::static_pointer_cast<MidiClip>(State::getInstance() -> getClip());
+				std::shared_ptr<MidiClip> clip = std::static_pointer_cast<MidiClip>(State::getClip());
 				displayMidiClipDetails (clip);
 			}
 			break;
@@ -834,7 +834,7 @@ void ProjectScreen (std::shared_ptr<Project> project)
 	//std::vector<RawMidi *> * midilog = State::getInstance()->getMidiLog();
 	//for ( unsigned int i=0; i<midilog->size(); i++ )
 	//{
-		//RawMidi * m = midilog -> at(i);
+		//RawMidi * m = midilog->at(i);
 		//ImGui::Text("MIDI IN :");
 		//for ( std::vector<unsigned char>::iterator c=m->begin(); c != m->end(); c++ )
 		//{
@@ -857,9 +857,9 @@ void ConsoleTitle ()
 
 void SelectConsoleClip (std::shared_ptr<Clip> clip)
 {
-	Waiter::getInstance() -> selectClip( clip ); 
+	Waiter::getInstance()->selectClip( clip ); 
 	ressources_panel = true;
-	switch (clip -> dataType ())
+	switch (clip->dataType ())
 	{
 	case AUDIO:	
 		ui.context = Screen::AUDIOCLIP;
@@ -877,7 +877,7 @@ void ConsoleClip ( std::shared_ptr<Clip> clip, int id, float hue, float val )
 	float sat = CLIP_SATURATION;
 	bool selected = false;
 	
-	if ( State::getInstance()->getClip() == clip ) selected = true;
+	if ( State::getClip() == clip ) selected = true;
 	if ( selected ) ImGui::PushStyleColor( ImGuiCol_Border, SELECTED_CLIP_BORDER );
 	ImGui::PushStyleVar( ImGuiStyleVar_ChildWindowRounding, 0.0f );
 	ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 0, 0 ) );
@@ -888,7 +888,7 @@ void ConsoleClip ( std::shared_ptr<Clip> clip, int id, float hue, float val )
 	ImGui::PushStyleColor( ImGuiCol_Button, ImColor::HSV( hue, sat, val ) );
 	ImGui::PushStyleColor( ImGuiCol_ButtonHovered, ImColor::HSV( hue, sat, val ) );
 	ImGui::PushStyleColor( ImGuiCol_ButtonActive, ImColor::HSV( hue, sat, val ) );
-	if ( ImGui::Button(">") ) clip -> arm() ; 
+	if ( ImGui::Button(">") ) clip->arm() ; 
 	ImGui::SameLine();
 	ImGui::ProgressBar( clip->getProgress(), ImVec2( -1, 0 ), clip->getName().c_str() );
 	ImGui::SameLine();
@@ -907,7 +907,7 @@ void ConsoleClip ( std::shared_ptr<Clip> clip, int id, float hue, float val )
 	if ( ImGui::BeginPopup( "popup-midiclip" ) )
 	{
 		if ( ImGui::Selectable( "delete this clip" ) )
-			clip -> getParent() -> deleteClip( id );
+			clip->getParent()->deleteClip( id );
 		ImGui::EndPopup();
 	}
 	ImGui::PopStyleVar(2);
@@ -934,9 +934,9 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 	ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2( 0, 0 ) );
 	// DISPLAYING TRACKS
 	std::shared_ptr<Track> asking_track = NULL;
-	for ( unsigned int i=0; i < project -> nTracks (); i++ )
+	for ( unsigned int i=0; i < project->nTracks (); i++ )
 	{
-		std::shared_ptr<Track> track = project -> getTrack(i);
+		std::shared_ptr<Track> track = project->getTrack(i);
 		// track name/id
 		char child_id[32];
 		sprintf(child_id, "Track%03d", i);
@@ -955,41 +955,41 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 			float saturation = TRACK_SATURATION;
 			float value = TRACK_VALUE;
 			float alpha = 1.00f;
-			if ( State::getInstance() -> getTrack() == track )
+			if ( State::getTrack() == track )
 			{
 				saturation = ACTIVE_TRACK_SATURATION;
 				value = ACTIVE_TRACK_VALUE;
 			}
-			ImColor color_bg = ImColor::HSV( track -> getHue (), saturation, value, alpha );
+			ImColor color_bg = ImColor::HSV( track->getHue (), saturation, value, alpha );
 			// begining TrackUI
 			ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2(5, 5) );
 			ImGui::PushStyleColor( ImGuiCol_ChildWindowBg, color_bg );
 			ImGui::BeginChild( child_id, ImVec2( TRACK_WIDTH, 0 ), true );
 			ImGui::PushStyleVar( ImGuiStyleVar_ItemSpacing, ImVec2(8, 8) );
 
-			if ( ImGui::Button("X") ) project -> deleteTrack (i); // track delete button
+			if ( ImGui::Button("X") ) project->deleteTrack (i); // track delete button
 			else
 			{	// main track UI
 				ImGui::SameLine (); ImGui::Text("%02d", i+1); // track number
-				std::string type_str = " " + track -> getTypeStr () + " "; // track type
+				std::string type_str = " " + track->getTypeStr () + " "; // track type
 				ImGui::SameLine (); ImGui::Text("%s", type_str.c_str());
 				ImGui::SameLine ();
 				// move track buttons
 				if ( i == 0 ) ImGui::Button(" ");
-				else if ( ImGui::Button("<") ) project -> swapTracks (i, i-1); // to left
+				else if ( ImGui::Button("<") ) project->swapTracks (i, i-1); // to left
 				ImGui::SameLine ();
 				if ( i == project->nTracks()-1 ) ImGui::Button(" ");
-				else if ( ImGui::Button(">") ) project -> swapTracks (i, i+1); // to right
+				else if ( ImGui::Button(">") ) project->swapTracks (i, i+1); // to right
 				
-				ImGui::Text ( "%s", track -> getName().c_str() ); // track name
+				ImGui::Text ( "%s", track->getName().c_str() ); // track name
 				if ( ImGui::BeginPopupContextItem ("rename track") ) // renaming popup
 				{
 					char buf[20];
-					sprintf (buf, "%s", track -> getName().c_str());
+					sprintf (buf, "%s", track->getName().c_str());
 					if ( ImGui::InputText ("track name", buf, IM_ARRAYSIZE(buf),
 						ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
 					{
-						track -> setName (buf);
+						track->setName (buf);
 						ImGui::CloseCurrentPopup ();
 					}
 					ImGui::EndPopup ();
@@ -1000,7 +1000,7 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 				float clip_value = (1.0f-value);
 				clip_value *= clip_value;
 				// displaying Clips
-				for ( unsigned int j=0; j < track -> nClips(); j++ )
+				for ( unsigned int j=0; j < track->nClips(); j++ )
 					ConsoleClip (track->getClip(j), j, track->getHue(), clip_value);
 			}
 			
@@ -1019,9 +1019,9 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 	}
 
 	// SETTING NEW ACTIVE TRACK
-	if ( action_drag_clip and not asking_track ) State::getInstance() -> setTrack(NULL);
-	if ( asking_track and asking_track != State::getInstance() -> getTrack() )
-		State::getInstance() -> setTrack(asking_track);
+	if ( action_drag_clip and not asking_track ) State::getInstance()->setTrack(NULL);
+	if ( asking_track and asking_track != State::getTrack() )
+		State::getInstance()->setTrack(asking_track);
 	asking_track = NULL;
 
 	// DROPPING A CLIP
@@ -1029,8 +1029,8 @@ void ConsoleScreen( std::shared_ptr<Project> project )
 	{
 		if ( ImGui::IsMouseReleased(0) ) // if mouse released
 		{
-			if ( State::getInstance() -> getTrack() and ui.dragged_clip.dt == State::getInstance() -> getTrack() -> dataType() )
-				State::getInstance() -> getTrack() -> addClip (ui.dragged_clip.path, ui.dragged_clip.track);
+			if ( State::getTrack() and ui.dragged_clip.dt == State::getTrack()->dataType() )
+				State::getTrack()->addClip (ui.dragged_clip.path, ui.dragged_clip.track);
 			ui.dragged_clip = { NONE, "", 0};
 			action_drag_clip = false;
 		}
@@ -1103,7 +1103,7 @@ void OrgasampleScreen (std::shared_ptr<Project> project)
 
 void GUI_Main()
 {
-	std::shared_ptr<Project> project = State::getInstance()->getProject();
+	std::shared_ptr<Project> project = State::getProject();
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
 	{
@@ -1111,7 +1111,7 @@ void GUI_Main()
 		switch ( event.type )
 		{
 			case SDL_QUIT:
-				State::getInstance() -> halt();
+				State::getInstance()->halt();
 				break;
 				
 			case SDL_KEYDOWN:
@@ -1130,18 +1130,18 @@ void GUI_Main()
 						ui.type = Screen::ORGASAMPLE;
 						break;
 					case SDL_SCANCODE_F5:
-						//if ( project -> ctrlPressed () ) project -> addAudioTrack ("AudioTrack");
-						project -> addAudioTrack ("AudioTrack");
-						State::getInstance() -> shared();
+						//if ( project->ctrlPressed () ) project->addAudioTrack ("AudioTrack");
+						project->addAudioTrack ("AudioTrack");
+						State::getInstance()->shared();
 						break;
 					case SDL_SCANCODE_F6:
-						//if ( project -> ctrlPressed () ) project -> addMidiTrack ("MidiTrack");
-						project -> addMidiTrack ("MidiTrack");
-						State::getInstance() -> shared();
+						//if ( project->ctrlPressed () ) project->addMidiTrack ("MidiTrack");
+						project->addMidiTrack ("MidiTrack");
+						State::getInstance()->shared();
 						break;
 					case SDL_SCANCODE_LCTRL:
 					case SDL_SCANCODE_RCTRL:
-						project -> ctrlDown ();
+						project->ctrlDown ();
 						break;
 					default:
 						break;
@@ -1153,7 +1153,7 @@ void GUI_Main()
 				{
 					case SDL_SCANCODE_LCTRL:
 					case SDL_SCANCODE_RCTRL:
-						project -> ctrlUp ();
+						project->ctrlUp ();
 						break;
 					default:
 						break;

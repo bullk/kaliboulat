@@ -62,11 +62,11 @@ void Project::tick ()
 {
 	for ( unsigned int j = 0; j < nTracks(); j++ )
 	{
-		if ( getTrack(j) -> dataType() == MIDI )
+		if ( getTrack(j)->dataType() == MIDI )
 		{
 			std::shared_ptr<MidiTrack> daTrack = std::static_pointer_cast<MidiTrack>( getTrack(j) );
-			if ( daTrack -> isPlaying() )
-				daTrack -> tick ();
+			if ( daTrack->isPlaying() )
+				daTrack->tick ();
 		}
 	}
 }
@@ -90,9 +90,9 @@ void Project::updateRessources ()
 	
 	DIR * audiodir = testandcreatedir( getAudioDir() );
 	while ( ( daFile = readdir( audiodir ) ) != NULL )
-		if ( daFile -> d_type == DT_REG )
+		if ( daFile->d_type == DT_REG )
 		{
-			std::string str = daFile -> d_name;
+			std::string str = daFile->d_name;
 			std::size_t found = str.find_last_of( "." );
 			if ( ( str.substr( found+1 ) == "wav" ) or ( str.substr( found+1 ) == "WAV" ) )
 			{
@@ -108,9 +108,9 @@ void Project::updateRessources ()
 	DIR * mididir = testandcreatedir (getMidiDir());
 	daFile = NULL;
 	while ((daFile = readdir(mididir)) != NULL)
-		if ( daFile -> d_type == DT_REG )
+		if ( daFile->d_type == DT_REG )
 		{
-			std::string str = daFile -> d_name;
+			std::string str = daFile->d_name;
 			std::size_t found = str.find_last_of(".");
 			if ( (str.substr(found+1) == "mid") or (str.substr(found+1) == "MID") )
 			{
@@ -125,14 +125,14 @@ void Project::addAudioTrack ( std::string s )
 {
 	std::shared_ptr<Track> track (new AudioTrack(s));
 	tracks_.push_back (track);
-	State::getInstance() -> setTrack(track);
+	State::getInstance()->setTrack(track);
 }
 
 void Project::addMidiTrack ( std::string s )
 {
 	std::shared_ptr<Track> track (new MidiTrack(s));
 	tracks_.push_back (track);
-	State::getInstance() -> setTrack(track);
+	State::getInstance()->setTrack(track);
 }
 
 void Project::deleteTrack (unsigned int i)

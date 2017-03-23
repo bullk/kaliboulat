@@ -16,7 +16,7 @@ AudioClip::AudioClip( std::string fname ) : Clip(), FileWvIn(),
 	launchstyle_ = LAUNCH_BAR;
 	stopstyle_ = STOP_FREE;
 	loopstyle_ = ONESHOT;
-	std::string uri = State::getInstance()->getProject()->getAudioDir() + "/" + filename_;
+	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
 	openFile( uri );
 	initPitShift();
 	//angle_ = 0;
@@ -32,7 +32,7 @@ AudioClip::AudioClip
 {
 	data_type_ = AUDIO;
 	filename_ = name_from_path( fname );
-	std::string uri = State::getInstance()->getProject()->getAudioDir() + "/" + filename_;
+	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
 	openFile( uri );
 	initPitShift();
 	//angle_ = 0;

@@ -41,12 +41,12 @@ wavrepair: wavrepair.cpp
 	
 #AUTODEPS
 AudioClip.o: AudioClip.hpp State.hpp Project.hpp Clip.hpp 
-AudioFile.o: AudioFile.hpp 
+AudioFile.o: AudioFile.hpp RessourceFile.hpp 
 AudioTrack.o: AudioTrack.hpp AudioClip.hpp Track.hpp 
 Clip.o: Clip.hpp midi.hpp globals.hpp midi.hpp 
 Clock.o: globals.hpp Clock.hpp Waiter.hpp 
 globals.o: globals.hpp spdlog/spdlog.h 
-GUI.o: GUI.hpp State.hpp Project.hpp MidiFile.hpp MidiClip.hpp AudioFile.hpp AudioClip.hpp Listener.hpp Clock.hpp imgui/imgui.h imgui/imgui_impl_sdl.h 
+GUI.o: GUI.hpp State.hpp Project.hpp MidiFile.hpp MidiClip.hpp AudioFile.hpp AudioClip.hpp Listener.hpp Clock.hpp imgui/imgui.h imgui/imgui_impl_sdl.h globals.hpp 
 Kaliboulat.o: midi.hpp Clock.hpp State.hpp Project.hpp Modules.hpp Listener.hpp GUI.hpp Clock.hpp AudioTrack.hpp MidiTrack.hpp MidiFile.hpp Project.hpp Modules.hpp GUI.hpp 
 Listener.o: Listener.hpp spdlog/spdlog.h 
 MidiClip.o: MidiClip.hpp midi.hpp Project.hpp State.hpp MidiFile.hpp Clock.hpp Clip.hpp midi.hpp 
@@ -57,7 +57,7 @@ Modules.o: Modules.hpp AudioTrack.hpp MidiTrack.hpp
 Project.o: Project.hpp Clock.hpp State.hpp Modules.hpp AudioFile.hpp MidiFile.hpp Track.hpp 
 RessourceFile.o: RessourceFile.hpp globals.hpp 
 Scheduled.o: Scheduled.hpp 
-State.o: State.hpp spdlog/spdlog.h cereal/types/vector.hpp cereal/types/string.hpp 
+State.o: spdlog/spdlog.h globals.hpp State.hpp cereal/types/vector.hpp cereal/types/string.hpp 
 Track.o: Track.hpp Clip.hpp 
 Waiter.o: spdlog/spdlog.h Waiter.hpp Project.hpp State.hpp Clock.hpp midi.hpp 
 #AUTODEPS
