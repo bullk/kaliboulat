@@ -21,6 +21,7 @@ private:
 	RtMidiOut * midiout_;
 	RtMidiIn * midiin_;
 	bool onoff_;
+	unsigned int lastOSCport_;
 	static State * singleton_;
 	static std::shared_ptr<Project> project_;
 	static std::shared_ptr<Track> track_;
@@ -37,6 +38,7 @@ private:
 	void loadConfiguration();
 
 public:
+	unsigned int newOSCport();
 	inline RtMidiIn * getMidiIn() { return midiin_; }
 	inline RtMidiOut * getMidiOut() { return midiout_; }
 	inline void setMidiIn( RtMidiIn * mi ) { midiin_ = mi; }

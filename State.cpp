@@ -21,7 +21,7 @@ std::shared_ptr<Track> State::track_ = NULL;
 std::shared_ptr<Clip> State::clip_ = NULL;
 
 // Constructor
-State::State () : onoff_(true)
+State::State () : onoff_(true), lastOSCport_(7300)
 {
 	spdlog::get( "main" )->info( "creating State" );
 	loadConfiguration();
@@ -52,6 +52,11 @@ std::string State::getConfigurationFileName()
 	testandcreatedir( fname );
 	sprintf( fname, "%s/.config/BullK/Kaliboulat.xml", getenv("HOME") );
 	return std::string( fname );
+}
+
+unsigned int State::newOSCport()
+{
+	return ++lastOSCport_;
 }
 
 void State::loadConfiguration()
