@@ -23,7 +23,7 @@ std::shared_ptr<Clip> State::clip_ = NULL;
 // Constructor
 State::State () : onoff_(true)
 {
-	spdlog::get("main")->info("creating State");
+	spdlog::get( "main" )->info( "creating State" );
 	loadConfiguration();
 	scanAudioFiles();
 	scanMidiFiles();
@@ -33,7 +33,9 @@ State::State () : onoff_(true)
 State::~State ()
 {
 	auto mainlog= spdlog::get( "main" );
-	mainlog->info("killing State");
+	mainlog->info( "killing State" );
+	mainlog->info( "saving configuration" );
+	saveConfiguration();
 	track_ = NULL;
 	clip_ = NULL;
 	project_ = NULL;
@@ -46,7 +48,9 @@ State::~State ()
 std::string State::getConfigurationFileName()
 {
 	char fname[128] = "";
-	sprintf( fname, "%s/.Kaliboulat.xml", getenv("HOME") );
+	sprintf( fname, "%s/.config/BullK", getenv("HOME") );
+	testandcreatedir( fname );
+	sprintf( fname, "%s/.config/BullK/Kaliboulat.xml", getenv("HOME") );
 	return std::string( fname );
 }
 

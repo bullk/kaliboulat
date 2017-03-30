@@ -13,6 +13,7 @@
 
 
 #include <string>
+#include <dirent.h>
 
 enum DataType { NONE, AUDIO, MIDI, OSC, COM };
 
@@ -20,5 +21,6 @@ std::string user_dir();
 
 std::string name_from_path( std::string );
 
+DIR * testandcreatedir( std::string );
 
 #endif

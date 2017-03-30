@@ -45,7 +45,7 @@ AudioFile.o: AudioFile.hpp RessourceFile.hpp
 AudioTrack.o: spdlog/spdlog.h AudioTrack.hpp AudioClip.hpp Track.hpp 
 Clip.o: spdlog/spdlog.h Clip.hpp midi.hpp globals.hpp midi.hpp 
 Clock.o: spdlog/spdlog.h Clock.hpp Waiter.hpp 
-globals.o: globals.hpp 
+globals.o: spdlog/spdlog.h globals.hpp 
 GUI.o: spdlog/spdlog.h GUI.hpp State.hpp Project.hpp MidiFile.hpp MidiClip.hpp AudioFile.hpp AudioClip.hpp Listener.hpp Clock.hpp imgui/imgui.h imgui/imgui_impl_sdl.h globals.hpp 
 Kaliboulat.o: spdlog/spdlog.h midi.hpp Clock.hpp State.hpp Project.hpp Listener.hpp AudioTrack.hpp GUI.hpp Clock.hpp MidiTrack.hpp MidiFile.hpp Project.hpp GUI.hpp 
 Listener.o: Listener.hpp spdlog/spdlog.h 

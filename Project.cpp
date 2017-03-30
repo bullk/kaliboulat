@@ -1,6 +1,5 @@
 #include <stdlib.h> //getenv
 #include <algorithm>
-#include <dirent.h>
 
 #include "spdlog/spdlog.h"
 
@@ -11,25 +10,6 @@
 #include "AudioTrack.hpp"
 #include "MidiFile.hpp"
 #include "MidiTrack.hpp"
-
-DIR * testandcreatedir (std::string s)
-{
-	auto mainlog = spdlog::get("main");	
-	int resmkdir;
-	DIR * dir = opendir (s.c_str());
-	if (dir == NULL)
-	{
-		mainlog->info("Création du dossier {}", s.c_str());
-		resmkdir = mkdir (s.c_str(), S_IRWXU | S_IRWXG);
-		if ( resmkdir )
-		{
-			mainlog->error("Impossible de créer le dossier {}", s.c_str());
-			exit(1);
-		}
-		else dir = opendir (s.c_str());
-	}
-	return dir;
-}
 
 Project::Project (std::string str)
 {
