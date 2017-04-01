@@ -12,26 +12,19 @@
 #include <cereal/types/polymorphic.hpp>
 
 
-class SLClip : public Clip, public stk::FileWvIn
+class SLClip : public Clip
 {
 	
 public:
 	SLClip (std::string);
 	SLClip (std::string, std::string, int, int, int, int, int, float, float, int);
 	~SLClip ();
-	inline void rewind() { reset(); }
+	inline void rewind() {}
 	unsigned long getLength ();
 	stk::StkFloat getTime ();
 	float getProgress();
 	float * getVolume ();
-	float * getGUIData ();
-	float * getGUIRateP ();
-	int * getGUIPitchP ();
-	void updateRate ();
-	void updatePitch ();
-	stk::StkFloat tick (unsigned int channel=0);
 	//void setVolume (StkFloat);
-	//int getAngle (void);
 
 	template <class Archive>
 	void serialize (Archive & archive)
@@ -44,9 +37,7 @@ public:
 			CEREAL_NVP(loopstyle_),
 			CEREAL_NVP(armMIDIchannel_),
 			CEREAL_NVP(armMIDIkey_),
-			CEREAL_NVP(volume_),
-			CEREAL_NVP(gui_rate_),
-			CEREAL_NVP(gui_pitch_)
+			CEREAL_NVP(volume_)
 		);
 	}
 	
@@ -64,12 +55,6 @@ public:
 	
 protected:    
 	float volume_;
-	float gui_rate_;
-	int gui_pitch_;
-	float gui_data_[];
-	//stk::LentPitShift * pitshift_;
-	stk::PitShift * pitshift_;
-	void initPitShift();
 	
 };
 

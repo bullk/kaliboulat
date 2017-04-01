@@ -33,7 +33,6 @@ public:
 	inline unsigned int nClips() const { return clipset_.size(); }
 	void stopAll();
 	inline float * getVolume() { return &volume_; }
-	stk::StkFloat tick() const;
 	
 	template <class Archive>
 	void serialize(Archive & archive)

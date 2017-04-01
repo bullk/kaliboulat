@@ -113,16 +113,3 @@ void SLBus::stopAll()
 		clipset_.at(i) -> stop();
 }
 		
-stk::StkFloat SLBus::tick() const
-{
-	register stk::StkFloat sample;
-
-	sample = 0;
-	for ( unsigned int j = 0; j < clipset_.size (); j++ )
-	{
-		sample += clipset_.at(j) -> tick();
-	}
-	return sample;
-}
-
-
