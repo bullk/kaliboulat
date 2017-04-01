@@ -178,6 +178,7 @@ void mainMenu ()
 	static bool open_project = false;
 	static bool new_audio_track = false;
 	static bool new_midi_track = false;
+	static bool new_sl_bus = false;
 	static bool import_audio_files = false;
 	static bool import_midi_files = false;
 	static bool options = false;
@@ -224,6 +225,7 @@ void mainMenu ()
 			//if (ImGui::MenuItem("MIDI Track", "", false, menu_mask)) project->addMidiTrack ( "MidiTrack" );
 			if (ImGui::MenuItem("Audio Track", "", false, menu_mask)) new_audio_track = true;
 			if (ImGui::MenuItem("MIDI Track", "", false, menu_mask)) new_midi_track = true;
+			if (ImGui::MenuItem("SL Bus", "", false, menu_mask)) new_sl_bus = true;
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help"))
@@ -238,6 +240,7 @@ void mainMenu ()
 	if (open_project) ImGui::OpenPopup("Open Project");
 	if (new_audio_track) ImGui::OpenPopup("New audio track");
 	if (new_midi_track) ImGui::OpenPopup("New MIDI track");
+	if (new_sl_bus) ImGui::OpenPopup("New SooperLooper bus");
 	if (import_audio_files) ImGui::OpenPopup("Import audio files");
 	if (import_midi_files) ImGui::OpenPopup("Import MIDI files");
 	if (options) ImGui::OpenPopup("Options");
@@ -348,15 +351,15 @@ void mainMenu ()
 		ImGui::EndPopup();
 	}
 	
-	if (ImGui::BeginPopupModal("New audio track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if ( ImGui::BeginPopupModal( "New audio track", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
 	{
 		char buf[20];
-		sprintf (buf, "%s", "AudioTrack");
-		ImGui::SetKeyboardFocusHere ();
-		if ( ImGui::InputText ("audio track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+		sprintf( buf, "%s", "AudioTrack" );
+		ImGui::SetKeyboardFocusHere();
+		if ( ImGui::InputText("audio track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue ) ) 
 		{
-			project->addAudioTrack (buf);
-			ImGui::CloseCurrentPopup ();
+			project->addAudioTrack( buf );
+			ImGui::CloseCurrentPopup();
 			new_audio_track = false;
 		}
 		//if (ImGui::Button("Close", ImVec2(200,0))) 
@@ -367,25 +370,39 @@ void mainMenu ()
 		ImGui::EndPopup();
 	}
 	
-	if (ImGui::BeginPopupModal("New MIDI track", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if ( ImGui::BeginPopupModal( "New MIDI track", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
 	{
 		char buf[20];
-		sprintf (buf, "%s", "MidiTrack");
-		ImGui::SetKeyboardFocusHere ();
-		if ( ImGui::InputText ("MIDI track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue) ) 
+		sprintf( buf, "%s", "MidiTrack" );
+		ImGui::SetKeyboardFocusHere();
+		if ( ImGui::InputText( "MIDI track name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue ) ) 
 		{
-			project->addMidiTrack (buf);
-			ImGui::CloseCurrentPopup ();
+			project->addMidiTrack( buf );
+			ImGui::CloseCurrentPopup();
 			new_midi_track = false;
 		}
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::BeginPopupModal("Options", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if ( ImGui::BeginPopupModal( "New SooperLooper bus", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
 	{
-		ImGui::Text("Options\n");
-		ImGui::Columns(3, NULL, false);
-		if (ImGui::Button("Save", ImVec2(80,0))) 
+		char buf[20];
+		sprintf( buf, "%s", "SL Bus" );
+		ImGui::SetKeyboardFocusHere();
+		if ( ImGui::InputText( "SL bus name", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_AutoSelectAll|ImGuiInputTextFlags_EnterReturnsTrue ) ) 
+		{
+			project->addSLBus( buf );
+			ImGui::CloseCurrentPopup();
+			new_sl_bus = false;
+		}
+		ImGui::EndPopup();
+	}
+
+	if ( ImGui::BeginPopupModal( "Options", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
+	{
+		ImGui::Text( "Options\n" );
+		ImGui::Columns( 3, NULL, false );
+		if ( ImGui::Button( "Save", ImVec2(80,0) ) ) 
 		{
 			State::getInstance()->saveConfiguration();
 			ImGui::CloseCurrentPopup();
@@ -401,11 +418,12 @@ void mainMenu ()
 		ImGui::EndPopup();
 	}	
 	
-	if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	if ( ImGui::BeginPopupModal( "About", NULL, ImGuiWindowFlags_AlwaysAutoResize ) )
 	{
 		ImGui::Text("      Kaliboulat / Fullbox Project\n\n    Versatile looper by BullK Studio\nCoded by Olivier Cadiou aka Al Kali Boul\n");
-		ImGui::Columns(3, NULL, false); ImGui::NextColumn();
-		if (ImGui::Button("Close", ImVec2(80,0))) 
+		ImGui::Columns( 3, NULL, false );
+		ImGui::NextColumn();
+		if ( ImGui::Button( "Close", ImVec2(80,0) ) ) 
 		{
 			ImGui::CloseCurrentPopup();
 			about_open = false;

@@ -59,11 +59,8 @@ public:
 
 protected:
 	float volume_;
-	unsigned int sl_port_;
-	pid_t sl_pid_;
 	std::vector<std::shared_ptr<AudioClip>> clipset_;
 	RtAudio * output_;
-	void startSL();
 
 
 };

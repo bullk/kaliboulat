@@ -1,0 +1,128 @@
+//#include <stdlib.h>
+/* Pour fork() */
+#include <unistd.h>
+#include <errno.h>
+#include <lo/lo.h>
+#include "spdlog/spdlog.h"
+
+#include "State.hpp"
+#include "SLBus.hpp"
+
+
+//-------------
+// Constructor
+//-------------
+
+SLBus::SLBus( std::string s ) : Track( SL, "SooperLooper", s ), volume_(1.0f)
+{
+	hue_ =  1.0f + (float)((rand() % 31) -15) / 100;
+	hue_ -= ( hue_ >= 1.0f ); 
+	startSL();
+}
+
+SLBus::SLBus( std::string s, float h, float v, std::vector<std::shared_ptr<SLClip>> cs ) :
+	Track( SL, "SooperLooper", s, h ), volume_(v), clipset_(cs)
+{
+	startSL();
+	for ( std::vector<std::shared_ptr<SLClip>>::iterator it=clipset_.begin(); it<clipset_.end(); it++ )
+		(*it)->setParent( this );
+}
+
+//------------
+// Destructor 
+//------------
+
+SLBus::~SLBus()
+{
+	lo_address t = lo_address_new( NULL, std::to_string( sl_port_ ).c_str() );
+	if (lo_send(t, "/quit", "") == -1) {
+		printf("OSC error %d: %s\n", lo_address_errno(t), lo_address_errstr(t));
+	}
+
+	while (clipset_.size())
+		clipset_.pop_back();
+}
+
+
+//------------
+// Add a clip
+//------------
+
+void SLBus::startSL()
+{
+	auto mainlog = spdlog::get( "main" );	
+	sl_port_ = State::getInstance()->newOSCport();
+	std::string s_port_arg = "--osc-port=" + std::to_string( sl_port_ );
+	char * port_arg = const_cast<char*>( s_port_arg.c_str() );
+	std::string s_jack_client_arg = "--jack-name=sl-" + name_;
+	char * jack_client_arg = const_cast<char*>( s_jack_client_arg.c_str() );
+	char *arg[] = { "sooperlooper", "--loopcount=0", "--discrete-io=no",
+		port_arg, jack_client_arg, NULL };
+	do {
+		sl_pid_ = fork();
+	} while ( ( sl_pid_ == -1 ) && ( errno == EAGAIN ) );
+
+	switch ( sl_pid_ )
+	{
+	case -1:
+		mainlog->info( "launching superlooper : Fork failed" );
+		break;
+	case 0:
+		if ( execv( "/usr/bin/sooperlooper", arg ) == -1 )
+		{
+			mainlog->info( "launching superlooper : execv failed" );
+			exit(EXIT_FAILURE);
+		}
+		break;
+	default:
+		mainlog->info( "launching superlooper pid {} on port {}", sl_pid_, sl_port_ );
+		break;
+	}
+}
+
+void SLBus::addClip( std::string path, int tn )
+{
+	auto mainlog = spdlog::get( "main" );	
+	mainlog->debug( "SLBus::addClip" );
+	std::shared_ptr<SLClip> clip( new SLClip( path ) );
+	addClip( clip );
+	mainlog->debug( "/SLBus::addClip" );
+}
+
+void SLBus::addClip( std::shared_ptr<Clip> clip )
+{
+	addClip( std::static_pointer_cast<SLClip>(clip) );
+}
+
+void SLBus::addClip( std::shared_ptr<SLClip> clip )
+{
+	clipset_.push_back( clip );
+	clip -> setParent( this );
+	Waiter::getInstance() -> selectClip( clip );
+}
+
+void SLBus::deleteClip( unsigned int i )
+{
+	std::shared_ptr<SLClip> clip = clipset_.at(i);
+	clipset_.erase (clipset_.begin() + i);
+}
+
+void SLBus::stopAll()
+{
+	for ( unsigned int i=0; i < clipset_.size(); i++ )
+		clipset_.at(i) -> stop();
+}
+		
+stk::StkFloat SLBus::tick() const
+{
+	register stk::StkFloat sample;
+
+	sample = 0;
+	for ( unsigned int j = 0; j < clipset_.size (); j++ )
+	{
+		sample += clipset_.at(j) -> tick();
+	}
+	return sample;
+}
+
+

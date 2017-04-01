@@ -15,7 +15,7 @@
 #include <string>
 #include <dirent.h>
 
-enum DataType { NONE, AUDIO, MIDI, OSC, COM };
+enum DataType { NONE, AUDIO, MIDI, OSC, COM, SL };
 
 std::string user_dir();
 

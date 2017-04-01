@@ -27,31 +27,32 @@ class Project
 {
 
 public:
-	Project (std::string str);
-	~Project ();
-	void updateRessources ();
-	inline std::string getName () { return name_; }
-	inline std::string getFile () { return file_; }
-	inline Clock * getClock () { return clock_; }
-	void tick ();
-	inline std::string getAudioDir () { return dir_ + "/Audio"; }
-	inline std::string getMidiDir () { return dir_ + "/MIDI"; }
-	void addAudioTrack (std::string s);
-	void addMidiTrack (std::string s);
-	void deleteTrack (unsigned int i);
-	void swapTracks (unsigned int i, unsigned int j);
-	inline unsigned int nTracks () { return tracks_.size (); }
-	inline std::shared_ptr<Track> getTrack (unsigned int i) { return tracks_[i]; }
-	void addAudioFile (std::string s);
-	inline std::vector<AudioFile *> * getAudioFiles () { return &audiofiles_; }
-	void addMidiFile (std::string s);
-	inline std::vector<MidiFile *> * getMidiFiles () { return &midifiles_; }
-	inline bool ctrlPressed () { return ctrl_; }
-	inline void ctrlDown () { ctrl_ = true; }
-	inline void ctrlUp () { ctrl_ = false; }
+	Project( std::string str );
+	~Project();
+	void updateRessources();
+	inline std::string getName() { return name_; }
+	inline std::string getFile() { return file_; }
+	inline Clock * getClock() { return clock_; }
+	void tick();
+	inline std::string getAudioDir() { return dir_ + "/Audio"; }
+	inline std::string getMidiDir() { return dir_ + "/MIDI"; }
+	void addAudioTrack( std::string );
+	void addMidiTrack( std::string );
+	void addSLBus( std::string );
+	void deleteTrack( unsigned int i );
+	void swapTracks( unsigned int i, unsigned int j );
+	inline unsigned int nTracks() { return tracks_.size(); }
+	inline std::shared_ptr<Track> getTrack( unsigned int i ) { return tracks_[i]; }
+	void addAudioFile( std::string s );
+	inline std::vector<AudioFile *> * getAudioFiles() { return &audiofiles_; }
+	void addMidiFile( std::string s );
+	inline std::vector<MidiFile *> * getMidiFiles() { return &midifiles_; }
+	inline bool ctrlPressed() { return ctrl_; }
+	inline void ctrlDown() { ctrl_ = true; }
+	inline void ctrlUp() { ctrl_ = false; }
 	
 	template<class Archive>
-	void serialize(Archive & archive)
+	void serialize( Archive & archive )
 	{
 		archive (
 			CEREAL_NVP(name_),

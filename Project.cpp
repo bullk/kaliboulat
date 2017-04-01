@@ -8,6 +8,7 @@
 #include "State.hpp"
 #include "AudioFile.hpp"
 #include "AudioTrack.hpp"
+#include "SLBus.hpp"
 #include "MidiFile.hpp"
 #include "MidiTrack.hpp"
 
@@ -102,17 +103,25 @@ void Project::updateRessources ()
 
 void Project::addAudioTrack ( std::string s )
 {
-	std::shared_ptr<Track> track (new AudioTrack(s));
-	tracks_.push_back (track);
-	State::getInstance()->setTrack(track);
+	std::shared_ptr<Track> track( new AudioTrack(s) );
+	tracks_.push_back( track );
+	State::getInstance()->setTrack( track );
 }
 
 void Project::addMidiTrack ( std::string s )
 {
-	std::shared_ptr<Track> track (new MidiTrack(s));
-	tracks_.push_back (track);
-	State::getInstance()->setTrack(track);
+	std::shared_ptr<Track> track( new MidiTrack(s) );
+	tracks_.push_back( track );
+	State::getInstance()->setTrack( track );
 }
+
+void Project::addSLBus( std::string s )
+{
+	std::shared_ptr<Track> track( new SLBus(s) );
+	tracks_.push_back( track );
+	State::getInstance()->setTrack( track );
+}
+
 
 void Project::deleteTrack (unsigned int i)
 {

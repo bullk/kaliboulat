@@ -15,13 +15,11 @@
 AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f)
 {
 	hue_ =  0.25f + (float)((rand() % 31) -15) / 100;
-	startSL();
 }
 
 AudioTrack::AudioTrack (std::string s, float h, float v, std::vector<std::shared_ptr<AudioClip>> cs) :
 	Track (AUDIO, "Audio", s, h), volume_(v), clipset_(cs)
 {
-	startSL();
 	for ( std::vector<std::shared_ptr<AudioClip>>::iterator it=clipset_.begin(); it<clipset_.end(); it++ )
 		(*it)->setParent( this );
 }
@@ -41,34 +39,6 @@ AudioTrack::~AudioTrack ()
 // Add a clip
 //------------
 
-void AudioTrack::startSL()
-{
-	auto mainlog = spdlog::get( "main" );	
-	sl_port_ = State::getInstance()->newOSCport();
-	char port_arg[32] = "";
-	sprintf( port_arg, "--osc-port=%u", sl_port_ );
-	char *arg[] = { "sooperlooper", "--loopcount=0", port_arg, NULL };
-	do {
-		sl_pid_ = fork();
-	} while ( (sl_pid_ == -1) && (errno == EAGAIN) );
-
-	switch (sl_pid_)
-	{
-	case -1:
-		mainlog->info( "launching superlooper : Fork failed" );
-		break;
-	case 0:
-		if ( execv( "/usr/bin/sooperlooper", arg ) == -1 )
-		{
-			mainlog->info( "launching superlooper : execv failed" );
-			exit(EXIT_FAILURE);
-		}
-		break;
-	default:
-		mainlog->info( "launching superlooper pid {} on port {}", sl_pid_, sl_port_ );
-		break;
-	}
-}
 
 void AudioTrack::addClip (std::string path, int tn)
 {
