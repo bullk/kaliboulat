@@ -13,7 +13,6 @@
 
 #include <typeinfo>  //for 'typeid' to work  
 
-class SLClip;
 
 class SLBus : public Track
 {

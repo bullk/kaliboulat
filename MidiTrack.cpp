@@ -8,7 +8,7 @@
 MidiTrack::MidiTrack( std::string name ) : Track( MIDI, "MIDI", name )
 {
 	//clipset_ = new std::vector<std::shared_ptr<MidiClip>>;
-	hue_ =  0.75f + (float)((rand() % 31) -15) / 100 ;
+	hue_ =  0.67f + (float)((rand() % 31) -15) / 100 ;
 }
 
 MidiTrack::MidiTrack( std::string s, float h, std::vector<std::shared_ptr<MidiClip>> cs ) :

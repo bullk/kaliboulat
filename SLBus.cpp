@@ -13,7 +13,7 @@
 // Constructor
 //-------------
 
-SLBus::SLBus( std::string s ) : Track( SL, "SooperLooper", s ), volume_(1.0f)
+SLBus::SLBus( std::string s ) : Track( AUDIO, "SooperLooper", s ), volume_(1.0f)
 {
 	hue_ =  1.0f + (float)((rand() % 31) -15) / 100;
 	hue_ -= ( hue_ >= 1.0f ); 
@@ -21,7 +21,7 @@ SLBus::SLBus( std::string s ) : Track( SL, "SooperLooper", s ), volume_(1.0f)
 }
 
 SLBus::SLBus( std::string s, float h, float v, std::vector<std::shared_ptr<SLClip>> cs ) :
-	Track( SL, "SooperLooper", s, h ), volume_(v), clipset_(cs)
+	Track( AUDIO, "SooperLooper", s, h ), volume_(v), clipset_(cs)
 {
 	startSL();
 	for ( std::vector<std::shared_ptr<SLClip>>::iterator it=clipset_.begin(); it<clipset_.end(); it++ )
