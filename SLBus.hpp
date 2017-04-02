@@ -3,15 +3,16 @@
 
 //#include <iostream> // cout, endl
 #include <vector>
-#include "SLClip.hpp"
-#include "Track.hpp"
+#include <typeinfo>  //for 'typeid' to work
 
+#include <lo/lo.h>
 #include <cereal/types/vector.hpp>
 //#include <cereal/archives/binary.hpp>
 #include <cereal/archives/xml.hpp>
 #include <cereal/types/polymorphic.hpp>
 
-#include <typeinfo>  //for 'typeid' to work  
+#include "SLClip.hpp"
+#include "Track.hpp"
 
 
 class SLBus : public Track
@@ -32,6 +33,8 @@ public:
 	inline unsigned int nClips() const { return clipset_.size(); }
 	void stopAll();
 	inline float * getVolume() { return &volume_; }
+	inline lo_address getSLTarget() { return sl_target_; }
+	void send2SL();
 	
 	template <class Archive>
 	void serialize(Archive & archive)
@@ -58,6 +61,7 @@ protected:
 	float volume_;
 	unsigned int sl_port_;
 	pid_t sl_pid_;
+	lo_address sl_target_;
 	std::vector<std::shared_ptr<SLClip>> clipset_;
 	void startSL();
 

@@ -57,7 +57,7 @@ Project.o: spdlog/spdlog.h Project.hpp Clock.hpp State.hpp AudioFile.hpp AudioTr
 RessourceFile.o: RessourceFile.hpp globals.hpp 
 Scheduled.o: Scheduled.hpp 
 SLBus.o: spdlog/spdlog.h State.hpp SLBus.hpp SLClip.hpp Track.hpp 
-SLClip.o: SLClip.hpp State.hpp Project.hpp Clip.hpp 
+SLClip.o: spdlog/spdlog.h SLClip.hpp SLBus.hpp State.hpp Project.hpp Clip.hpp 
 State.o: spdlog/spdlog.h globals.hpp State.hpp cereal/types/vector.hpp cereal/types/string.hpp 
 Track.o: spdlog/spdlog.h Track.hpp Clip.hpp 
 Waiter.o: spdlog/spdlog.h Waiter.hpp Project.hpp State.hpp Clock.hpp midi.hpp 

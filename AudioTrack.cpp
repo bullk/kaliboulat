@@ -14,7 +14,7 @@
 
 AudioTrack::AudioTrack (std::string s) : Track (AUDIO, "Audio", s), volume_(1.0f)
 {
-	hue_ =  0.33f + (float)((rand() % 31) -15) / 100;
+	hue_ =  0.33f + (float)((rand() % 21) -10) / 100;
 }
 
 AudioTrack::AudioTrack (std::string s, float h, float v, std::vector<std::shared_ptr<AudioClip>> cs) :

@@ -2,7 +2,7 @@
 /* Pour fork() */
 #include <unistd.h>
 #include <errno.h>
-#include <lo/lo.h>
+#include <stk/FileWvIn.h>
 #include "spdlog/spdlog.h"
 
 #include "State.hpp"
@@ -15,7 +15,7 @@
 
 SLBus::SLBus( std::string s ) : Track( AUDIO, "SooperLooper", s ), volume_(1.0f)
 {
-	hue_ =  1.0f + (float)((rand() % 31) -15) / 100;
+	hue_ =  1.0f + (float)((rand() % 21) -10) / 100;
 	hue_ -= ( hue_ >= 1.0f ); 
 	startSL();
 }
@@ -34,9 +34,10 @@ SLBus::SLBus( std::string s, float h, float v, std::vector<std::shared_ptr<SLCli
 
 SLBus::~SLBus()
 {
-	lo_address t = lo_address_new( NULL, std::to_string( sl_port_ ).c_str() );
-	if (lo_send(t, "/quit", "") == -1) {
-		printf("OSC error %d: %s\n", lo_address_errno(t), lo_address_errstr(t));
+	if ( lo_send( sl_target_, "/quit", "" ) == -1 ) {
+		spdlog::get( "main" )->error(
+			"OSC error {}: {}", lo_address_errno(sl_target_), lo_address_errstr(sl_target_)
+		);
 	}
 
 	while (clipset_.size())
@@ -52,6 +53,7 @@ void SLBus::startSL()
 {
 	auto mainlog = spdlog::get( "main" );	
 	sl_port_ = State::getInstance()->newOSCport();
+	sl_target_ = lo_address_new( NULL, std::to_string( sl_port_ ).c_str() );
 	std::string s_port_arg = "--osc-port=" + std::to_string( sl_port_ );
 	char * port_arg = const_cast<char*>( s_port_arg.c_str() );
 	std::string s_jack_client_arg = "--jack-name=sl-" + name_;
@@ -65,7 +67,7 @@ void SLBus::startSL()
 	switch ( sl_pid_ )
 	{
 	case -1:
-		mainlog->info( "launching superlooper : Fork failed" );
+		mainlog->error( "launching superlooper : Fork failed" );
 		break;
 	case 0:
 		if ( execv( "/usr/bin/sooperlooper", arg ) == -1 )
@@ -78,6 +80,15 @@ void SLBus::startSL()
 		mainlog->info( "launching superlooper pid {} on port {}", sl_pid_, sl_port_ );
 		break;
 	}
+}
+
+void SLBus::send2SL()
+{
+	//if ( lo_send( sl_target_, "/quit", "" ) == -1 ) {
+		//spdlog::get( "main" )->error(
+			//"OSC error {}: {}", lo_address_errno(sl_target_), lo_address_errstr(sl_target_)
+		//);
+	//}
 }
 
 void SLBus::addClip( std::string path, int tn )
@@ -96,9 +107,20 @@ void SLBus::addClip( std::shared_ptr<Clip> clip )
 
 void SLBus::addClip( std::shared_ptr<SLClip> clip )
 {
-	clipset_.push_back( clip );
-	clip -> setParent( this );
-	Waiter::getInstance() -> selectClip( clip );
+	stk::FileWvIn f( clip->getURI() );
+	
+	if ( lo_send( sl_target_, "/loop_add", "if", f.channelsOut(), 10.0f ) == -1 ) {
+		spdlog::get( "main" )->error(
+			"OSC error {}: {}", lo_address_errno(sl_target_), lo_address_errstr(sl_target_)
+		);
+	}
+	else {
+		clip->setParent( this );
+		clip->setSLid( clipset_.size() );
+		clip->SLload();
+		clipset_.push_back( clip );
+		Waiter::getInstance() -> selectClip( clip );
+	}
 }
 
 void SLBus::deleteClip( unsigned int i )

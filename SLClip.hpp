@@ -19,6 +19,9 @@ public:
 	SLClip (std::string);
 	SLClip (std::string, std::string, int, int, int, int, int, float, float, int);
 	~SLClip ();
+	inline void setSLid( int i ) { sl_id_ = i; }
+	void SLload();
+	inline std::string getURI() { return uri_; }
 	inline void rewind() {}
 	unsigned long getLength ();
 	stk::StkFloat getTime ();
@@ -54,8 +57,11 @@ public:
 	}
 	
 protected:    
+	std::string uri_;
+	int sl_id_;
 	float volume_;
-	
+	void send2SL( const char*, lo_message );
+	void SLload( std::string );
 };
 
 CEREAL_REGISTER_TYPE (SLClip)

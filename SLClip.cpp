@@ -1,4 +1,8 @@
+#include <lo/lo.h>
+#include "spdlog/spdlog.h"
+
 #include "SLClip.hpp"
+#include "SLBus.hpp"
 #include "State.hpp"
 #include "Project.hpp"
 
@@ -9,13 +13,13 @@
 SLClip::SLClip( std::string fname ) : Clip(), volume_(0.5f)
 {
 	data_type_ = AUDIO;
-	filename_ = name_from_path( fname );
+	uri_ = fname;
+	filename_ = name_from_path( uri_ );
 	int p = filename_.rfind( "." );
 	name_ = filename_.substr( 0, p );
 	launchstyle_ = LAUNCH_BAR;
 	stopstyle_ = STOP_FREE;
 	loopstyle_ = ONESHOT;
-	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
 }
 
 SLClip::SLClip
@@ -23,8 +27,8 @@ SLClip::SLClip
 	Clip(name, launch, stop, loop, amc, amk), volume_(vol)
 {
 	data_type_ = AUDIO;
-	filename_ = name_from_path( fname );
-	std::string uri = State::getProject()->getAudioDir() + "/" + filename_;
+	uri_ = fname;
+	filename_ = name_from_path( uri_ );
 }
 
 
@@ -37,6 +41,41 @@ SLClip::~SLClip()
 }
 
 //------------
+
+void SLClip::send2SL(const char* pathend, lo_message msg)
+{
+	auto mainlog = spdlog::get( "main" );
+	mainlog->info( "SLClip::send2SL");
+	lo_address target = ((SLBus*)parent_)->getSLTarget();
+	mainlog->info( "* address : {}", target);
+	std::string path = "/sl/" + std::to_string( sl_id_ ) + pathend;
+	mainlog->info( "* path : {}", path);
+	if ( lo_send_message( target, path.c_str(), msg ) == -1 ) {
+		mainlog->error(
+			"OSC error {}: {}", lo_address_errno(target), lo_address_errstr(target)
+		);
+	}
+	mainlog->info( "/SLClip::send2SL");
+}
+
+void SLClip::SLload()
+{
+	SLload( uri_ );
+}
+
+void SLClip::SLload( std::string path )
+{
+	auto mainlog = spdlog::get( "main" );
+	mainlog->info( "SLClip::SLload");
+	lo_message msg = lo_message_new();
+	lo_message_add( msg, "sss", path.c_str(), "osc.udp://localhost:7300", "/test");
+	//lo_message_add( msg, "sss", path.c_str(), "localhost:7300", "/test");
+	//mainlog->info( "* message : {}", msg);
+	lo_message_pp( msg );
+	send2SL( "/load_loop", msg );
+	mainlog->info( "/SLClip::SLload");
+}
+
 
 unsigned long SLClip::getLength () { return 0; }
 
