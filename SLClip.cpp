@@ -46,6 +46,7 @@ void SLClip::send2SL(const char* pathend, lo_message msg)
 {
 	auto mainlog = spdlog::get( "main" );
 	mainlog->info( "SLClip::send2SL");
+	lo_message_pp( msg );
 	lo_address target = ((SLBus*)parent_)->getSLTarget();
 	mainlog->info( "* address : {}", target);
 	std::string path = "/sl/" + std::to_string( sl_id_ ) + pathend;
@@ -68,14 +69,25 @@ void SLClip::SLload( std::string path )
 	auto mainlog = spdlog::get( "main" );
 	mainlog->info( "SLClip::SLload");
 	lo_message msg = lo_message_new();
-	lo_message_add( msg, "sss", path.c_str(), "osc.udp://localhost:7300", "/test");
+	lo_message_add( msg, "sss", path.c_str(), "osc.udp://localhost:7300", "/error");
 	//lo_message_add( msg, "sss", path.c_str(), "localhost:7300", "/test");
 	//mainlog->info( "* message : {}", msg);
-	lo_message_pp( msg );
 	send2SL( "/load_loop", msg );
 	mainlog->info( "/SLClip::SLload");
 }
 
+void SLClip::SLget( std::string control )
+{
+	auto mainlog = spdlog::get( "main" );
+	mainlog->info( "SLClip::SLget");
+	lo_message msg = lo_message_new();
+	mainlog->info( "* new OSC message");
+	std::string rpath = "/sl/" + ((SLBus*)parent_)->getName() + "/" + std::to_string(sl_id_);
+	mainlog->info( "* rpath : {}", rpath);
+	lo_message_add( msg, "sss", control.c_str(), "osc.udp://localhost:7300", rpath.c_str() );
+	send2SL( "/get", msg );
+	mainlog->info( "/SLClip::SLget");
+}
 
 unsigned long SLClip::getLength () { return 0; }
 

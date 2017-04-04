@@ -58,8 +58,9 @@ void SLBus::startSL()
 	char * port_arg = const_cast<char*>( s_port_arg.c_str() );
 	std::string s_jack_client_arg = "--jack-name=sl-" + name_;
 	char * jack_client_arg = const_cast<char*>( s_jack_client_arg.c_str() );
-	char *arg[] = { "sooperlooper", "--loopcount=0", "--discrete-io=no",
+	char *arg[] = { "sooperlooper", "--discrete-io=no", "--loopcount=0",
 		port_arg, jack_client_arg, NULL };
+	//char *arg[] = { "sooperlooper", "--loopcount=0", port_arg, jack_client_arg, NULL };
 	do {
 		sl_pid_ = fork();
 	} while ( ( sl_pid_ == -1 ) && ( errno == EAGAIN ) );
@@ -108,8 +109,9 @@ void SLBus::addClip( std::shared_ptr<Clip> clip )
 void SLBus::addClip( std::shared_ptr<SLClip> clip )
 {
 	stk::FileWvIn f( clip->getURI() );
+	float duration = f.getSize() / f.getFileRate();
 	
-	if ( lo_send( sl_target_, "/loop_add", "if", f.channelsOut(), 10.0f ) == -1 ) {
+	if ( lo_send( sl_target_, "/loop_add", "if", f.channelsOut(), duration ) == -1 ) {
 		spdlog::get( "main" )->error(
 			"OSC error {}: {}", lo_address_errno(sl_target_), lo_address_errstr(sl_target_)
 		);
@@ -117,9 +119,12 @@ void SLBus::addClip( std::shared_ptr<SLClip> clip )
 	else {
 		clip->setParent( this );
 		clip->setSLid( clipset_.size() );
+		clip->SLget( "state" );
+		sleep(1);
+		clip->SLget( "state" );
 		clip->SLload();
 		clipset_.push_back( clip );
-		Waiter::getInstance() -> selectClip( clip );
+		Waiter::getInstance()->selectClip( clip );
 	}
 }
 

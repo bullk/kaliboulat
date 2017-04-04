@@ -27,6 +27,7 @@ public:
 	stk::StkFloat getTime ();
 	float getProgress();
 	float * getVolume ();
+	void SLget( std::string );
 	//void setVolume (StkFloat);
 
 	template <class Archive>
