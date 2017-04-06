@@ -24,9 +24,6 @@
 
 ### Fonctionnalités
 
-* finir l'implémentation des Launch / Stop / Loop pour AudioClip
-  et l'adapter pour MidiClip
-* Navigation / Import de fichiers
 * Clip Warp
 * ajout multi-clips (ex : fichier MIDI multitracks entier)
 	

@@ -37,7 +37,7 @@ void audioClose (RtAudio * dac);
 // AUDIO FUNCTIONS
 //----------------------------------------------------------------------
 
-int tick( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+int audioProcess( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
 		 double streamTime, RtAudioStreamStatus status, void *dataPointer)
 {
 	register StkFloat * samples = (StkFloat *) outputBuffer;
@@ -86,7 +86,7 @@ void audioInit (RtAudio * dac)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &tick, (void *)NULL, &options ); }
+	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &audioProcess, (void *)NULL, &options ); }
 	catch ( RtAudioError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
@@ -176,8 +176,9 @@ int main( int argc, char* args[] )
 		#ifdef WITH_GUI
 			GUI_Main();
 		#endif
-		//usleep(500000 / State::getProject()->getClock()->getTicksPerBeat());
-		sleep(0);
+
+		usleep( 500000 / State::getProject()->getClock()->getTicksPerBeat() );
+		//sleep(0);
 	}
 	
 	state->shared();

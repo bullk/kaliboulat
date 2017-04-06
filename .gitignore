@@ -11,5 +11,6 @@ Kaliboulat-rtmidi2.0.1
 CMakeLists.txt
 imgui.ini
 wavrepair
+jacktest
 
 #GUI.*
