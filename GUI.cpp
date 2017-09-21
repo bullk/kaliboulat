@@ -698,7 +698,7 @@ void displayMidiClipDetails (std::shared_ptr<MidiClip> clip)
 
 void displayAudioClipDetails (std::shared_ptr<AudioClip> clip)
 {
-	ImGui::PushItemWidth(100);
+	ImGui::PushItemWidth(200);
 	//ImGui::TextColored(ImColor(255,255,0), "%s", clip->getName().c_str());
 	//ImGui::Text("Location : %s", clip->getFileName().c_str());
 	ImGui::Separator();
