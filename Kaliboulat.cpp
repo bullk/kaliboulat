@@ -21,6 +21,16 @@
 #include "GUI.hpp"
 #endif
 
+#define APP_NAME "Kaliboulat"
+#define AUDIO_MODULE_NAME "Kaliboulat | Audio"
+#define MIDIIN_MODULE_NAME "Kaliboulat | MIDI in"
+#define MIDIOUT_MODULE_NAME "Kaliboulat | MIDI out"
+#define APP_NAME "Kaliboulat"
+#define FILE_EXT ".kal"
+#define GLOBAL_SAMPLE_RATE 44100
+#define AUDIO_INPUTS 0
+#define AUDIO_OUTPUTS 2
+
 using namespace stk;
 using namespace std;
 
@@ -71,9 +81,14 @@ void audioInit (RtAudio * dac)
 	Stk::showWarnings (true);
 	
 	// Figure out how many bytes in an StkFloat and setup the RtAudio stream.
-	RtAudio::StreamParameters input_parameters;
-	input_parameters.deviceId = dac->getDefaultInputDevice ();
-	input_parameters.nChannels = AUDIO_INPUTS;
+	//RtAudio::StreamParameters *input_pp = NULL;
+
+	//if (AUDIO_INPUTS > 0) {
+		//RtAudio::StreamParameters input_parameters;
+		//input_parameters.deviceId = dac->getDefaultInputDevice ();
+		//input_parameters.nChannels = AUDIO_INPUTS;
+		//input_pp = &input_parameters;
+	//}
 	
 	RtAudio::StreamParameters output_parameters;
 	output_parameters.deviceId = dac->getDefaultOutputDevice ();
@@ -86,7 +101,8 @@ void audioInit (RtAudio * dac)
 	
 	unsigned int bufferFrames = RT_BUFFER_SIZE;
 
-	try { dac->openStream ( &output_parameters, &input_parameters, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &audioProcess, (void *)NULL, &options ); }
+
+	try { dac->openStream ( &output_parameters, NULL, format, (unsigned int)Stk::sampleRate(), &bufferFrames, &audioProcess, (void *)NULL, &options ); }
 	catch ( RtAudioError &error ) { error.printMessage (); }
 
 	try { dac->startStream (); }
